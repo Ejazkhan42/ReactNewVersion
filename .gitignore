@@ -2,6 +2,5 @@ node_modules/
 public/env.js
 .env
 .well-known/
-.main/
 .node_modules/
 .hataccess
