@@ -81,14 +81,14 @@ function Homepage() {
   }, []);
 
   const processChartData = (data) => {
-    const pieCounts = { pass: 0, fail: 0, running: 0 };
+    const pieCounts = { pass: 0, fail: 0, Running: 0 };
     data.forEach((item) => {
       pieCounts[item.test_status] += 1;
     });
     setPieData([
       { name: "Pass", value: pieCounts.pass },
       { name: "Fail", value: pieCounts.fail },
-      { name: "Running", value: pieCounts.running },
+      { name: "Running", value: pieCounts.Running },
     ]);
 
     // Aggregate line chart data
@@ -134,7 +134,7 @@ function Homepage() {
         return { color: "red", borderColor: "darkred" };
       case "pass":
         return { color: "green", borderColor: "darkgreen" };
-      case "running":
+      case "Running":
         return { color: "orange", borderColor: "darkorange" };
       default:
         return { color: "black", borderColor: "transparent" };
@@ -385,10 +385,20 @@ function Homepage() {
   };
 
 const sortedData = useMemo(() => {
-  return sortData(dashboardData.filter((data) =>
-    data.test_name.toLowerCase().includes(searchTerm.toLowerCase())
-  ));
-}, [dashboardData,orderBy,searchTerm,order]);
+  return sortData(
+    dashboardData.filter((data) => {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      // Check if test_name, _test_status, or id contains the searchTerm
+      const matchesTestName = data.test_name.toLowerCase().includes(lowerCaseSearchTerm);
+      const matchesTestStatus = data.test_status.toLowerCase().includes(lowerCaseSearchTerm);
+      const matchesId = data.id.toString().includes(lowerCaseSearchTerm); // Assuming id can be filtered too
+      
+      // Return true if any condition matches
+      return matchesTestName || matchesTestStatus || matchesId;
+    })
+  );
+}, [dashboardData, orderBy, searchTerm, order]);
+
 
   const slicedData = sortedData.slice(
     page * rowsPerPage,
@@ -404,9 +414,9 @@ const sortedData = useMemo(() => {
           <Item>
           <h3>Recent Run Test Case</h3>
            <TextField
-    autoFocus={Focus}
+            autoFocus={Focus}
               style={{ marginTop: "0px" }}
-              label="Search"
+              label="Search By Id, Name, Status"
               variant="outlined"
               value={searchTerm}
               onChange={handleSearchChange}
