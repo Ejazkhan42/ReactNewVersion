@@ -62,9 +62,11 @@ function Homepage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const headCells = [
-  { id: 'id', label: 'ID' },
+  { id: 'id', label: 'Job Id' },
   { id: 'test_name', label: 'Name' },
-  { id: 'start_time', label: 'Job Run' },
+  { id: 'video_url', label: 'Videos' },
+  { id: 'report', label: 'Excel' },
+  { id: 'start_time', label: 'Date' },
   { id: 'test_status', label: 'Status' },
 ];
 
@@ -450,7 +452,12 @@ const sortedData = useMemo(() => {
                   <TableCell>
                     {row.test_name}
                   </TableCell>
-                  
+                  <TableCell>
+                  <a href={row.Video}>Video</a>
+                  </TableCell>
+                  <TableCell>
+                  <a href="https://jenkins.doingerp.com/job/GFH/job/Test/job/Recruitment_Module_DB/50/artifact/target/results/latest/data_report_50.xlsx">Excel Report</a>
+                  </TableCell>
                   <TableCell>
                     {new Date(row.start_time).toLocaleDateString()}
                   </TableCell>
