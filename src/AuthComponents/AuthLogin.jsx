@@ -1,0 +1,228 @@
+
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { createTheme } from '@mui/material/styles';
+import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DescriptionIcon from '@mui/icons-material/Description';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import SchemaIcon from '@mui/icons-material/Schema';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import FenceIcon from '@mui/icons-material/Fence';
+import AirIcon from '@mui/icons-material/Air';
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
+import AdsClickIcon from '@mui/icons-material/AdsClick';
+import DataObjectIcon from '@mui/icons-material/DataObject';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import ManageAccountsSharpIcon from '@mui/icons-material/ManageAccountsSharp';
+import ModelTrainingSharpIcon from '@mui/icons-material/ModelTrainingSharp';
+import CasesSharpIcon from '@mui/icons-material/CasesSharp';
+import ListIcon from '@mui/icons-material/List';
+import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt"
+import useScrollTrigger from '@mui/material/useScrollTrigger';
+import Fab from '@mui/material/Fab';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Fade from '@mui/material/Fade';
+import Box from '@mui/material/Box';
+
+
+import Login from "./../pages/Login";
+import Signup from "./../pages/Signup";
+import './Styles/loadingPage.css';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
+import { Link, useLocation } from 'react-router-dom';
+import { base } from '../config';
+
+const API_URL=base(window.env.AP)
+
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: '#F9F9FE',
+          paper: '#EEEEF9',
+        },
+      },
+    },
+    dark: {
+      palette: {
+        background: {
+          default: '#2A4364',
+          paper: '#112E4D',
+        },
+      },
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
+
+const iconMapping = {
+  "DashboardIcon": <DashboardIcon/>,
+  "ShoppingCartIcon": <ShoppingCartIcon/>,
+  "DescriptionIcon": <DescriptionIcon/>,
+  "AdminPanelSettingsIcon":<AdminPanelSettingsIcon/>,
+  "SupervisorAccountIcon":<SupervisorAccountIcon/>,
+  "SchemaIcon":<SchemaIcon/>,
+  "ViewModuleIcon":<ViewModuleIcon/>,
+  "ApartmentIcon":<ApartmentIcon/>,
+  "FenceIcon":<FenceIcon/>,
+  "AirIcon":<AirIcon/>,
+  "EmojiObjectsIcon":<EmojiObjectsIcon/>,
+  "AdsClickIcon":<AdsClickIcon/>,
+  "DataObjectIcon":<DataObjectIcon/>,
+  "SupportAgentIcon":<SupportAgentIcon/>,
+  "ListIcon":<ListIcon/>,
+  "ManageAccountsSharpIcon":<ManageAccountsSharpIcon/>,
+  "CasesSharpIcon":<CasesSharpIcon/>,
+  "ModelTrainingSharpIcon":<ModelTrainingSharpIcon/>,
+  "AppSettingsAltIcon":<AppSettingsAltIcon/>,
+};
+
+
+function ScrollTop(props) {
+  const { children, window } = props;
+  const trigger = useScrollTrigger({
+    target: window ? window() : undefined,
+    disableHysteresis: true,
+    threshold: 10,
+  });
+
+const handleClick = () => {
+    const scrollWindow = window || globalThis || document; // Fallback to global context if window is undefined
+    if (scrollWindow.scrollTo) {
+      scrollWindow.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return (
+    <Fade in={trigger}>
+      <Box
+        onClick={handleClick}
+        role="presentation"
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+      >
+        {children}
+      </Box>
+    </Fade>
+  );
+}
+
+
+
+
+
+const logout = () => {
+  axios
+    .get(`${API_URL}/logout`, { withCredentials: true })
+    .then((res) => {
+      if (res.data === "success") {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/login";
+      }
+    });
+};
+export const AuthLoginInfo = createContext({});
+
+export function AuthLogin(props) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [Menu, setMenu] = useState(null);
+  const [session, setSession] = useState(null);
+
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setSession({
+        user: {
+          name: parsedUser.FirstName,
+          email: parsedUser.Email,
+          image: 'https://avatars.githubusercontent.com/u/19550456',
+        }
+      });
+    }
+
+    const storedMenu = sessionStorage.getItem("menu");
+    if (storedMenu) {
+      setMenu(JSON.parse(storedMenu));
+    }
+  },[]);
+  const NAVIGATION = Menu?.map((item) => {
+    return {
+      segment: item.link,
+      title: item.title,
+      icon: iconMapping[item.icon] || null, 
+    };
+  }).filter((item) => item.title);
+
+
+  const authentication = {
+    signIn: () => {
+      return session;
+    },
+    signOut: () => {
+      setSession(null);
+      setLoading(true)
+      logout();
+    },
+  };
+  const isLoginPage =sessionStorage.getItem('user')? false : true;
+  const isSignupPage=location.pathname==='/signup'
+  return (
+    <AuthLoginInfo.Provider value={user}>
+      <SessionContext.Provider value={session}>
+        {!isLoginPage && (
+          <AppProvider
+            id="backToHome"
+            navigation={NAVIGATION}
+            theme={demoTheme}
+            session={session}
+            authentication={authentication}
+            branding={{
+              logo: (
+                <img
+                  src="https://doingerp.com/wp-content/uploads/2023/11/New-Project-1-1.png"
+                  alt="MUI logo"
+                />
+              ),
+              title: '',
+            }}
+          >
+            <DashboardLayout>{props.children}</DashboardLayout>
+        <ScrollTop>
+        <Fab size="small" aria-label="scroll back to top">
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </ScrollTop>
+          </AppProvider>
+        )}
+       {isLoginPage && !isSignupPage && <Login />}
+      
+      {/* Render the signup page if the current path is '/signup' */}
+      {isSignupPage && <Signup />}
+      </SessionContext.Provider>
+    </AuthLoginInfo.Provider>
+  );
+};

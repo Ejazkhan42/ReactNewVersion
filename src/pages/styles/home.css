@@ -1,0 +1,56 @@
+.btn {
+    display: block;
+    position: relative;
+    width: 200px;
+    height: 60px;
+    background: #393E46;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, .3);
+    border-radius: 10px;
+    line-height: 55px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5%;
+    font-size: 1.2rem;
+  }
+  
+  .btn::before {
+    display: block;
+    position: absolute;
+    z-index: -1;
+    width: 200px;
+    height: 60px;
+    border-radius: 10px;
+    background: black;
+    opacity: 0;
+    content: '';
+    animation: pulse 1s infinite;
+  }
+  
+  .btn:hover::before {
+    animation: none;
+    opacity: .4;
+    transform: scale(1.3);
+    color: white;
+  }
+  
+  .btn.is-clicked {
+    background: #00ADB5;
+  }
+  
+  .btn.is-clicked::before {
+    animation: blastOut 1s;
+  }
+  
+  @keyframes pulse {
+    from {
+      transform: scale(1);
+      opacity: .4;
+    }
+    to {
+      transform: scale(1.3);
+      opacity: 0;
+    }
+  }

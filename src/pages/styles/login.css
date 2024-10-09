@@ -1,0 +1,71 @@
+/* login.css */
+/*label{*/
+/*    font-size: 1.2remrem;*/
+/*  }*/
+  
+  .sign-in-button{
+    background: #333;
+  }
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    /* height: 100vh; */
+  }
+  
+  .login-header {
+    background-color: #333; /* Dark background */
+    color: #fff;
+    padding: 40px 20px;
+    text-align: center;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center
+  }
+  
+  .login-title, .login-subtitle {
+    font-size: 1.2remrem;
+  }
+  
+  .login-content {
+    flex-grow: 1;
+    /* background-color: #f3f4f6; */
+    display: flex;
+    /* justify-content: center; */
+    /* align-items: center; */
+  }
+  
+  .login-paper {
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 5%;
+    /* background-color: #fff; */
+  }
+  
+  .forgot-password {
+    color: #1976d2;
+    cursor: pointer;
+  }
+  
+  .sign-in-button {
+    height: 50px;
+    font-size: 1.2remrem;
+    width: 100%;
+  }
+  
+  /*.MuiFormControl-root {*/
+  /*  margin-top: 20px;*/
+  /*}*/
+  
+  @media (max-width: 600px) {
+    .login-title, .login-subtitle {
+      font-size: 1.2rem;
+    }
+  
+    .sign-in-button {
+      font-size: 1.2rem;
+    }
+  }
+  
