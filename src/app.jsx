@@ -15,7 +15,8 @@ import Progress from "./pages/Progress"
 import Signup from "./pages/Signup"
 import AdminPanel from "./pages/AdminPanel"
 import { PageContainer } from '@toolpad/core';
-// import db from "./database/db"
+import Worklist from "./pages/worklist"
+
 
 
 const AppRoutes = () => {
@@ -27,7 +28,6 @@ const AppRoutes = () => {
    
     const title = segment.map(seg => seg.charAt(0).toUpperCase() + seg.slice(1)).join(' / ');
     const newBreadcrumb = { title, path };
-    console.log(newBreadcrumb)
     setBreadCrumbs((prev) => {
       const exists = prev.find(breadcrumb => breadcrumb.path === newBreadcrumb.path);
       return exists ? prev : [...prev, newBreadcrumb];
@@ -59,9 +59,9 @@ const AppRoutes = () => {
         path="/instances" 
         element={
           <PrivateRoute>
-            <PageContainer title="Instance"breadCrumbs={breadCrumbs}/>
+            <PageContainer title="Instance"breadCrumbs={breadCrumbs}>
               <Instance />
-            
+             </PageContainer>
           </PrivateRoute>
         } 
       />
@@ -111,6 +111,16 @@ const AppRoutes = () => {
           <PrivateRoute>
             <PageContainer title="Progress" breadCrumbs={breadCrumbs}>
               <Progress />
+            </PageContainer>
+          </PrivateRoute>
+        } 
+      />
+     <Route 
+        path="/worklist" 
+        element={
+          <PrivateRoute>
+            <PageContainer title="WorkList" breadCrumbs={breadCrumbs}>
+              <Worklist />
             </PageContainer>
           </PrivateRoute>
         } 
@@ -166,8 +176,6 @@ const AppRoutes = () => {
 };
 
 function App() {
-    // const [rows] = await db.query("SELECT 1 + 1 AS result");
-    // console.log("Test query result:", rows);//   const ctx = useContext(AuthLoginInfo);
 
   return (
     <BrowserRouter>

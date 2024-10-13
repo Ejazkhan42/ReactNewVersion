@@ -33,6 +33,7 @@ import * as XLSX from 'xlsx';
 import { v4 as uuid } from 'uuid';
 import { base } from '../config';
 const API_URL=base(window.env.AP)
+const VIDEO_URL=base(window.env.VU)
 
 let JOBNAME;
 
@@ -83,6 +84,7 @@ const VisuallyHiddenImageInput = styled('input')({
 const TestCasePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const ctx = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
   const { moduleId, JOB } = location.state || {};
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
@@ -107,8 +109,10 @@ const TestCasePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [error, seterror] = useState('')
+  let envvairable= JSON.parse(localStorage.getItem('env'))
+  console.log(envvairable)
   useEffect(() => {
-    let env = JSON.parse(localStorage.getItem('env'))
+     env = JSON.parse(localStorage.getItem('env'))
 
     if (env == undefined || env == '') {
       const fetchClients = async () => {
@@ -155,7 +159,7 @@ const TestCasePage = () => {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
     setSearchTerm(event.target.value);
-    setCurrentPage(0); // Reset to the first page on new search
+    setCurrentPage(0);
   };
 
   const filteredTestCases = testCases.filter((testCase) =>
@@ -233,6 +237,9 @@ const TestCasePage = () => {
     formData.append('TestCase', testCaseList.join(','));
     formData.append('GridMode', gridMode);
     formData.append('Browsers', selectedBrowser);
+    formData.append('Username',ctx.username)
+    formData.append('VIDEO_URL',VIDEO_URL)
+    formData.append('API',API_URL)
 
     if (localStorage.getItem('Token') !== null) {
       formData.append('Token', localStorage.getItem('Token'));
@@ -324,9 +331,20 @@ const TestCasePage = () => {
               color="primary"
               onClick={handleRunClick}
               disabled={selectedTestCases.length === 0}
-              sx={{ backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+              sx={{margin:"3px", backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
               Run
+            </Button>
+            <Button
+            style={{ fontSize: '0.5em' }}
+              variant="contained"
+              color="primary"
+              href=
+              {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Sample`}
+              
+              sx={{margin:"3px",  backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+            >
+               Dowload Test Template
             </Button>
           </Grid>
 

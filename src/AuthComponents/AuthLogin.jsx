@@ -1,4 +1,6 @@
+'use client';
 
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { createTheme } from '@mui/material/styles';
 import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
@@ -27,15 +29,20 @@ import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fade from '@mui/material/Fade';
 import Box from '@mui/material/Box';
-
-
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import { ToastContainer, toast } from 'react-toastify';
 import Login from "./../pages/Login";
 import Signup from "./../pages/Signup";
 import './Styles/loadingPage.css';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useEffect, useMemo, useState, useRef} from 'react';
 import axios from 'axios';
 import { Link, useLocation } from 'react-router-dom';
 import { base } from '../config';
+import Notifications from './Notifications';
+
+import wavFile from './notification.wav';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_URL=base(window.env.AP)
 
@@ -104,7 +111,7 @@ function ScrollTop(props) {
   });
 
 const handleClick = () => {
-    const scrollWindow = window || globalThis || document; // Fallback to global context if window is undefined
+    const scrollWindow = window || globalThis || document;
     if (scrollWindow.scrollTo) {
       scrollWindow.scrollTo({
         top: 0,
@@ -150,6 +157,8 @@ export function AuthLogin(props) {
   const [session, setSession] = useState(null);
 
 
+
+
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
@@ -188,12 +197,18 @@ export function AuthLogin(props) {
       logout();
     },
   };
+  const isLoggedIn = Boolean(user?.username); // Check if user is logged in
+
   const isLoginPage =sessionStorage.getItem('user')? false : true;
   const isSignupPage=location.pathname==='/signup'
   return (
     <AuthLoginInfo.Provider value={user}>
+  
       <SessionContext.Provider value={session}>
+
         {!isLoginPage && (
+        
+
           <AppProvider
             id="backToHome"
             navigation={NAVIGATION}
@@ -210,18 +225,29 @@ export function AuthLogin(props) {
               title: '',
             }}
           >
-            <DashboardLayout>{props.children}</DashboardLayout>
+
+     
+
+        <DashboardLayout slots={{ toolbarActions: Notifications}}>
+      
+
+        {props.children}
+
+        </DashboardLayout>
+
         <ScrollTop>
         <Fab size="small" aria-label="scroll back to top">
           <KeyboardArrowUpIcon />
         </Fab>
       </ScrollTop>
-          </AppProvider>
+      
+      </AppProvider>
         )}
        {isLoginPage && !isSignupPage && <Login />}
       
       {/* Render the signup page if the current path is '/signup' */}
       {isSignupPage && <Signup />}
+      
       </SessionContext.Provider>
     </AuthLoginInfo.Provider>
   );

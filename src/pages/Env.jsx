@@ -41,11 +41,10 @@ const EnvPage = () => {
                 >
                   <TableCell style={{ fontSize: '1.2rem', width: '60px', textAlign: 'center' }}>
                     <IconButton>
-                      {/* Display a unique icon based on environment */}
                       <DeviceHubIcon color="primary" style={{ fontSize: '1.2rem' }} />
                     </IconButton>
                   </TableCell>
-                  <TableCell style={{ fontSize: '1.2rem' }}>{env.envName}</TableCell>
+                  <TableCell  style={{ fontSize: '1.2rem' }}>{env.envName}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

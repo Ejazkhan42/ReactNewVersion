@@ -14,6 +14,7 @@ import {
   Cell,
 } from "recharts";
 import {
+  Button,
   TableCell,
   TextField,
   TableContainer,
@@ -31,6 +32,10 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import PaymentsRoundedIcon from "@mui/icons-material/PaymentsRounded";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import IconButton from '@mui/material/IconButton';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
+
 import { AuthLoginInfo } from "../AuthComponents/AuthLogin";
 import Grid from '@mui/material/Grid2';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -42,7 +47,6 @@ import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fade from '@mui/material/Fade';
-
 import { base } from '../config';
 const API_URL=base(window.env.AP)
 
@@ -50,11 +54,11 @@ const API_URL=base(window.env.AP)
 
 
 function Homepage() {
-  const [data,setdata]=useState(true)    
+  const ctx = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
+  const [data,setdata]=useState(true)
   const [Focus, setFocus] = useState(false);
-
-  const [order, setOrder] = useState('desc'); // Sort direction
-  const [orderBy, setOrderBy] = useState('test_status'); // Column to sort by
+  const [order, setOrder] = useState('desc'); 
+  const [orderBy, setOrderBy] = useState('start_time'); 
   const [dashboardData, setDashboardData] = useState([]);
   const [pieData, setPieData] = useState([]);
   const [lineData, setLineData] = useState([]);
@@ -72,15 +76,16 @@ function Homepage() {
 
   useEffect(() => {
     axios
-      .get(`${API_URL}/getlogs`, { withCredentials: true })
+      .get(`${API_URL}/getlogs?user=${ctx.username}`, { withCredentials: true })
       .then((res) => {
         if (res.data) {
           setDashboardData(res.data);
           processChartData(res.data);
-        //   setdata(false)
         }
       });
   }, []);
+  
+  
 
   const processChartData = (data) => {
     const pieCounts = { pass: 0, fail: 0, Running: 0 };
@@ -171,16 +176,10 @@ function Homepage() {
     });
   };
  
-
  
  
  
- 
-
-
-  
-
-  function ButtonComponent() {
+function ButtonComponent() {
     const [isClicked, setIsClicked] = useState(false);
     const navigate = useNavigate();
 
@@ -209,12 +208,11 @@ function Homepage() {
       >
         Run Test Case
       </a>
+
       </Container>
 
     );
   }
-
-
 
   const TopPanel = () => {
     return (
@@ -390,12 +388,9 @@ const sortedData = useMemo(() => {
   return sortData(
     dashboardData.filter((data) => {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
-      // Check if test_name, _test_status, or id contains the searchTerm
       const matchesTestName = data.test_name.toLowerCase().includes(lowerCaseSearchTerm);
       const matchesTestStatus = data.test_status.toLowerCase().includes(lowerCaseSearchTerm);
-      const matchesId = data.id.toString().includes(lowerCaseSearchTerm); // Assuming id can be filtered too
-      
-      // Return true if any condition matches
+      const matchesId = data.id.toString().includes(lowerCaseSearchTerm); 
       return matchesTestName || matchesTestStatus || matchesId;
     })
   );
@@ -407,6 +402,7 @@ const sortedData = useMemo(() => {
     page * rowsPerPage + rowsPerPage
   );
 
+// ${API_URL}/download?path=${Jenkins_Path}&build=${row.build}`
   const TableComponent = () => {
     
     return (
@@ -453,10 +449,11 @@ const sortedData = useMemo(() => {
                     {row.test_name}
                   </TableCell>
                   <TableCell>
-                  <a href={row.Video}>Video</a>
+                  <Button variant="contained" style={{ fontSize: '0.5em' }} href={row.Video} startIcon={<PlayCircleOutlineIcon />}> Video
+                  </Button>
                   </TableCell>
                   <TableCell>
-                  <a href="https://jenkins.doingerp.com/job/GFH/job/Test/job/Recruitment_Module_DB/50/artifact/target/results/latest/data_report_50.xlsx">Excel Report</a>
+                  <Button variant="contained"  style={{ fontSize: '0.5em' }} href={`${API_URL}/download?path=${row.jenkinsPath}&build=${row.build}`} startIcon={<DriveFileMoveIcon/>}>Excel Report</Button>
                   </TableCell>
                   <TableCell>
                     {new Date(row.start_time).toLocaleDateString()}

@@ -15,10 +15,12 @@ import {
   Button,
   TablePagination,
   InputLabel,
+  CircularProgress
 } from "@mui/material";
 import VncScreen from "./Browser";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
+import Grid from '@mui/material/Grid2';
 import { useLocation } from "react-router-dom";
 import { base } from '../config';
 const API_URL=base(window.env.AP)
@@ -147,6 +149,7 @@ const DataSetTable = ({ excelData }) => {
 
 const ResponsivePage = () => {
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
   const { excelData } = location.state || { excelData: [] };
   const [getSession,setSesssion]=useState(false)
   const [sessionIds, setSessionIds] = useState([]);
@@ -169,7 +172,6 @@ const ResponsivePage = () => {
       .catch((error) => {
         console.error("Error fetching session IDs:", error);
       });
-      setSesssion(false)
   },[getSession]);
 
   const handleConnect = () => {
@@ -182,13 +184,32 @@ const ResponsivePage = () => {
   const handleDisconnect = () => {
     setSelectedSession(null);
     setVncConnectionStatus("disconnected");
-    setSesssion(true);
+    setSesssion(true)
   };
 
   const handleSessionChange = (event) => {
+    setLoading(false)
     setSelectedSession(event.target.value)
-    setSesssion(true);
+    
   };
+const handleDropdownOpen = () => {
+    setLoading(true)
+  axios
+      .get(`${API_URL}/getBrowserId`)
+      .then((res) => {
+
+        if (res.data.token==localStorage.getItem('Token')) {
+          setSessionIds([res.data]);
+        } else {
+          console.error("Invalid response format:", res.data);
+        
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching session IDs:", error);
+      });
+      setLoading(false)
+};
 
   const getMarginBottom = () => {
     switch (vncConnectionStatus) {
@@ -206,74 +227,82 @@ const ResponsivePage = () => {
   return (
     <Container>
      <Box sx={{
-    display: 'grid',
-    columnGap: 1,
-    rowGap: 1,
-    gridTemplateColumns: 'repeat(1, 1fr)',
-  }}>
-    <Item>
-    <InputLabel id="demo-multiple-checkbox-label" sx={{fontSize: "1.2rem"}}>
+        display: 'grid',
+        columnGap: 1,
+        rowGap: 1,
+        gridTemplateColumns: 'repeat(1, 1fr)',
+        }}>
+  <Grid>
+        <Grid>
+            <InputLabel id="demo-multiple-checkbox-label" sx={{fontSize: "1.2rem"}}>
         Select Session
-      </InputLabel>
-      <Select
-        value={selectedSession}
-        onChange={handleSessionChange}
-        displayEmpty
-        fullWidth
-        variant="outlined"
-        disabled={
+            </InputLabel>
+        <Select
+            value={selectedSession}
+            onChange={handleSessionChange}
+            onOpen={handleDropdownOpen}
+            displayEmpty
+            fullWidth
+            variant="outlined"
+            disabled={
           vncConnectionStatus === "connecting" ||
           vncConnectionStatus === "connected"
-        }
+            }
       >
-        <MenuItem value="" disabled>
-          Select Session ID
-        </MenuItem>
-        {sessionIds.map((session) => (
-          <MenuItem key={session.browserId} value={session.browserId}>
-            {session.testcase}
-          </MenuItem>
-        ))}
-      </Select>
-    </Item>
-    <Item>
-    <Button
-          sx={{ ml: 2, fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
-          onClick={handleConnect}
-          disabled={
-            vncConnectionStatus === "connecting" ||
-            vncConnectionStatus === "connected"
+        {loading ? (
+              <MenuItem disabled>
+                    <CircularProgress size={24} style={{ marginRight: '10px' }} />
+                    Session ID
+              </MenuItem>
+            ) : (
+              sessionIds.map((session) => (
+                <MenuItem key={session.browserId} value={session.browserId}>
+                  {session.testcase}
+                </MenuItem>
+              ))
+            )}
+          </Select>
+    </Grid>
+    <Grid>
+        <Button
+            sx={{ ml: 2, fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
+                 onClick={handleConnect}
+             disabled={
+                     vncConnectionStatus === "connecting" ||
+                     vncConnectionStatus === "connected"
           }
         >
           LIVE VIEW
         </Button>
-        <Button
-          style={{ marginLeft: "10px" }}
-          variant="outlined"
-          sx={{ ml: 2, fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
-          onClick={handleDisconnect}
-          disabled={vncConnectionStatus === "disconnected"}
+             <Button
+            style={{ marginLeft: "10px" }}
+            variant="outlined"
+            sx={{ ml: 2, fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
+            onClick={handleDisconnect}
+            disabled={vncConnectionStatus === "disconnected"}
         >
           Disconnect
         </Button>
-    </Item>
+    </Grid>
     {/* I want change marginButton on vncConnectionStatus==connecting margin 50% ==connected margin 4%  */}
-    <Item sx={{height:"100%",maxHeight:"638px",marginBottom:getMarginBottom()}}>
+    <Grid sx={{height:"100%",maxHeight:"638px",marginBottom:getMarginBottom()}}>
     {selectedSession && (
         <VncScreen
           session={selectedSession}
           onUpdateState={setVncConnectionStatus}
         />
       )}
-    </Item>
-    <Item sx={{with:"70%",maxWidth:"1200px"}}>
+    </Grid>
+    <Grid sx={{with:"70%",maxWidth:"1200px"}}>
+    </Grid>
+    
     <StyledPaper>
     <Typography variant="h6" gutterBottom>
       Data Set
     </Typography>
     <DataSetTable excelData={excelData} />
   </StyledPaper>
-    </Item>
+    </Grid>
 
      </Box>
     </Container>
