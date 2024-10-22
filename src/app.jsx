@@ -16,7 +16,7 @@ import Signup from "./pages/Signup"
 import AdminPanel from "./pages/AdminPanel"
 import { PageContainer } from '@toolpad/core';
 import Worklist from "./pages/worklist"
-
+// import test from "./Components/AdminPanelComponents/Note"
 
 
 const AppRoutes = () => {
@@ -171,6 +171,7 @@ const AppRoutes = () => {
           </LoginRoute>
         } 
       />
+       
     </Routes>
   );
 };

@@ -8,10 +8,8 @@ import { StyledEngineProvider } from '@mui/material/styles';
 
 createRoot(document.querySelector("#root")).render(
       <StyledEngineProvider injectFirst>
-      <React.StrictMode>
         <AuthLogin>
         <App />
         </AuthLogin>
-        </React.StrictMode>
       </StyledEngineProvider>
   );

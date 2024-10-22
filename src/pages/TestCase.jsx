@@ -314,18 +314,17 @@ const TestCasePage = () => {
     <Container>
       <StyledPaper>
         <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 4, sm: 4, md: 4 }}>
-          <Grid size={1} sx={{}}>
-            <Typography variant="h5" component="h2" gutterBottom>
-              Test Cases
-            </Typography>
-          </Grid>
-          <Grid size={1} sx={{
+
+          <Grid size={4} sx={{
             alignItems: "center",
             display: "inline-flex",
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
             alignItems: "stretch",
             height: "53px",
           }}>
+         <Typography variant="h5" component="h5" gutterBottom>
+              Test Cases
+            </Typography>
             <Button
               variant="contained"
               color="primary"
@@ -346,10 +345,7 @@ const TestCasePage = () => {
             >
                Dowload Test Template
             </Button>
-          </Grid>
-
-          <Grid size={2} sx={{}}>
-
+            
             <TextField
               style={{ marginTop: "0px" }}
               label="Search Test Cases"
@@ -359,6 +355,8 @@ const TestCasePage = () => {
               fullWidth
             />
           </Grid>
+
+
           <Grid size={{ xs: 4, sm: 4, md: 4 }}>
             <TableContainer sx={{ maxHeight: 500 }} component={Paper}>
               <Table stickyHeader aria-label="sticky table">
