@@ -13,7 +13,6 @@ header("Content-Type: application/javascript");
 
 // Encode the values and output them
 $apiUrl = base64_encode($ini['API_URL']);
-$buUrl = base64_encode($ini['BU_URL']);
 $vncPass = base64_encode($ini['VNC_PASS']);
 $vncUrl = base64_encode($ini['VNC_URL']);
 
