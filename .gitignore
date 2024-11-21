@@ -1,5 +1,4 @@
 node_modules/
-build/
 public/env.js
 .env
 .well-known/
