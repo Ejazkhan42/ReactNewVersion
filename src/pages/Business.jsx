@@ -1,28 +1,37 @@
-import React from "react";
-import { Container, Box } from "@mui/material";
-import { useLocation  } from "react-router-dom";
-import Grid from '@mui/material/Grid2';
-import { base } from "../config";
-const BU_URL=base(window.env.BU)
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import FlowPage from './Business/flows'; 
+import ComponentPage from './Business/components';
+import Testcase from './Business/testcases';
+import ObjectsPage from './Business/objects';
+import ScenarioManager from './Business/scenario_manager';
+import Cammands from './Business/cammand';
+import Types from './Business/object_type';
+import Modules from './Business/modules';
+
 export default function Business() {
-    const location = useLocation();
-    const path = location.pathname.replace('/business', ''); 
-    const SRC_URL=BU_URL+"#"+path
-    console.log(SRC_URL)
-    return (
-        <Container maxWidth="md" style={{ display: "flex", justifyContent: "center", alignItems: "center" , marginLeft:"26%" }}>
-            <Box>
-            <Grid>
-                <iframe 
-                    title="Business App"
-                    width="1300" 
-                    height="700" 
-                    frameBorder="0" 
-                    allow="clipboard-write;camera;geolocation;fullscreen" 
-                    src={SRC_URL}
-                ></iframe>
-            </Grid>
-            </Box>
-        </Container>
-    );
+  const location = useLocation();  // Hook to get the current location
+  const path = location.pathname.replace('/business', ''); // Remove /business from the path
+  const SRC_URL = path;
+
+  switch (SRC_URL) {
+    case "/scenario":
+      return <ScenarioManager />;
+    case "/manager":
+      return <FlowPage />;
+    case "/components":
+      return <ComponentPage />;
+    case "/testcase":
+      return <Testcase />;
+    case "/objects":
+      return <ObjectsPage />;
+    case "/command":
+      return <Cammands />;
+    case "/types":
+      return <Types />;
+    case "/module":
+      return <Modules />;
+    default:
+      return <div>Page not found</div>; // Default case to handle undefined paths
+  }
 }

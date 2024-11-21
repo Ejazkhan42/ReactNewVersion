@@ -178,14 +178,29 @@ export function AuthLogin(props) {
       setMenu(JSON.parse(storedMenu));
     }
   },[]);
-  const NAVIGATION = Menu?.map((item) => {
-    return {
-      segment: item.link,
-      title: item.title,
-      icon: iconMapping[item.icon] || null, 
-    };
-  }).filter((item) => item.title);
+ 
 
+ const NAVIGATION = Menu? Menu:[]
+const updatedNavigation = NAVIGATION?.map(item => {
+  // If the item has a string 'icon', replace it with the corresponding JSX element
+  if (typeof item.icon === 'string' && iconMapping[item.icon]) {
+    item.icon = iconMapping[item.icon];
+  }
+  // Parse children if it is a JSON string 
+  if (item.children && typeof item.children === 'string') { item.children = JSON.parse(item.children); }
+
+  // If children exist, update their icons too
+  if (Array.isArray(item.children)) {
+      
+    item.children = item.children.map(child => {
+      if (typeof child.icon === 'string' && iconMapping[child.icon]) {
+        child.icon = iconMapping[child.icon];
+      }
+      return child;
+    });
+  }
+  return item;
+});
 
   const authentication = {
     signIn: () => {

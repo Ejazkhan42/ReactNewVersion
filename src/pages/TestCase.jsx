@@ -110,7 +110,6 @@ const TestCasePage = () => {
   const [data, setData] = useState([]);
   const [error, seterror] = useState('')
   let envvairable= JSON.parse(localStorage.getItem('env'))
-  console.log(envvairable)
   useEffect(() => {
      env = JSON.parse(localStorage.getItem('env'))
 

@@ -26,6 +26,7 @@ import {
   Paper,
   TablePagination,
   Container,
+  Link,
 } from "@mui/material";
 import LibraryBooksRoundedIcon from "@mui/icons-material/LibraryBooksRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
@@ -35,7 +36,6 @@ import PaymentsRoundedIcon from "@mui/icons-material/PaymentsRounded";
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import IconButton from '@mui/material/IconButton';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
-
 import { AuthLoginInfo } from "../AuthComponents/AuthLogin";
 import Grid from '@mui/material/Grid2';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -48,6 +48,13 @@ import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fade from '@mui/material/Fade';
 import { base } from '../config';
+import WebSocketManager from '../AuthComponents/useWebSocket';
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridToolbarContainer, GridToolbarExport
+} from '@mui/x-data-grid';
+import clsx from 'clsx';
 const API_URL=base(window.env.AP)
 
 
@@ -75,14 +82,14 @@ function Homepage() {
 ];
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/getlogs?user=${ctx.username}`, { withCredentials: true })
-      .then((res) => {
-        if (res.data) {
-          setDashboardData(res.data);
-          processChartData(res.data);
-        }
-      });
+      const handleWebSocketData = (data) => {
+      if (Array.isArray(data) && data[0]?.test_name && data[0]?.test_status) {
+         setDashboardData(data);
+         processChartData(data);
+      }
+    };
+    WebSocketManager.subscribe(handleWebSocketData);
+    WebSocketManager.sendMessage({ path: "data", type: "list", table: "logs",whereCondition:"username=?",whereValues:[ctx.username] });
   }, []);
   
   
@@ -370,122 +377,140 @@ function ButtonComponent() {
     );
   };
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
-  };
+const formatDate = (dateString) => {
+  console.log(dateString)
+  const date = new Date(dateString);
+  
+  // Get the day, month, and year
+  const day = String(date.getDate()).padStart(2, '0'); // Adds leading zero if needed
+  const month = date.toLocaleString('default', { month: 'short' }).toLowerCase(); // 'oct' for October
+  const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
+  
+  return `${day}-${month}-${year}`;
+};
+ 
+const columns = [
+    {
+      field: "id",
+      headerName: 'Id',
+      flex: 0.2,
+      resizable: false,
+      minWidth: 80,
+    },
+    {
+      field: "test_name",
+      headerName: 'Job Name',
+      flex: 1,
+      resizable: false,
+      minWidth: 150,
+    },
+    
+    {
+      field: "Video",
+      headerName: 'Video',
+      flex: 0.2,
+          resizable: false,
+      minWidth: 80,
+      renderCell: (params) => (
+    <Link 
+      variant="contained" 
+      href={params.row.Video}
+      target="_blank" 
+      rel="noopener noreferrer"
+      startIcon={<PlayCircleOutlineIcon />}
+    >
+      Watch Video
+    </Link>
+  ),
+    },
+    {
+      field: "jenkinsPath",
+      headerName: 'Excel Report',
+      flex: 0.2,
+          resizable: false,
+      minWidth: 80,
+      renderCell: (params) => (
+    <Link 
+      variant="contained" 
+      href={`${API_URL}/download?path=${params.row.jenkinsPath}&build=${params.row.build}`}
+      target="_blank" 
+      rel="noopener noreferrer"
+      
+    >
+     Excel Report
+    </Link>
+  ),
+    },
+     {
+      field: "end_time",
+      headerName: 'Date',
+      flex: 0.2,
+          resizable: false,
+      minWidth: 80,
+      type:'date',
+      valueGetter: (value) => value && new Date(value)
+    },
+    {
+        field: "test_status",
+        headerName: 'Status',
+        flex: 0.2,
+        resizable: false,
+        minWidth: 80,
+        cellClassName: (params) => {
+      if (params.value == null) {
+        return '';
+      }
 
-   const handleSearchChange = (event) => {
-    setFocus(true)
-    setSearchTerm(event.target.value);
-    setPage(0);
-  };
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+      return clsx('super-app', {
+        fail: params.value == 'fail',
+        pass: params.value == 'pass',
+        running:params.value   == "Running"
+      });
+    },
+      },
+  ];
+const paginationModel = { page: 0, pageSize: 20 };
 
-const sortedData = useMemo(() => {
-  return sortData(
-    dashboardData.filter((data) => {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
-      const matchesTestName = data.test_name.toLowerCase().includes(lowerCaseSearchTerm);
-      const matchesTestStatus = data.test_status.toLowerCase().includes(lowerCaseSearchTerm);
-      const matchesId = data.id.toString().includes(lowerCaseSearchTerm); 
-      return matchesTestName || matchesTestStatus || matchesId;
-    })
-  );
-}, [dashboardData, orderBy, searchTerm, order]);
-
-
-  const slicedData = sortedData.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
-// ${API_URL}/download?path=${Jenkins_Path}&build=${row.build}`
-  const TableComponent = () => {
+const TableComponent = () => {
     
     return (
-      <Box  sx={{paddingTop:"10px"}} id="table-component">
+      <Box  sx={{paddingTop:"10px",
+        width: '100%',
+      '& .super-app-theme--cell': {
+          backgroundColor: 'rgba(224, 183, 60, 0.55)',
+          color: '#1a3e72',
+          fontWeight: '600',
+        },
+        '& .super-app.fail': {
+          color: 'floralwhite',
+          backgroundColor: "darkred",
+           textTransform:'uppercase',
+          fontWeight: '600',
+        },
+        '& .super-app.running': {
+          color: "floralwhite", 
+          backgroundColor: "darkorange",
+          textTransform:'uppercase',
+          fontWeight: '600',
+        },
+        '& .super-app.pass': {
+          color: "floralwhite",
+          backgroundColor: 'green',
+           textTransform:'uppercase',
+          fontWeight: '600',
+        },}} id="table-component">
 
         <Grid>
           <Item>
           <h3>Recent Run Test Case</h3>
-           <TextField
-            autoFocus={Focus}
-              style={{ marginTop: "0px" }}
-              label="Search By Id, Name, Status"
-              variant="outlined"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              fullWidth
-              sx={{paddingBottom:"10px"}}
-              
-            />
-        <TableContainer sx={{ maxHeight: 500}} component={Paper}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                 {headCells.map((headCell) => (
-                    <TableCell key={headCell.id} sortDirection={orderBy === headCell.id ? order : false}>
-                      <TableSortLabel
-                        active={orderBy === headCell.id}
-                        direction={orderBy === headCell.id ? order : 'asc'}
-                        onClick={createSortHandler(headCell.id)}
-                      >
-                        {headCell.label}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {slicedData.map((row) => (
-                <TableRow hover role="checkBox" tabIndex={-1} key={row.id}>
-                  <TableCell>
-                    {row.id}
-                  </TableCell>
-                  <TableCell>
-                    {row.test_name}
-                  </TableCell>
-                  <TableCell>
-                  <Button variant="contained" style={{ fontSize: '0.5em' }} href={row.Video} startIcon={<PlayCircleOutlineIcon />}> Video
-                  </Button>
-                  </TableCell>
-                  <TableCell>
-                  <Button variant="contained"  style={{ fontSize: '0.5em' }} href={`${API_URL}/download?path=${row.jenkinsPath}&build=${row.build}`} startIcon={<DriveFileMoveIcon/>}>Excel Report</Button>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(row.start_time).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      style={{
-                        ...getStatusColor(row.test_status),
-                        padding: "6px 12px",
-                        borderRadius: "4px",
-                        textTransform: "uppercase",
-                        border: `1px solid ${getStatusColor(row.test_status).borderColor
-                          }`,
-                      }}
-                    >
-                      {row.test_status}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            component="div"
-            count={sortedData.length}
-            page={page}
-            onPageChange={handlePageChange}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleRowsPerPageChange}
-          />
-        </TableContainer>
-          </Item>
+             <DataGrid
+          columns={columns}
+          rows={dashboardData}
+           initialState={{ pagination: { paginationModel } ,sorting: {
+      sortModel: [{ field: 'end_time', sort: 'desc' }],},}}
+          pageSizeOptions={[20, 40, 80, 100]}/>
+            
+            </Item>
    
         </Grid>
       </Box>
@@ -494,11 +519,16 @@ const sortedData = useMemo(() => {
 
   return (
 
-    <Box sx={{padding:"10px"}}>
+    <Box sx={{
+        padding: "10px",
+      
+        
+      }}>
       <ButtonComponent/>
       <TopPanel/>
       <ChartComponent />
       <TableComponent />
+     
     </Box>
 
   );

@@ -23,6 +23,7 @@ import axios from "axios";
 import Grid from '@mui/material/Grid2';
 import { useLocation } from "react-router-dom";
 import { base } from '../config';
+import WebSocketManager from '../AuthComponents/useWebSocket';
 const API_URL=base(window.env.AP)
 
 const StyledPaper = styled(Paper)({
@@ -156,23 +157,33 @@ const ResponsivePage = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [vncConnectionStatus, setVncConnectionStatus] =
   useState("disconnected");
-
   useEffect(() => {
-    axios
-      .get(`${API_URL}/getBrowserId`)
-      .then((res) => {
-
-        if (res.data.token==localStorage.getItem('Token')) {
-          setSessionIds([res.data]);
-        } else {
-          console.error("Invalid response format:", res.data);
+    const handleWebSocketData = (data) => {
+      if (data.path ==="chat" && data?.token === localStorage.getItem('Token')) {
+        setSessionIds([data]);
         
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching session IDs:", error);
-      });
-  },[getSession]);
+      }
+    };
+
+    WebSocketManager.subscribe(handleWebSocketData);
+    return () => WebSocketManager.unsubscribe(handleWebSocketData);
+  }, [getSession]);
+//   useEffect(() => {
+//     axios
+//       .get(`${API_URL}/getBrowserId`)
+//       .then((res) => {
+
+//         if (res.data.token==localStorage.getItem('Token')) {
+//           setSessionIds([res.data]);
+//         } else {
+//           console.error("Invalid response format:", res.data);
+        
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error fetching session IDs:", error);
+//       });
+//   },[getSession]);
 
   const handleConnect = () => {
     if (selectedSession) {
@@ -193,22 +204,14 @@ const ResponsivePage = () => {
     
   };
 const handleDropdownOpen = () => {
-    setLoading(true)
-  axios
-      .get(`${API_URL}/getBrowserId`)
-      .then((res) => {
+   const handleWebSocketData = (data) => {
+      if ( data.path ==="chat" &&data?.token === localStorage.getItem('Token')) {
+        setSessionIds([data]);
+      }
+    };
 
-        if (res.data.token==localStorage.getItem('Token')) {
-          setSessionIds([res.data]);
-        } else {
-          console.error("Invalid response format:", res.data);
-        
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching session IDs:", error);
-      });
-      setLoading(false)
+    WebSocketManager.subscribe(handleWebSocketData);
+    return () => WebSocketManager.unsubscribe(handleWebSocketData);
 };
 
   const getMarginBottom = () => {
