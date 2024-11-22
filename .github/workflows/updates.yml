@@ -1,0 +1,28 @@
+# This is a basic workflow that is triggered on push to the main branch or manually
+name: Updates
+
+# Trigger the workflow on push to the main branch or manually
+on:
+  push: 
+    branches:
+      - main
+  workflow_dispatch:
+
+# Define the jobs
+jobs:
+  greet:
+    # Specify the type of runner to use
+    runs-on: ubuntu-latest
+
+    # Define the sequence of steps in the job
+    steps:
+      # Check out the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Trigger an update version
+      - name: Trigger Update
+        run: |
+          echo "Trigger Update Version"
+          curl -X POST ${{ vars.AAPANEL_TIGGER }}
+          echo "Completed"
