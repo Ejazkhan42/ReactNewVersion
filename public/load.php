@@ -19,7 +19,6 @@ $vncUrl = base64_encode($ini['VNC_URL']);
 // Generate the JavaScript object with encoded values
 echo "window.env = {";
 echo "    AP: '$apiUrl',";
-echo "    BU: '$buUrl',";
 echo "    VP: '$vncPass',";
 echo "    VU: '$vncUrl'";
 echo "};";
