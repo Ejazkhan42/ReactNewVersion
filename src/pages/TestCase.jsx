@@ -190,6 +190,7 @@ const TestCasePage = () => {
   };
 
   const handleFileChange = async (event) => {
+    console.log(servers)
     if (event.target.files !== undefined) {
       setSelectedFile(event.target.files[0]);
       setButtonDisableFile(true);
@@ -203,9 +204,7 @@ const TestCasePage = () => {
       const sheetName = 'Test_Data';
       const sheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(sheet);
-      console.log(jsonData)
       const filteredData = jsonData.filter((entry) => testCaseList.includes(entry['Test Data']));
-      console.log(filteredData)
       setExcelData(filteredData);
     }
   };
