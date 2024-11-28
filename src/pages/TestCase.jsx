@@ -108,7 +108,12 @@ const TestCasePage = () => {
   const [buttonDisableImage, setButtonDisableImage] = useState(false);
   const [filePopUp, setFilePopUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [servers, setservers] = useState(null);
+  const [servers, setservers] = useState({
+    id: 1,
+    name: 'SQ Brother Server',
+    url: 'https://gridview.doingerp.com:443',
+    password: 'selenoid'
+  });
   const [error, seterror] = useState('')
   let envvairable= JSON.parse(localStorage.getItem('env'))
   useEffect(() => {

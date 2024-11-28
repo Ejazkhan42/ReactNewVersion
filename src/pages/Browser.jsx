@@ -64,7 +64,7 @@ export default class VncScreen extends Component {
 
     createRFB(hostname, port, session, secure) {
         const { SELENOID_PASSWORD } = this.props;
-        console.log("Password",password)
+  
         const rfb = new RFB(
             this.canvas,
             `${secure ? "wss" : "ws"}://${hostname}:${port}/vnc/${session}`,
