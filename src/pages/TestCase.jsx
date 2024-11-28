@@ -190,7 +190,6 @@ const TestCasePage = () => {
   };
 
   const handleFileChange = async (event) => {
-    console.log(servers)
     if (event.target.files !== undefined) {
       setSelectedFile(event.target.files[0]);
       setButtonDisableFile(true);
@@ -266,7 +265,7 @@ const TestCasePage = () => {
       if (response.ok) {
         const result = await response.json();
         setMessage('Success');
-        navigate('/Progress', { state: { excelData,server } });
+        navigate('/Progress', { state: { excelData,servers } });
       } else {
         console.error('Error:', response.statusText);
       }
