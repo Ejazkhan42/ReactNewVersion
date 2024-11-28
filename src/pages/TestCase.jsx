@@ -108,7 +108,7 @@ const TestCasePage = () => {
   const [buttonDisableImage, setButtonDisableImage] = useState(false);
   const [filePopUp, setFilePopUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [servers, setservers] = useState();
+  const [servers, setservers] = useState(null);
   const [error, seterror] = useState('')
   let envvairable= JSON.parse(localStorage.getItem('env'))
   useEffect(() => {
@@ -232,7 +232,6 @@ const TestCasePage = () => {
       }
 
     }
-    const server=SeleniumServer.find((s)=>s.id=servers)
     setIsLoading(true);
     const formData = new FormData();
     formData.append('JobName', JOBNAME);
@@ -240,7 +239,7 @@ const TestCasePage = () => {
     formData.append('GridMode', gridMode);
     formData.append('Browsers', selectedBrowser);
     formData.append('Username',ctx.username)
-    formData.append('VIDEO_URL',server.url)
+    formData.append('VIDEO_URL',servers?.url || VIDEO_URL)
     formData.append('API',API_URL)
 
     if (localStorage.getItem('Token') !== null) {
@@ -446,7 +445,7 @@ const TestCasePage = () => {
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel>Selenium Server</InputLabel>
-                <Select value={servers} onChange={(e) => setservers(e.target.value)}>
+                <Select value={servers.name} onChange={(e) => setservers(SeleniumServer.find((s)=>s.id===e.target.value))}>
                   {SeleniumServer.map((server)=>
                   <MenuItem value={server.id}>{server.name}</MenuItem>
                   )}
