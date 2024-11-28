@@ -108,7 +108,7 @@ const TestCasePage = () => {
   const [buttonDisableImage, setButtonDisableImage] = useState(false);
   const [filePopUp, setFilePopUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [servers, setservers] = useState(null);
+  const [servers, setservers] = useState({ id: 1, name: "SQ Brother Server", url: "https://gridview.doingerp.com:443", password: "selenoid" });
   const [error, seterror] = useState('')
   let envvairable= JSON.parse(localStorage.getItem('env'))
   useEffect(() => {
@@ -184,7 +184,6 @@ const TestCasePage = () => {
       .join(', ');
 
     setTestCaseList(selectedTestCaseNames ? selectedTestCaseNames.split(', ').map((item) => item.replace(/"/g, '')) : []);
-    setservers(SeleniumServer?.[0])
     setButtonDisableFile(false);
     setButtonDisableImage(false);
     setOpenModal(true);
@@ -445,11 +444,11 @@ const TestCasePage = () => {
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel>Selenium Server</InputLabel>
-                <Select value={servers?.name} onChange={(e) => setservers(SeleniumServer.find((s)=>s.id===e.target.value))}>
+                <Select value={servers?.id || ""}  renderValue={() => servers?.name || ""} onChange={(e) => setservers(SeleniumServer.find((s)=>s.id===e.target.value))}>
                   {SeleniumServer.map((server)=>
-                  <MenuItem value={server.id}>{server.name}</MenuItem>
+                  <MenuItem key={server.id} value={server.id}>{server.name}</MenuItem>
                   )}
-                </Select>
+                  </Select>
               </FormControl>
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
