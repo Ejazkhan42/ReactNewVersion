@@ -240,7 +240,7 @@ const TestCasePage = () => {
     formData.append('GridMode', gridMode);
     formData.append('Browsers', selectedBrowser);
     formData.append('Username',ctx.username)
-    formData.append('VIDEO_URL',VIDEO_URL)
+    formData.append('VIDEO_URL',servers.url)
     formData.append('API',API_URL)
 
     if (localStorage.getItem('Token') !== null) {
