@@ -140,7 +140,6 @@ const TestCasePage = () => {
 
   }, []);
 
-
   useEffect(() => {
     const handleWebSocketData = (data) => {
     if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
