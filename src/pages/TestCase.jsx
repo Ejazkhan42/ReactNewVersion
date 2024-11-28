@@ -232,7 +232,7 @@ const TestCasePage = () => {
       }
 
     }
-    const url=SeleniumServer.find((s)=>s.id=servers)?.url
+    const server=SeleniumServer.find((s)=>s.id=servers)
     setIsLoading(true);
     const formData = new FormData();
     formData.append('JobName', JOBNAME);
@@ -240,7 +240,7 @@ const TestCasePage = () => {
     formData.append('GridMode', gridMode);
     formData.append('Browsers', selectedBrowser);
     formData.append('Username',ctx.username)
-    formData.append('VIDEO_URL',url)
+    formData.append('VIDEO_URL',server.url)
     formData.append('API',API_URL)
 
     if (localStorage.getItem('Token') !== null) {
@@ -267,7 +267,7 @@ const TestCasePage = () => {
       if (response.ok) {
         const result = await response.json();
         setMessage('Success');
-        navigate('/Progress', { state: { excelData } });
+        navigate('/Progress', { state: { excelData,server } });
       } else {
         console.error('Error:', response.statusText);
       }

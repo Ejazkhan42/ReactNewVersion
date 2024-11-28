@@ -58,8 +58,8 @@ export default class VncScreen extends Component {
     }
 
     connectRFB = (session) => {
-
-        const selenoid = new URL(SELENOID_URL);
+        const { selenoidUrl } = this.props;
+        const selenoid = new URL(selenoidUrl || SELENOID_URL);
         const protocol = selenoid.protocol
         const port = selenoid.port
         const hostname = selenoid.hostname
@@ -68,12 +68,13 @@ export default class VncScreen extends Component {
     };
 
     createRFB(hostname, port, session, secure) {
+        const { password } = this.props;
         const rfb = new RFB(
             this.canvas,
             `${secure ? "wss" : "ws"}://${hostname}:${port}/vnc/${session}`,
             {
                 credentials: {
-                    password: SELENOID_PASSWORD,
+                    password: password || SELENOID_PASSWORD,
                 },
             }
         );
