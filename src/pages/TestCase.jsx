@@ -98,7 +98,7 @@ const TestCasePage = () => {
   const [gridMode, setGridMode] = useState('on');
   const [message, setMessage] = useState(null);
   const [testCaseList, setTestCaseList] = useState([]);
-  const [changeList, setChangeList] = useState([]);
+  const [SeleniumServer, setSeleniumServer] = useState([]);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [excelData, setExcelData] = useState([]);
   const [selectEnv, setSelectEnv] = useState([]);
@@ -108,7 +108,7 @@ const TestCasePage = () => {
   const [buttonDisableImage, setButtonDisableImage] = useState(false);
   const [filePopUp, setFilePopUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [server, setserver] = useState();
   const [error, seterror] = useState('')
   let envvairable= JSON.parse(localStorage.getItem('env'))
   useEffect(() => {
@@ -138,7 +138,7 @@ const TestCasePage = () => {
     }
 
 
-  }, []);
+  }, [moduleId]);
 
   useEffect(() => {
     const handleWebSocketData = (data) => {
@@ -149,22 +149,6 @@ const TestCasePage = () => {
   WebSocketManager.subscribe(handleWebSocketData);
   
 }, []);
-
-  // useEffect(() => {
-  //   if (moduleId !== null) {
-  //     const fetchTestCases = async () => {
-  //       try {
-  //         const response = await axios.get(`${API_URL}/testcase?id=${moduleId}`, { withCredentials: true });
-  //         if (response.data != null) {
-  //           setTestCases(response.data);
-  //         }
-  //       } catch (error) {
-  //         console.error('Error fetching test cases:', error);
-  //       }
-  //     };
-  //     fetchTestCases();
-  //   }
-  // }, [moduleId]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -186,6 +170,14 @@ const TestCasePage = () => {
   };
 
   const handleRunClick = () => {
+    
+    const handleWebSocketData = (data) => {
+      if (Array.isArray(data) && data[0]?.name && data[0]?.password) {
+        setSeleniumServer(data);
+      }
+    };
+    WebSocketManager.subscribe(handleWebSocketData);
+    WebSocketManager.sendMessage({ path: "data", type: "list", table: "server_vnc"});
     const selectedTestCaseNames = paginatedData
       .filter((testCase) => selectedTestCases.includes(testCase.id))
       .map((testCase) => testCase.Test_Case)
@@ -286,19 +278,6 @@ const TestCasePage = () => {
     }
   };
 
-  const handleTestCaseChange = (event) => {
-    const { value } = event.target;
-    if (value !== null) {
-      setChangeList(value);
-    }
-  };
-
-  const handleSelectEnvChange = (event) => {
-    const { value } = event.target;
-    if (value != null) {
-      setSelectedEnv(value);
-    }
-  };
 
   const handleCloseModal = () => {
     setButtonDisableFile(false);
@@ -463,6 +442,16 @@ const TestCasePage = () => {
                 fullWidth
                 disabled
               />
+            </Grid>
+            <Grid size={{ xs: 4, sm: 4, md: 4 }}>
+              <FormControl variant="outlined" fullWidth>
+                <InputLabel>Selenium Server</InputLabel>
+                <Select value={servers} onChange={(e) => setserver(e.target.value)}>
+                  {SeleniumServer.map((server)=>
+                  <MenuItem value={server.id}>{server.name}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
