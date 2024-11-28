@@ -151,7 +151,7 @@ const DataSetTable = ({ excelData }) => {
 const ResponsivePage = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { excelData,servers } = location.state || { excelData: [],servers:[] };
+  const { excelData,servers } = location.state || { excelData: [],servers:{} };
   const [getSession,setSesssion]=useState(false)
   const [sessionIds, setSessionIds] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -226,7 +226,7 @@ const handleDropdownOpen = () => {
         return "50%";
     }
   };
-
+  console.log("server",servers)
   return (
     <Container>
      <Box sx={{
@@ -292,8 +292,8 @@ const handleDropdownOpen = () => {
     {selectedSession && (
         <VncScreen
           session={selectedSession}
-          selenoidurl={servers.url}
-          password={servers.password}
+          selenoidurl={servers?.url}
+          password={servers?.password}
           onUpdateState={setVncConnectionStatus}
         />
       )}
