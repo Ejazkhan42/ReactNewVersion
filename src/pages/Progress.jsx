@@ -210,7 +210,7 @@ const handleDropdownOpen = () => {
         return "50%";
     }
   };
-  console.log("server",servers)
+
   return (
     <Container>
      <Box sx={{
