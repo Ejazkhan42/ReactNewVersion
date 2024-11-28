@@ -108,7 +108,7 @@ const TestCasePage = () => {
   const [buttonDisableImage, setButtonDisableImage] = useState(false);
   const [filePopUp, setFilePopUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [server, setserver] = useState();
+  const [servers, setservers] = useState();
   const [error, seterror] = useState('')
   let envvairable= JSON.parse(localStorage.getItem('env'))
   useEffect(() => {
@@ -446,7 +446,7 @@ const TestCasePage = () => {
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel>Selenium Server</InputLabel>
-                <Select value={servers} onChange={(e) => setserver(e.target.value)}>
+                <Select value={servers} onChange={(e) => setservers(e.target.value)}>
                   {SeleniumServer.map((server)=>
                   <MenuItem value={server.id}>{server.name}</MenuItem>
                   )}
