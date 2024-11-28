@@ -30,7 +30,7 @@ function Orders() {
     }
   };
   WebSocketManager.subscribe(handleWebSocketData);
-  WebSocketManager.sendMessage({ path: "data", type: "list", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
+  WebSocketManager.sendMessage({ path: "data", type: "find", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
 }, [ctx.id]);
   // useEffect(() => {
   //   const fetchModules = async () => {
@@ -45,7 +45,7 @@ function Orders() {
   // }, [ctx.id]);
 
   const handleCardClick = (moduleId, moduleName,JOB) => {
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
+    WebSocketManager.sendMessage({ path: "data", type: "find", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
     navigate('/Jobs', { state: { moduleId, moduleName,JOB} });
   };
 

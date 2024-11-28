@@ -147,7 +147,7 @@ const TestCasePage = () => {
     }
   };
   WebSocketManager.subscribe(handleWebSocketData);
-  // WebSocketManager.sendMessage({ path: "data", type: "list", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
+  
 }, [moduleId]);
 
   // useEffect(() => {
