@@ -168,22 +168,6 @@ const ResponsivePage = () => {
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   }, [getSession]);
-//   useEffect(() => {
-//     axios
-//       .get(`${API_URL}/getBrowserId`)
-//       .then((res) => {
-
-//         if (res.data.token==localStorage.getItem('Token')) {
-//           setSessionIds([res.data]);
-//         } else {
-//           console.error("Invalid response format:", res.data);
-        
-//         }
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching session IDs:", error);
-//       });
-//   },[getSession]);
 
   const handleConnect = () => {
     if (selectedSession) {
@@ -235,7 +219,7 @@ const handleDropdownOpen = () => {
         rowGap: 1,
         gridTemplateColumns: 'repeat(1, 1fr)',
         }}>
-  <Grid>
+        <Grid>
         <Grid>
             <InputLabel id="demo-multiple-checkbox-label" sx={{fontSize: "1.2rem"}}>
         Select Session
@@ -292,8 +276,8 @@ const handleDropdownOpen = () => {
     {selectedSession && (
         <VncScreen
           session={selectedSession}
-          selenoidurl={servers?.url}
-          password={servers?.password}
+          SELENOID_URL={servers?.url}
+          SELENOID_PASSWORD={servers?.password}
           onUpdateState={setVncConnectionStatus}
         />
       )}

@@ -1,11 +1,6 @@
 import React, { Component } from "react";
 import RFB from "@novnc/novnc/lib/rfb"; // Adjust the import path as per your setup
 import { CircularProgress } from "@mui/material";
-import { base } from "../config";
-
-const SELENOID_URL=base(window.env.VU)
-
-const SELENOID_PASSWORD=base(window.env.VP)
 
 export default class VncScreen extends Component {
     constructor(props) {
@@ -58,9 +53,8 @@ export default class VncScreen extends Component {
     }
 
     connectRFB = (session) => {
-        const { selenoidUrl } = this.props;
-        console.log("selenoidUrl",selenoidUrl)
-        const selenoid = new URL(selenoidUrl || SELENOID_URL);
+        const { SELENOID_URL } = this.props;
+        const selenoid = new URL(SELENOID_URL);
         const protocol = selenoid.protocol
         const port = selenoid.port
         const hostname = selenoid.hostname
@@ -69,14 +63,14 @@ export default class VncScreen extends Component {
     };
 
     createRFB(hostname, port, session, secure) {
-        const { password } = this.props;
+        const { SELENOID_PASSWORD } = this.props;
         console.log("Password",password)
         const rfb = new RFB(
             this.canvas,
             `${secure ? "wss" : "ws"}://${hostname}:${port}/vnc/${session}`,
             {
                 credentials: {
-                    password: password || SELENOID_PASSWORD,
+                    password: SELENOID_PASSWORD,
                 },
             }
         );
