@@ -148,7 +148,7 @@ const TestCasePage = () => {
   };
   WebSocketManager.subscribe(handleWebSocketData);
   
-}, [moduleId]);
+}, []);
 
   // useEffect(() => {
   //   if (moduleId !== null) {
