@@ -445,7 +445,7 @@ const TestCasePage = () => {
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel>Selenium Server</InputLabel>
-                <Select value={servers.name} onChange={(e) => setservers(SeleniumServer.find((s)=>s.id===e.target.value))}>
+                <Select value={servers?.name} onChange={(e) => setservers(SeleniumServer.find((s)=>s.id===e.target.value))}>
                   {SeleniumServer.map((server)=>
                   <MenuItem value={server.id}>{server.name}</MenuItem>
                   )}
