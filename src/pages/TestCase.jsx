@@ -32,6 +32,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { v4 as uuid } from 'uuid';
 import { base } from '../config';
+import WebSocketManager from '../AuthComponents/useWebSocket';
 const API_URL=base(window.env.AP)
 const VIDEO_URL=base(window.env.VU)
 
@@ -139,21 +140,32 @@ const TestCasePage = () => {
 
   }, []);
 
+
   useEffect(() => {
-    if (moduleId !== null) {
-      const fetchTestCases = async () => {
-        try {
-          const response = await axios.get(`${API_URL}/testcase?id=${moduleId}`, { withCredentials: true });
-          if (response.data != null) {
-            setTestCases(response.data);
-          }
-        } catch (error) {
-          console.error('Error fetching test cases:', error);
-        }
-      };
-      fetchTestCases();
+    const handleWebSocketData = (data) => {
+    if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
+      setTestCases(data);
     }
-  }, [moduleId]);
+  };
+  WebSocketManager.subscribe(handleWebSocketData);
+  // WebSocketManager.sendMessage({ path: "data", type: "list", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
+}, [moduleId]);
+
+  // useEffect(() => {
+  //   if (moduleId !== null) {
+  //     const fetchTestCases = async () => {
+  //       try {
+  //         const response = await axios.get(`${API_URL}/testcase?id=${moduleId}`, { withCredentials: true });
+  //         if (response.data != null) {
+  //           setTestCases(response.data);
+  //         }
+  //       } catch (error) {
+  //         console.error('Error fetching test cases:', error);
+  //       }
+  //     };
+  //     fetchTestCases();
+  //   }
+  // }, [moduleId]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);

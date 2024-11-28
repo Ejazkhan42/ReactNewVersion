@@ -9,6 +9,7 @@ import SupervisorAccountRoundedIcon from '@mui/icons-material/SupervisorAccountR
 import EventNoteRoundedIcon from '@mui/icons-material/EventNoteRounded';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { base } from '../config';
+import WebSocketManager from '../AuthComponents/useWebSocket';
 const API_URL=base(window.env.AP)
 
 const iconMap = {
@@ -23,18 +24,28 @@ function Orders() {
   const ctx = useContext(AuthLoginInfo);
 
   useEffect(() => {
-    const fetchModules = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/module?user_id=${ctx.id}`, { withCredentials: true });
-        setModules(response.data);
-      } catch (error) {
-        console.error('Error fetching modules:', error);
-      }
-    };
-    fetchModules();
-  }, [ctx.id]);
+    const handleWebSocketData = (data) => {
+    if (Array.isArray(data) && data[0]?.User_id && data[0]?.JOB) {
+      setModules(data);
+    }
+  };
+  WebSocketManager.subscribe(handleWebSocketData);
+  WebSocketManager.sendMessage({ path: "data", type: "list", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
+}, [ctx.id]);
+  // useEffect(() => {
+  //   const fetchModules = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_URL}/module?user_id=${ctx.id}`, { withCredentials: true });
+  //       setModules(response.data);
+  //     } catch (error) {
+  //       console.error('Error fetching modules:', error);
+  //     }
+  //   };
+  //   fetchModules();
+  // }, [ctx.id]);
 
   const handleCardClick = (moduleId, moduleName,JOB) => {
+    WebSocketManager.sendMessage({ path: "data", type: "list", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
     navigate('/Jobs', { state: { moduleId, moduleName,JOB} });
   };
 
