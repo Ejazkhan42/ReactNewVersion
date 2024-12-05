@@ -6,7 +6,7 @@ import {
 
 
 
-import React, { useState,useEffect ,useMemo, useContext} from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { AppProvider, SignInPage } from '@toolpad/core';
 import { useTheme } from '@mui/material/styles';
 import { Container, Typography, Box, IconButton } from '@mui/material';
@@ -20,7 +20,7 @@ import Signup from "./Signup"
 import { useLocalStorageState } from '@toolpad/core';
 import { AuthLoginInfo } from '../AuthComponents/AuthLogin';
 import { base } from '../config';
-const API_URL=base(window.env.AP)
+const API_URL = base(window.env.AP)
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 function CustomEmailField() {
@@ -46,32 +46,34 @@ function CustomEmailField() {
     />
   );
 }
-const Menu=(role_id)=>{
+const Menu = (role_id) => {
   axios
-      .get(`${API_URL}/menuLevel?role=${role_id}`, { withCredentials: true })
-      .then((res) => {
-        if(res.data){
-        sessionStorage.setItem("menu",JSON.stringify(res.data))
+    .get(`${API_URL}/menuLevel?role=${role_id}`, { withCredentials: true })
+    .then((res) => {
+      if (res.data) {
+        sessionStorage.setItem("menu", JSON.stringify(res.data))
 
         window.location.href = '/home';
-      }})
-      .catch((error) => {
-        console.error('Login error:', error);
-      });
+      }
+    })
+    .catch((error) => {
+      console.error('Login error:', error);
+    });
 };
 
-const User=() => {
-    axios
-      .get(`${API_URL}/user`, { withCredentials: true })
-      .then((res) => {
-        if(res.data){
-        sessionStorage.setItem("user",JSON.stringify(res.data))
+const User = () => {
+  axios
+    .get(`${API_URL}/user`, { withCredentials: true })
+    .then((res) => {
+      if (res.data) {
+        sessionStorage.setItem("user", JSON.stringify(res.data))
         Menu(res.data.role_id)
-      }})
-      .catch((error) => {
-        console.error('Login error:', error); 
-      });
-  };
+      }
+    })
+    .catch((error) => {
+      console.error('Login error:', error);
+    });
+};
 
 
 function SignUpLink() {
@@ -108,14 +110,15 @@ export default function CredentialsSignInPage() {
 
   return (
     <AppProvider>
-      <div className="login-container" sx={{padding:"0px",maxWidth:"1500px"}}>
+      <div className="login-container" sx={{ padding: "0px", maxWidth: "1500px" }}>
         <Box className="login-header">
           <Typography variant="h2" className="login-subtitle">
             DoingERP.com
           </Typography>
         </Box>
-        <SignInPage signIn={signIn} slots={{emailField:CustomEmailField,signUpLink: SignUpLink,
-}} providers={providers} />
+        <SignInPage signIn={signIn} slots={{
+          emailField: CustomEmailField, signUpLink: SignUpLink,
+        }} providers={providers} />
       </div>
     </AppProvider>
   );
