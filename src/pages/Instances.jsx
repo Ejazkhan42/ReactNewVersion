@@ -27,7 +27,7 @@ import { base } from '../config';
 const API_URL=base(window.env.AP)
 
 function Clients() {
-  const ctx = useContext(AuthLoginInfo);
+  const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const [data, setData] = useState([]);
   const [customerUpdate,setCustomerUpdate]=useState(false)
   const [open, setOpen] = useState(false);

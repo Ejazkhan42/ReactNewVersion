@@ -7,8 +7,8 @@ import { base } from '../config';
 const API_URL=base(window.env.AP)
 
 
-const EnvPage = () => {
-  const navigate = useNavigate();
+const EnvPage = ({pathname, navigate}) => {
+  // const navigate = useNavigate();
   const location = useLocation();
   const env= JSON.parse(localStorage.getItem('env'))
 

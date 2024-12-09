@@ -82,10 +82,9 @@ const VisuallyHiddenImageInput = styled('input')({
   width: 1,
 });
 
-const TestCasePage = () => {
-  const navigate = useNavigate();
+const TestCasePage = ({ pathname,navigate }) => {
   const location = useLocation();
-  const ctx = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
+  const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const { moduleId, JOB } = location.state || {};
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);

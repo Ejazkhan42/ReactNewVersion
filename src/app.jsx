@@ -1,6 +1,7 @@
 import {useContext,useState,useEffect}  from 'react';
 import { BrowserRouter, Routes, Route,useNavigate,useLocation } from 'react-router-dom';
 import Homepage from './pages/Homepage';
+import AdminRoute from './AuthComponents/AdminRoute';
 import PrivateRoute from './AuthComponents/PrivateRoute';
 import LoginRoute from './AuthComponents/LoginRoute';
 import { AuthLoginInfo } from './AuthComponents/AuthLogin';
@@ -40,109 +41,131 @@ const AppRoutes = () => {
         path="/" 
         element={
           <PrivateRoute>
-            <PageContainer title="Home" breadCrumbs={breadCrumbs}/>
-              <Homepage />
+            
+            {/* <PageContainer title="Home" breadCrumbs={breadCrumbs}/> */}
+            <AdminRoute/>
+           
           </PrivateRoute>
         } 
       />
-      <Route 
+      {/* <Route 
         path="/home" 
         element={
-          <PrivateRoute>
+          
+            <AdminRoute>
             <PageContainer title="Home"breadCrumbs={breadCrumbs}>
               <Homepage />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+         
         } 
       />
       <Route 
         path="/instances" 
         element={
-          <PrivateRoute>
+        
+            <AdminRoute>
             <PageContainer title="Instance"breadCrumbs={breadCrumbs}>
               <Instance />
              </PageContainer>
-          </PrivateRoute>
+             </AdminRoute>
+          
         } 
       />
       <Route 
         path="/customers" 
         element={
-          <PrivateRoute>
+    
+            <AdminRoute>
             <PageContainer title="Customers" breadCrumbs={breadCrumbs}>
               <Customers />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+         
         } 
       />
       <Route 
         path="/env" 
         element={
-          <PrivateRoute>
+
+            <AdminRoute>
             <PageContainer title="Environment" breadCrumbs={breadCrumbs}>
               <Env />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+       
         } 
       />
       <Route 
         path="/modules" 
         element={
-          <PrivateRoute>
+
+            <AdminRoute>
             <PageContainer title="Modules" breadCrumbs={breadCrumbs}>
               <Modules />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+      
         } 
       />
       <Route 
         path="/jobs" 
         element={
-          <PrivateRoute>
+   
+            <AdminRoute>
             <PageContainer title="Jobs"  breadCrumbs={breadCrumbs}>
               <TestCase />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+  
         } 
       />
       <Route 
         path="/progress" 
         element={
-          <PrivateRoute>
+ 
+            <AdminRoute>
             <PageContainer title="Progress" breadCrumbs={breadCrumbs}>
               <Progress />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+
         } 
       />
      <Route 
         path="/worklist" 
         element={
-          <PrivateRoute>
+   
+            <AdminRoute>
             <PageContainer title="WorkList" breadCrumbs={breadCrumbs}>
               <Worklist />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+
         } 
       />
       <Route 
         path="/business/:path" 
         element={
-          <PrivateRoute>
+
+            <AdminRoute>
             <PageContainer title="business" breadCrumbs={breadCrumbs}>
               <Business />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+
         } 
       />
     <Route 
         path="/business/components/:path" 
         element={
-          <PrivateRoute>
+
+            <AdminRoute>
             <PageContainer title="components" breadCrumbs={breadCrumbs}>
               <Business />
             </PageContainer>
-          </PrivateRoute>
+            </AdminRoute>
+
         } 
       />
        <Route 
@@ -154,7 +177,7 @@ const AppRoutes = () => {
             </PageContainer>
           </PrivateRoute>
         } 
-      />
+      />*/}
       <Route 
         path="/signup" 
         element={
@@ -170,7 +193,7 @@ const AppRoutes = () => {
               <Login />
           </LoginRoute>
         } 
-      />
+      /> 
        
     </Routes>
   );
@@ -180,7 +203,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AppRoutes />  {/* Nested AppRoutes within the BrowserRouter */}
+      <AppRoutes />  
     </BrowserRouter>
   );
 }

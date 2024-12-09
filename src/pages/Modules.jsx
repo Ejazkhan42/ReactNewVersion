@@ -18,10 +18,10 @@ const iconMap = {
   'Core Hr': <EventNoteRoundedIcon style={{ fontSize: 40 }} />,
 };
 
-function Orders() {
-  const navigate = useNavigate();
+function Orders({pathname, navigate}) {
+  // const navigate = useNavigate();
   const [modules, setModules] = useState([]);
-  const ctx = useContext(AuthLoginInfo);
+  const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
 
   useEffect(() => {
     const handleWebSocketData = (data) => {

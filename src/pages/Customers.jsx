@@ -8,10 +8,10 @@ import { base } from '../config';
 import { PageContainer } from '@toolpad/core/PageContainer';
 const API_URL=base(window.env.AP)
 
-const CustomersPage = () => {
+const CustomersPage = ({pathname, navigate}) => {
     const [customers, setCustomers] = useState({});
-    const navigate = useNavigate();
-    const ctx = useContext(AuthLoginInfo);
+    // const navigate = useNavigate();
+    const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
     
     useEffect(() => {
         const fetchCustomers = async () => {

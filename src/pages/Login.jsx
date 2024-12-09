@@ -7,7 +7,7 @@ import {
 
 
 import React, { useState, useEffect, useMemo, useContext } from 'react';
-import { AppProvider, SignInPage } from '@toolpad/core';
+import { AppProvider, SignInPage, SessionContext } from '@toolpad/core';
 import { useTheme } from '@mui/material/styles';
 import { Container, Typography, Box, IconButton } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -53,7 +53,7 @@ const Menu = (role_id) => {
       if (res.data) {
         sessionStorage.setItem("menu", JSON.stringify(res.data))
 
-        window.location.href = '/home';
+        window.location.href = '/';
       }
     })
     .catch((error) => {
@@ -105,8 +105,11 @@ const signIn = async (provider, formData) => {
   }
 };
 
+
+
 export default function CredentialsSignInPage() {
-  const theme = useTheme();
+
+
 
   return (
     <AppProvider>

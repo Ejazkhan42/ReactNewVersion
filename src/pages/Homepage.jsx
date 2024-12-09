@@ -60,7 +60,7 @@ const API_URL=base(window.env.AP)
 
 
 
-function Homepage() {
+function Homepage({ pathname, navigate }) {
   const ctx = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
   const [data,setdata]=useState(true)
   const [Focus, setFocus] = useState(false);
@@ -188,7 +188,7 @@ function Homepage() {
  
 function ButtonComponent() {
     const [isClicked, setIsClicked] = useState(false);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
       let timeoutId;

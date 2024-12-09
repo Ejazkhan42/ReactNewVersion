@@ -3,7 +3,7 @@
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { createTheme } from '@mui/material/styles';
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import { Account, AuthenticationContext, SessionContext,useSession } from '@toolpad/core';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -137,6 +137,7 @@ const handleClick = () => {
 
 
 
+
 const logout = () => {
   axios
     .get(`${API_URL}/logout`, { withCredentials: true })
@@ -151,26 +152,25 @@ const logout = () => {
 export const AuthLoginInfo = createContext({});
 
 export function AuthLogin(props) {
+  // const U=useSession()
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [Menu, setMenu] = useState(null);
-  const [session, setSession] = useState(null);
-
-
-
+  // const [session, setSession] = useState(null);
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      setSession({
-        user: {
-          name: parsedUser.FirstName,
-          email: parsedUser.Email,
-          image: 'https://avatars.githubusercontent.com/u/19550456',
-        }
-      });
+      // setSession({
+      //   user: {
+      //     id: parsedUser.id,
+      //     name: parsedUser.FirstName,
+      //     email: parsedUser.Email,
+      //     image: 'https://avatars.githubusercontent.com/u/19550456',
+      //   }
+      // });
     }
 
     const storedMenu = sessionStorage.getItem("menu");
@@ -180,7 +180,7 @@ export function AuthLogin(props) {
   },[]);
  
 
- const NAVIGATION = Menu? Menu:[]
+const NAVIGATION = Menu? Menu:[]
 const updatedNavigation = NAVIGATION?.map(item => {
   // If the item has a string 'icon', replace it with the corresponding JSX element
   if (typeof item.icon === 'string' && iconMapping[item.icon]) {
@@ -202,24 +202,24 @@ const updatedNavigation = NAVIGATION?.map(item => {
   return item;
 });
 
-  const authentication = {
-    signIn: () => {
-      return session;
-    },
-    signOut: () => {
-      setSession(null);
-      setLoading(true)
-      logout();
-    },
-  };
-  const isLoggedIn = Boolean(user?.username); // Check if user is logged in
+//   const authentication = {
+//     signIn: () => {
+//       return session;
+//     },
+//     signOut: () => {
+//       setSession(null);
+//       setLoading(true)
+//       logout();
+//     },
+//   };
+//   const isLoggedIn = Boolean(user?.username); // Check if user is logged in
 
-  const isLoginPage =sessionStorage.getItem('user')? false : true;
-  const isSignupPage=location.pathname==='/signup'
+//   const isLoginPage =U?.user? false : true;
+//   const isSignupPage=location.pathname==='/signup'
   return (
     <AuthLoginInfo.Provider value={user}>
   
-      <SessionContext.Provider value={session}>
+      {/* <SessionContext.Provider value={session}>
 
         {!isLoginPage && (
         
@@ -244,26 +244,28 @@ const updatedNavigation = NAVIGATION?.map(item => {
      
 
         <DashboardLayout slots={{ toolbarActions: Notifications}}>
-      
+       */}
 
         {props.children}
 
-        </DashboardLayout>
-
-        <ScrollTop>
-        <Fab size="small" aria-label="scroll back to top">
-          <KeyboardArrowUpIcon />
-        </Fab>
-      </ScrollTop>
-      
-      </AppProvider>
-        )}
-       {isLoginPage && !isSignupPage && <Login />}
-      
-      {/* Render the signup page if the current path is '/signup' */}
-      {isSignupPage && <Signup />}
-      
-      </SessionContext.Provider>
     </AuthLoginInfo.Provider>
   );
 };
+
+
+      //   {/* </DashboardLayout>
+
+      //   <ScrollTop>
+      //   <Fab size="small" aria-label="scroll back to top">
+      //     <KeyboardArrowUpIcon />
+      //   </Fab>
+      // </ScrollTop>
+      
+      // </AppProvider>
+      //   )}
+      //  {isLoginPage && !isSignupPage && <Login />}
+      
+      // {/* Render the signup page if the current path is '/signup' */}
+      // {isSignupPage && <Signup />}
+      
+      // </SessionContext.Provider> */}

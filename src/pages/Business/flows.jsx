@@ -4,22 +4,12 @@ import {
   Box,
   Container,
   Modal,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
   Button,
   FormControl,
   Autocomplete,
-  TableFooter,
-  Paper,
-  TableContainer,
-  TablePagination
-} from '@mui/material';
+  Paper} from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 const style = {
   position: 'absolute',
