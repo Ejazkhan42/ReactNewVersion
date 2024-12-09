@@ -1,5 +1,5 @@
 window.env = {
-            AP: "https://oracle.doingerp.com/api",
+            AP: "http://localhost:5000/api",
             VP: "c2VsZW5vaWQ=",
             VU: "https://gridview.doingerp.com:443"
 };
