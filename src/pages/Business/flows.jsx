@@ -229,7 +229,7 @@ const Flow = () => {
         columns: [],
       });
     }
-  }, [selectedTestCase, Load]);
+  }, [selectedTestCase, Load,selectedTestCase]);
 
   useEffect(() => {
     if (SelectedComponent) {
@@ -242,7 +242,7 @@ const Flow = () => {
         columns: [],
       });
     }
-  }, [Load, SelectedComponent]);
+  }, [Load, SelectedComponent,selectedTestCase]);
 
   useEffect(() => {
     if (selectedTestCase?.id && flowData.length > 0) {
@@ -252,7 +252,7 @@ const Flow = () => {
       setComponentList(filteredComponents);
       setSelectedComponent(filteredComponents[0]);
     }
-  }, [flowData, selectedTestCase,]);
+  }, [flowData, selectedTestCase,Load]);
 
 
   const handleSelectionChange = (event, newValue) => {
