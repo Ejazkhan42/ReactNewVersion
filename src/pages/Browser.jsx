@@ -54,6 +54,7 @@ export default class VncScreen extends Component {
 
     connectRFB = (session) => {
         const { SELENOID_URL } = this.props;
+        console.log(SELENOID_URL)
         const selenoid = new URL(SELENOID_URL);
         const protocol = selenoid.protocol
         const port = selenoid.port

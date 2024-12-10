@@ -148,10 +148,12 @@ const DataSetTable = ({ excelData }) => {
   );
 };
 
-const ResponsivePage = () => {
+const ResponsivePage = ({ pathname,navigate }) => {
+  
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const { excelData,servers } = location.state || { excelData: [],servers:{} };
+  console.log(servers)
   const [getSession,setSesssion]=useState(false)
   const [sessionIds, setSessionIds] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -189,7 +191,7 @@ const ResponsivePage = () => {
   };
 const handleDropdownOpen = () => {
    const handleWebSocketData = (data) => {
-      if ( data.path ==="chat" &&data?.token === localStorage.getItem('Token')) {
+      if ( data.path ==="chat" && data?.token === localStorage.getItem('Token')) {
         setSessionIds([data]);
       }
     };

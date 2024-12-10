@@ -26,7 +26,7 @@ import ModelTrainingSharpIcon from '@mui/icons-material/ModelTrainingSharp';
 import CasesSharpIcon from '@mui/icons-material/CasesSharp';
 import ListIcon from '@mui/icons-material/List';
 import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt"
-import { useDemoRouter } from '@toolpad/core/internal';
+import { useDemoRouter } from './Route';
 import Homepage from "../pages/Homepage";
 import Scenario_manager from "../pages/Business/scenario_manager";
 import TestCasePage from "../pages/TestCase";
@@ -45,6 +45,7 @@ import Types from '../pages/Business/object_type';
 import Module from '../pages/Business/modules';
 import { Box } from "@mui/material";
 import Worklist from '../pages/worklist'
+import { Route,useLocation } from "react-router-dom";
 
 
 const logout = () => {
@@ -112,7 +113,7 @@ const iconMapping = {
   "ModelTrainingSharpIcon":<ModelTrainingSharpIcon/>,
   "AppSettingsAltIcon":<AppSettingsAltIcon/>,
 };
-function AdminRoute() {
+function AdminRoute({pathname}) {
   const [user,setuser] = useState(JSON.parse(sessionStorage.getItem("user")));
   const [Menu, setMenu] = useState(JSON.parse(sessionStorage.getItem("menu")));
   const [session, setSession] = useState({
@@ -134,7 +135,7 @@ function AdminRoute() {
       logout();
     },
   };
-  const router = useDemoRouter('/home');
+  const router = useDemoRouter('/*');
 
   const NAVIGATION = Menu? Menu:[]
   const updatedNavigation = NAVIGATION?.map(item => {
@@ -157,8 +158,8 @@ function AdminRoute() {
   }
   return item;
 });
-
-
+  const location=useLocation()
+  console.log(router)
   return (
     <AppProvider
             id="backToHome"
@@ -181,6 +182,7 @@ function AdminRoute() {
       
         <PageContainer/>
         <DemoPageContent pathname={router.pathname} navigate={router.navigate}/>
+        {pathname && router.pathname=="/*" && <DemoPageContent pathname={pathname} navigate={router.navigate}/>}
         
       </DashboardLayout>
     </AppProvider>
