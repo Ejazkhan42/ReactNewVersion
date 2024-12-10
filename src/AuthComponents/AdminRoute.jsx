@@ -6,7 +6,7 @@ import { createTheme } from '@mui/material/styles';
 import "./Styles/loadingPage.css";
 import { base } from '../config';
 const API_URL=base(window.env.AP)
-
+import Notifications from './Notifications';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -44,6 +44,7 @@ import Cammands from '../pages/Business/cammand';
 import Types from '../pages/Business/object_type';
 import Module from '../pages/Business/modules';
 import { Box } from "@mui/material";
+import Worklist from '../pages/worklist'
 
 
 const logout = () => {
@@ -176,7 +177,7 @@ function AdminRoute() {
               title: '',
             }}
           >
-      <DashboardLayout>
+      <DashboardLayout slots={{ toolbarActions: Notifications}}>
       
         <PageContainer/>
         <DemoPageContent pathname={router.pathname} navigate={router.navigate}/>
@@ -212,6 +213,8 @@ function DemoPageContent({ pathname,navigate }) {
       {pathname === '/business/types' && <Types pathname={pathname} navigate={navigate} />}
       {pathname === '/AdminPanel' && <AdminPanel pathname={pathname} navigate={navigate} />}
       {pathname === '/Setting/Modules' && <Module pathname={pathname} navigate={navigate} />}
+      {pathname === '/worklist' && <Worklist pathname={pathname} navigate={navigate} />}
+
       </Box>
   );
 }

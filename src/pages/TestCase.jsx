@@ -264,7 +264,7 @@ const TestCasePage = ({ pathname,navigate }) => {
       if (response.ok) {
         const result = await response.json();
         setMessage('Success');
-        navigate('/Progress', { state: { excelData,servers } });
+        navigate('/progress', { state: { excelData,servers } });
       } else {
         console.error('Error:', response.statusText);
       }
