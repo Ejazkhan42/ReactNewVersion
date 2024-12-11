@@ -32,6 +32,7 @@ import {
   GridToolbarContainer, GridToolbarExport
 } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
+import { CoPresent } from '@mui/icons-material';
 function CustomToolbar({ handleAddClick }) {
 
   return (
@@ -44,7 +45,7 @@ function CustomToolbar({ handleAddClick }) {
     </GridToolbarContainer>
   );
 }
-const useWebSocketData = (subscriptions, Load, setLoad) => {
+const useWebSocketData = (subscriptions,Load,setLoad) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -53,22 +54,22 @@ const useWebSocketData = (subscriptions, Load, setLoad) => {
         subscriptions.forEach(({ condition, stateSetter }) => {
           if (condition(incomingData)) {
             stateSetter(incomingData);
-
+            setLoad(false)
           }
         });
       }
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
-    setLoad(false);
+    
     return () => {
       WebSocketManager.unsubscribe(handleWebSocketData);
     };
-  }, [subscriptions, Load]);
+  }, [subscriptions,Load]);
 
   return data;
 };
-const TestFlow = ({ selectedTestCase, flowData, paginationModel, setPaginationModel, setLoad }) => {
+const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flowData, paginationModel, setPaginationModel, setLoad }) => {
   const columns = [
     { field: "id", headerName: 'Id', flex: 0.3, minWidth: 100 },
     { field: "Test_Case", headerName: 'Name', flex: 1, minWidth: 150 },
@@ -115,8 +116,8 @@ const TestFlow = ({ selectedTestCase, flowData, paginationModel, setPaginationMo
   return (
     <div>
       <Paper>
-        <AddModal Open={openAdd} setOpen={setOpenAdd} setLoad={setLoad} rows={selectedTestCase} type={type} />
-        <UpdatesModal rows={rows} open={openUpdate} setOpen={setOpenUpdate} type={type} setLoad={setLoad} />
+        <AddModal Open={openAdd} setOpen={setOpenAdd} setLoad={setLoad} objects={objects} testCases={testCases} commands={commands} components={components} rows={selectedTestCase} type={type} />
+        <UpdatesModal rows={rows} open={openUpdate} setOpen={setOpenUpdate} testCases={testCases} components={components} objects={objects} commands={commands} type={type} setLoad={setLoad} />
         <DataGrid
           columns={columns}
           rows={flowData}
@@ -132,7 +133,7 @@ const TestFlow = ({ selectedTestCase, flowData, paginationModel, setPaginationMo
   );
 };
 
-const ComponentFlow = ({ SelectedComponent, componentData, paginationModel1, setPaginationModel1, setLoad }) => {
+const ComponentFlow = ({ SelectedComponent,components,objects,commands, componentData, paginationModel1, setPaginationModel1, setLoad }) => {
   const columns = [
     { field: "id", headerName: 'Id', flex: 0.3, minWidth: 100 },
     { field: "component_name", headerName: 'Name', flex: 1, minWidth: 150 },
@@ -178,8 +179,8 @@ const ComponentFlow = ({ SelectedComponent, componentData, paginationModel1, set
 
   return (
     <div>
-      <AddModal Open={openAdd} setOpen={setOpenAdd} setLoad={setLoad} type={type} rows={SelectedComponent} />
-      <UpdatesModal rows={rows} open={openUpdate} setOpen={setOpenUpdate} type={type} setLoad={setLoad} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} components={components} commands={commands} objects={objects}  setLoad={setLoad} type={type} rows={SelectedComponent} />
+      <UpdatesModal rows={rows} open={openUpdate}  components={components} objects={objects} commands={commands} SelectedComponent={SelectedComponent} setOpen={setOpenUpdate} type={type} setLoad={setLoad} />
       <Paper>
         <DataGrid
           columns={columns}
@@ -203,20 +204,29 @@ const Flow = () => {
   const [flowData, setFlowData] = useState([]);
   const [componentList, setComponentList] = useState([]);
   const [componentData, setComponentData] = useState([]);
+  const [components, setComponents] = useState([]);
+  const [objects, setObjects] = useState([]);  
+  const [commands, setCommands] = useState([]);
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [SelectedComponent, setSelectedComponent] = useState(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
   const [paginationModel1, setPaginationModel1] = useState({ page: 0, pageSize: 5 });
   useEffect(() => {
     WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'testcase' });
+    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'comp' });
+    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'object_repo' });
+    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'cammand' });
   }, []);
   const subscriptions = [
     { condition: data => data[0]?.hasOwnProperty('Modules_id'), stateSetter: setTestCases },
     { condition: data => data[0]?.hasOwnProperty('flow'), stateSetter: setFlowData },
-    { condition: data => data[0]?.hasOwnProperty('Cammand'), stateSetter: setComponentData },
+    { condition: data => data[0]?.hasOwnProperty('component_name') && !data[0]?.hasOwnProperty('comp_id'), stateSetter: setComponents },
+    { condition: data => data[0]?.hasOwnProperty('object_name') && !data[0]?.hasOwnProperty('comp_id'), stateSetter: setObjects },
+    { condition: data => data[0]?.hasOwnProperty('cammand') && !data[0]?.hasOwnProperty('comp_id'), stateSetter: setCommands },
+    { condition: data => data[0]?.hasOwnProperty('steps'), stateSetter: setComponentData },
   ];
 
-  const data = useWebSocketData(subscriptions, Load, setLoad);
+  const data = useWebSocketData(subscriptions,Load,setLoad);
 
   useEffect(() => {
     if (selectedTestCase) {
@@ -229,7 +239,7 @@ const Flow = () => {
         columns: [],
       });
     }
-  }, [selectedTestCase, Load,selectedTestCase]);
+  }, [selectedTestCase,openUpdate,openAdd,Load]);
 
   useEffect(() => {
     if (SelectedComponent) {
@@ -241,8 +251,9 @@ const Flow = () => {
         whereValues: [SelectedComponent.id],
         columns: [],
       });
+      
     }
-  }, [Load, SelectedComponent,selectedTestCase]);
+  }, [SelectedComponent,openUpdate,openAdd,Load]);
 
   useEffect(() => {
     if (selectedTestCase?.id && flowData.length > 0) {
@@ -250,18 +261,22 @@ const Flow = () => {
         .filter(f => f.testcase_id === selectedTestCase.id)
         .map(f => ({ id: f.comp_id, component_name: f.component_name }));
       setComponentList(filteredComponents);
-      setSelectedComponent(filteredComponents[0]);
+      setSelectedComponent(filteredComponents.find(f=>f.id===SelectedComponent?.id));
     }
-  }, [flowData, selectedTestCase,Load]);
+  }, [flowData, selectedTestCase,openUpdate]);
 
 
   const handleSelectionChange = (event, newValue) => {
+    setFlowData([]);
     setSelectedTestCase(newValue);
   };
 
   const handleSelectionCompChange = (event, newValue) => {
+    setComponentData([]);
     setSelectedComponent(newValue);
   };
+  var c=1
+  console.log("Render:", c+1)
 
   return (
     <Container>
@@ -279,6 +294,9 @@ const Flow = () => {
         selectedTestCase={selectedTestCase}
         testCases={testCases}
         flowData={flowData}
+        objects={objects}
+        commands={commands}
+        components={components}
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
 
@@ -297,7 +315,9 @@ const Flow = () => {
       <ComponentFlow
         setLoad={setLoad}
         SelectedComponent={SelectedComponent}
-        componentList={componentList}
+        components={components}
+        objects={objects}
+        commands={commands}
         componentData={componentData}
         paginationModel1={paginationModel1}
         setPaginationModel1={setPaginationModel1}
@@ -306,12 +326,7 @@ const Flow = () => {
   );
 };
 export default Flow;
-const AddModal = ({ Open, setOpen, rows, setLoad, type }) => {
-
-  const [testCases, setTestCases] = useState([]);
-  const [components, setComponents] = useState([]);
-  const [objects, setObjects] = useState([]);
-  const [commands, setCommands] = useState([]);
+const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,testCases,objects,commands }) => {
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -321,43 +336,14 @@ const AddModal = ({ Open, setOpen, rows, setLoad, type }) => {
   const [description, setDescription] = useState('');
   const [value, setValue] = useState('');
   const [customerName, setCustomerName] = useState('A');
+ 
   useEffect(() => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'testcase' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'comp' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'object_repo' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'cammand' });
-  }, [Open]);
-  useEffect(() => {
-    const handleWebSocketData = (data) => {
-      if (Array.isArray(data)) {
-        switch (true) {
-          case data[0]?.hasOwnProperty('Modules_id'):
-            setTestCases(data);
-            break;
-          case data[0]?.hasOwnProperty('component_name') && !data[0]?.hasOwnProperty("Test_Case"):
-            setComponents(data);
-            break;
-          case data[0]?.hasOwnProperty('object_name') && !data[0]?.hasOwnProperty("Test_Case"):
-            setObjects(data);
-            break;
-          case data[0]?.hasOwnProperty('cammand') && !data[0]?.hasOwnProperty("Test_Case"):
-            setCommands(data);
-            break;
-          default:
-            break;
-        }
-      }
-    };
-    WebSocketManager.subscribe(handleWebSocketData);
-    return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, []);
-
-  useEffect(() => {
+    console.log("Render time Add :", 1)
     if (type === 'Component') {
-      setSelectedComponent(components.find(comp => comp?.component_name === rows?.component_name) || null);
+      setSelectedComponent(components?.find(comp => comp?.component_name === rows?.component_name) || null);
          }
     else if (type === 'flow') {
-      setSelectedTestCase(testCases.find(testCase => testCase?.Test_Case === rows?.Test_Case) || null);
+      setSelectedTestCase(testCases?.find(testCase => testCase?.Test_Case === rows?.Test_Case) || null);
     }
   }, [rows,type]);
   const handleSubmit = (event) => {
@@ -375,7 +361,7 @@ const AddModal = ({ Open, setOpen, rows, setLoad, type }) => {
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "flow_data") {
           setOpen(false);
-          setLoad(true);
+          
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
@@ -466,11 +452,8 @@ const AddModal = ({ Open, setOpen, rows, setLoad, type }) => {
   );
 };
 
-const UpdatesModal = ({ rows, open, setOpen, setLoad, type }) => {
-  const [testCases, setTestCases] = useState([]);
-  const [components, setComponents] = useState([]);
-  const [objects, setObjects] = useState([]);
-  const [commands, setCommands] = useState([]);
+const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,objects,commands, type }) => {
+
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -481,53 +464,22 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad, type }) => {
   const [value, setValue] = useState('');
   const [customerName, setCustomerName] = useState('A');
   useEffect(() => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'testcase' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'comp' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'object_repo' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'cammand' });
-  }, [rows]);
-
-  useEffect(() => {
-    const handleWebSocketData = (data) => {
-      if (Array.isArray(data)) {
-        switch (true) {
-          case data[0]?.hasOwnProperty('Modules_id'):
-            setTestCases(data);
-            break;
-          case data[0]?.hasOwnProperty('component_name') && !data[0]?.hasOwnProperty("Test_Case"):
-            setComponents(data);
-            break;
-          case data[0]?.hasOwnProperty('object_name') && !data[0]?.hasOwnProperty("Test_Case"):
-            setObjects(data);
-            break;
-          case data[0]?.hasOwnProperty('cammand') && !data[0]?.hasOwnProperty("Test_Case"):
-            setCommands(data);
-            break;
-          default:
-            break;
-        }
-      }
-    };
-    WebSocketManager.subscribe(handleWebSocketData);
-    return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, []);
-
-  useEffect(() => {
+    
     if (type === 'Component') {
-      setSelectedComponent(components.find(comp => comp?.component_name === rows?.component_name) || null);
-      setSelectedObject(objects.find(object => object?.object_name === rows?.object_name) || null);
-      setSelectedCommand(commands.find(command => command?.cammand === rows?.Cammand) || null);
+      setSelectedComponent(components?.find(comp => comp?.component_name === rows?.component_name) || null);
+      setSelectedObject(objects?.find(object => object?.object_name === rows?.object_name) || null);
+      setSelectedCommand(commands?.find(command => command?.cammand === rows?.Cammand) || null);
       setDescription(rows?.Description || '');
       setValue(rows?.Value || '');
       setStepNo(rows?.steps || '');
     }
     else if (type === 'flow') {
-      setSelectedTestCase(testCases.find(testCase => testCase?.Test_Case === rows?.Test_Case) || null);
-      setSelectedComponent(components.find(comp => comp?.component_name === rows?.component_name) || null);
+      setSelectedTestCase(testCases?.find(testCase => testCase?.Test_Case === rows?.Test_Case) || null);
+      setSelectedComponent(components?.find(comp => comp?.component_name === rows?.component_name) || null);
       setStageNo(rows?.flow || '');
       setCustomerName(rows?.Customer || 'A');
     }
-  }, [rows, testCases, components, objects, commands]);
+  }, [rows,type]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
