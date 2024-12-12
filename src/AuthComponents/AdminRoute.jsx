@@ -135,7 +135,7 @@ function AdminRoute({pathname}) {
       logout();
     },
   };
-  const router = useDemoRouter('/*');
+  const router = useDemoRouter('/');
 
   const NAVIGATION = Menu? Menu:[]
   const updatedNavigation = NAVIGATION?.map(item => {
@@ -182,7 +182,7 @@ function AdminRoute({pathname}) {
       
         <PageContainer/>
         <DemoPageContent pathname={router.pathname} navigate={router.navigate}/>
-        {pathname && router.pathname=="/*" && <DemoPageContent pathname={pathname} navigate={router.navigate}/>}
+        {pathname && router.pathname=="/" && <DemoPageContent pathname={pathname} navigate={router.navigate}/>}
         
       </DashboardLayout>
     </AppProvider>
@@ -197,6 +197,7 @@ function DemoPageContent({ pathname,navigate }) {
       sx={{
         py: 4,
               }}>
+      {pathname === '/*' && <Homepage pathname={pathname} navigate={navigate} />}
       {pathname === '/' && <Homepage pathname={pathname} navigate={navigate} />}
       {pathname === '/home' && <Homepage pathname={pathname} navigate={navigate} />}
       {pathname === '/Instances' && <Instances />}
