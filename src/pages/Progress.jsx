@@ -152,8 +152,7 @@ const ResponsivePage = ({ pathname,navigate }) => {
   
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { excelData,servers } = location.state || { excelData: [],servers:{} };
-  console.log(servers)
+  const { excelData,servers } =location?.state?.excelData ? location?.state : { excelData: [],servers:{} };
   const [getSession,setSesssion]=useState(false)
   const [sessionIds, setSessionIds] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
