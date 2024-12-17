@@ -6,9 +6,14 @@ import {
   Modal,
   TextField,
   Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Autocomplete,
-  Button,
   Paper,
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
@@ -53,7 +58,7 @@ function Testcase() {
   const [Testcase, setTestcase] = useState([]);
   const [Modules, setModules] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-
+const [deleteId, setDeleteId] = useState(null)
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
@@ -78,8 +83,12 @@ function Testcase() {
     setOpenUpdate(true);
   };
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'testcase',id:`${id}`});
+    setDeleteId(id)
+  };
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'testcase',id:`${deleteId}`});
     setLodding(true);
+    setDeleteId(null)
   }
   const handleAddClick = () => {
     setOpenAdd(true);
@@ -158,6 +167,27 @@ function Testcase() {
  
         />
       </Paper>
+      <Dialog
+              open={deleteId !== null}
+              onClose={() => setDeleteId(null)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Are you sure you want to delete this Testcase?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setDeleteId(null)} color="primary">
+                  No
+                </Button>
+                <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+                  Yes
+                </Button>
+              </DialogActions>
+            </Dialog>
     </Container>
   );
 };

@@ -7,8 +7,15 @@ import {
     TextField,
     Typography,
     Button,
-    Paper,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
     Autocomplete,
+    Paper,
+
 
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
@@ -56,12 +63,13 @@ function Modules() {
     const [username, setusername] = useState([])
     const [access, setaccess] = useState([])
     const [types, settype] = useState(null)
+    const [deleteId, setDeleteId] = useState(null)
     useEffect(() => {
         WebSocketManager.sendMessage({ path: "data", type: "list", table: "modules" });
         WebSocketManager.sendMessage({ path: "data", type: "list", table: "users" });
         WebSocketManager.sendMessage({ path: "data", type: "list", table: "usermodulesaccess" });
 
-    }, [openUpdate, openAdd,lodding])
+    }, [openUpdate, openAdd, lodding])
     useEffect(() => {
         const handleWebSocketData = (data) => {
             if (Array.isArray(data) && data[0]?.hasOwnProperty('imagespath')) {
@@ -87,21 +95,21 @@ function Modules() {
         setOpenUpdate(true);
     };
     const handleDeleteClick = (id, type) => {
-        switch (type) {
-            case "Access":
-                WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'usermodulesaccess', id: `${id}` });
-                setLodding(true);
-                break
-            case "Modules":
-                WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'modules', id: `${id}` });
-                setLodding(true);
-                break
-
-        }
+        setDeleteId(id)
+        settype(type)
 
 
     };
-
+    const handleDeleteConfirm = () => {
+        if (types == "Modules") {
+            WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'modules', id: `${deleteId}` });
+        }
+        else if (types == "Access") {
+            WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'usermodulesaccess', id: `${deleteId}` });
+        }
+        setLodding(true);
+        setDeleteId(null)
+    };
     const handleAddClickModules = () => {
         settype("Modules")
         setOpenAdd(true);
@@ -239,7 +247,7 @@ function Modules() {
             <Paper
                 color="primary"
                 variant="outlined"
-                shape="rounded" sx={{ height: 410, width: '100%',py:6 }}>
+                shape="rounded" sx={{ height: 410, width: '100%', py: 6 }}>
                 <DataGrid
                     columns={columns1}
                     rows={access}
@@ -251,6 +259,27 @@ function Modules() {
                     }}
                 />
             </Paper>
+            <Dialog
+                open={deleteId !== null}
+                onClose={() => setDeleteId(null)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {types == "Modules" ? "Are you sure you want to delete this Modules?" : "Are you sure you want to delete this User Access?"}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)} color="primary">
+                        No
+                    </Button>
+                    <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

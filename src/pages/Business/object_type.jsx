@@ -7,6 +7,13 @@ import {
     TextField,
     Typography,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    Autocomplete,
     Paper,
 
 } from '@mui/material';
@@ -52,7 +59,7 @@ function Types() {
     const [lodding, setLodding] = useState(false);
     const [flowData, setFlowData] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
-
+    const [deleteId, setDeleteId] = useState(null)
     useEffect(() => {
         const handleWebSocketData = (data) => {
             if (Array.isArray(data) && data[0]?.type && !data[0]?.Test_Case) {
@@ -74,8 +81,15 @@ function Types() {
         setOpenUpdate(true);
     };
     const handleDeleteClick = (id) => {
-        WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'object_types', id: `${id}` });
+        setDeleteId(id);
+        
+    };
+    const handleDeleteConfirm = () => {
+    
+        WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'object_types', id: `${deleteId}` });
         setLodding(true);
+        setDeleteId(null);
+
     };
     const handleAddClick = () => {
         setOpenAdd(true);
@@ -146,6 +160,27 @@ function Types() {
                     }}
                 />
             </Paper>
+            <Dialog
+                    open={deleteId !== null}
+                    onClose={() => setDeleteId(null)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                  >
+                    <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete this Types?
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setDeleteId(null)} color="primary">
+                        No
+                      </Button>
+                      <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+                        Yes
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
         </Container>
     );
 };

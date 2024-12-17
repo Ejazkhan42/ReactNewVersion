@@ -4,21 +4,17 @@ import {
   Box,
   Container,
   Modal,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
-  Autocomplete,
-  TableFooter,
   Paper,
-  TableContainer,
-  TablePagination
+
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 import EditIcon from '@mui/icons-material/Edit';
@@ -62,7 +58,7 @@ function Componenets() {
   const [lodding, setLodding] = useState(false);
   const [flowData, setFlowData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [deleteId, setDeleteId] = useState(null)
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.component_name && !data[0]?.Test_Case) {
@@ -76,7 +72,7 @@ function Componenets() {
     WebSocketManager.sendMessage({ path: "data", type: "list", table: "comp" });
 
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, [openAdd,openUpdate,lodding]);
+  }, [openAdd, openUpdate, lodding]);
 
   const handleUpdateClick = (row) => {
     setSelectedRow(row);
@@ -84,12 +80,17 @@ function Componenets() {
     setOpenUpdate(true);
   };
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'comp',id:`${id}`});
-    setLodding(true);
+    setDeleteId(id)
+
   };
   const handleAddClick = () => {
     setOpenAdd(true);
   };
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'comp', id: `${deleteId}` });
+    setLodding(true);
+    setDeleteId(null)
+  }
   const columns = [
     {
       field: "id",
@@ -134,8 +135,8 @@ function Componenets() {
   const paginationModel = { page: 0, pageSize: 5 };
   return (
     <Container>
-<AddModal Open={openAdd} setOpen={setOpenAdd} />
-<UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} />
+      <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
       <Paper color="primary"
         variant="outlined"
         shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -149,13 +150,34 @@ function Componenets() {
           }}
         />
       </Paper>
+      <Dialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Components?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 export default Componenets
 
-const AddModal = ({Open,setOpen}) => {
-  
+const AddModal = ({ Open, setOpen }) => {
+
   const [component_name, setcomponent_name] = useState('');
 
   const handleOpen = () => {
@@ -175,13 +197,13 @@ const AddModal = ({Open,setOpen}) => {
     });
 
     const handleWebSocketData = (data) => {
-      if (data?.status== "inserted" && data?.tableName == "comp") {
-         setOpen(false);
-        }
+      if (data?.status == "inserted" && data?.tableName == "comp") {
+        setOpen(false);
       }
+    }
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-    };
+  };
 
   return (
     <div>
@@ -199,8 +221,8 @@ const AddModal = ({Open,setOpen}) => {
 const UpdatesModal = ({ rows, Open, setOpen }) => {
   const [component_name, setcomponent_name] = useState('');
   const [comp, setcomp] = useState([])
- 
- 
+
+
   useEffect(() => {
     setcomp(rows || null);
     setcomponent_name(rows?.component_name || '')
@@ -219,10 +241,10 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
     });
 
     const handleWebSocketData = (data) => {
-      if (data?.status== "updated" && data?.tableName == "comp" ) {
+      if (data?.status == "updated" && data?.tableName == "comp") {
         setOpen(false);
-        }
       }
+    }
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   };

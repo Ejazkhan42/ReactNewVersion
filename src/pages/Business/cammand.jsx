@@ -7,6 +7,13 @@ import {
   TextField,
   Typography,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  Autocomplete,
   Paper,
 
 } from '@mui/material';
@@ -52,7 +59,7 @@ function Cammands() {
   const [lodding, setLodding] = useState(false);
   const [cammandData, setcammandData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [deleteId, setDeleteId] = useState(null)
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.cammand && !data[0]?.Test_Case) {
@@ -74,9 +81,13 @@ function Cammands() {
     setOpenUpdate(true);
   };
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'cammand',id:`${id}`});
-    setLodding(true);
+    setDeleteId(id)
   };
+   const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'cammand',id:`${deleteId}`});
+    setLodding(true);
+      setDeleteId(null)
+    }
   const handleAddClick = () => {
     setOpenAdd(true);
   };
@@ -146,6 +157,27 @@ function Cammands() {
           }}
         />
       </Paper>
+      <Dialog
+              open={deleteId !== null}
+              onClose={() => setDeleteId(null)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Are you sure you want to delete this Command?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setDeleteId(null)} color="primary">
+                  No
+                </Button>
+                <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+                  Yes
+                </Button>
+              </DialogActions>
+            </Dialog>
     </Container>
   );
 };

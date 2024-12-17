@@ -7,6 +7,11 @@ import {
   TextField,
   Typography,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Autocomplete,
   Paper,
@@ -45,14 +50,14 @@ function CustomToolbar({ handleAddClick }) {
     </GridToolbarContainer>
   );
 }
-function Objects () {
+function Objects() {
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [lodding, setLodding] = useState(false);
   const [object_types, setobject_types] = useState([]);
   const [flowData, setFlowData] = useState([]);
   const [selectedRow, setSelectedRow] = useState([]);
-
+  const [deleteId, setDeleteId] = useState(null)
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.hasOwnProperty('object_name')) {
@@ -83,9 +88,15 @@ function Objects () {
     setOpenAdd(true);
   };
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'object_repo',id:`${id}`});
-    setLodding(true);
+  
+    setDeleteId(id)
   };
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'object_repo', id: `${deleteId}` });
+      setLodding(true);
+      setDeleteId(null)
+    }
+  
   const columns = [
     {
       field: "id",
@@ -166,9 +177,30 @@ function Objects () {
           slots={{
             toolbar: () => <CustomToolbar handleAddClick={handleAddClick} />, // Pass handleAddClick to CustomToolbar
           }}
- 
+
         />
       </Paper>
+      <Dialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Objects?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
@@ -214,17 +246,17 @@ const AddModal = ({ Open, setOpen }) => {
       values: [Objects_name, Objects_value, PageName, Selectedobject_types.id],
     });
     const handleWebSocketData = (data) => {
-      if ( data?.status == "inserted" && data.tableName == "object_repo") {
+      if (data?.status == "inserted" && data.tableName == "object_repo") {
         setOpen(false);
       }
     }
-    WebSocketManager.subscribe(handleWebSocketData);  
+    WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   };
 
   return (
     <div>
-        <Modal open={Open} onClose={() => setOpen(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <Modal open={Open} onClose={() => setOpen(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box component="form" sx={style} onSubmit={handleSubmit}>
           <Typography fullWidth id="modal-modal-title" variant="h6" component="h2">Add New Object</Typography>
           <TextField fullWidth label="Object Name" variant="outlined" value={Objects_name} onChange={(e) => setObjects_name(e.target.value)} />

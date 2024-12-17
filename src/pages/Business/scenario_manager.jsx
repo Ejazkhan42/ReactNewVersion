@@ -6,9 +6,14 @@ import {
   Modal,
   TextField,
   Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Autocomplete,
-  Button,
   Paper,
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
@@ -36,24 +41,24 @@ const style = {
 function CustomToolbar({ handleAddClick }) {
 
   return (
-      <GridToolbarContainer>
-          <Button color="primary" startIcon={<AddIcon />} onClick={handleAddClick} >
-              Add record
-          </Button>
-          <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
+    <GridToolbarContainer>
+      <Button color="primary" startIcon={<AddIcon />} onClick={handleAddClick} >
+        Add record
+      </Button>
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
 
-      </GridToolbarContainer>
+    </GridToolbarContainer>
   );
 }
 
-function scenario_manager () {
+function scenario_manager() {
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [lodding, setLodding] = useState(false);
   const [Testcase, setTestcase] = useState([]);
   const [Scenario, setScenario] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [deleteId, setDeleteId] = useState(null)
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
@@ -70,7 +75,7 @@ function scenario_manager () {
     WebSocketManager.sendMessage({ path: "data", type: "list", table: "scenario_manager" });
 
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, [openAdd,openUpdate,lodding]);
+  }, [openAdd, openUpdate, lodding]);
 
   const handleUpdateClick = (row) => {
     setSelectedRow(row);
@@ -79,9 +84,14 @@ function scenario_manager () {
   };
 
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'scenario_manager',id:`${id}`});
-    setLodding(true);
+    setDeleteId(id)
+
   };
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'scenario_manager', id: `${deleteId}` });
+    setLodding(true);
+    setDeleteId(null)
+  }
 
   const handleAddClick = () => {
     setOpenAdd(true);
@@ -204,15 +214,36 @@ function scenario_manager () {
           pageSizeOptions={[5, 10, 25, 100]}
           slots={{
             toolbar: () => <CustomToolbar handleAddClick={handleAddClick} />, // Pass handleAddClick to CustomToolbar
-        }}
+          }}
         />
       </Paper>
+      <Dialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Scenario?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 export default scenario_manager
 
-const AddModal = ({Open,setOpen}) => {
+const AddModal = ({ Open, setOpen }) => {
   const [TestScenario, setTestScenario] = useState('Sample');
   const [SSO, setSSO] = useState([{ id: 'NO' }, { id: 'YES' }]);
   const [selectedSSO, setSelectedSSO] = useState(SSO[0]); // Default selection for SSO
@@ -258,8 +289,8 @@ const AddModal = ({Open,setOpen}) => {
     { id: 'RunRangeOfIterations' }
   ]);
   const [selectedIterationMode, setSelectedIterationMode] = useState(iterationModes[0])
-  const [Start_Iteration,setStart_Iteration]=useState(null);
-  const [End_Iteration,setEnd_Iteration]=useState(null);
+  const [Start_Iteration, setStart_Iteration] = useState(null);
+  const [End_Iteration, setEnd_Iteration] = useState(null);
   const [SelectTestcase, setSelectTescase] = useState(null);
   const [Testcase, setTestcase] = useState([]);
   useEffect(() => {
@@ -273,7 +304,7 @@ const AddModal = ({Open,setOpen}) => {
         switch (true) {
           case data[0]?.hasOwnProperty('Test_Case') && data[0]?.hasOwnProperty("Modules_id"):
             setTestcase(data);
-            break; 
+            break;
           default:
             break;
         }
@@ -298,22 +329,22 @@ const AddModal = ({Open,setOpen}) => {
       values: [TestScenario, selectedSSO.id, selectedExecute.id, selectedBrowser.id, selectedPlatform.id, selectedDevice.id, selectedIterationMode.id, Start_Iteration, End_Iteration, SelectTestcase.id],
     });
     const handleWebSocketData = (data) => {
-      if (data?.status== "inserted" && data?.tableName == "scenario_manager" ) {
+      if (data?.status == "inserted" && data?.tableName == "scenario_manager") {
         setOpen(false);
-        }
       }
-      WebSocketManager.subscribe(handleWebSocketData);
-      return () => WebSocketManager.unsubscribe(handleWebSocketData);
-    };
-   
-  
+    }
+    WebSocketManager.subscribe(handleWebSocketData);
+    return () => WebSocketManager.unsubscribe(handleWebSocketData);
+  };
+
+
 
   return (
     <div>
-     
+
       <Modal open={Open} onClose={() => setOpen(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-SSO">
         <Box component="form" sx={style} onSubmit={handleSubmit}>
-        <Typography fullWidth id="modal-modal-title" variant="h6" component="h2">Add New Scenario</Typography>
+          <Typography fullWidth id="modal-modal-title" variant="h6" component="h2">Add New Scenario</Typography>
           <TextField fullWidth label="Test Scenario" variant="outlined" value={TestScenario} onChange={(e) => setTestScenario(e.target.value)} />
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
@@ -441,8 +472,8 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
     { id: 'RunRangeOfIterations' }
   ]);
   const [selectedIterationMode, setSelectedIterationMode] = useState(iterationModes[0])
-  const [Start_Iteration,setStart_Iteration]=useState(null);
-  const [End_Iteration,setEnd_Iteration]=useState(null);
+  const [Start_Iteration, setStart_Iteration] = useState(null);
+  const [End_Iteration, setEnd_Iteration] = useState(null);
   const [SelectTestcase, setSelectTescase] = useState(null);
   const [Testcase, setTestcase] = useState([]);
   const [TestScenario_id, setTestScenario_id] = useState([])
@@ -457,7 +488,7 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
         switch (true) {
           case data[0]?.hasOwnProperty('Test_Case') && data[0]?.hasOwnProperty("Modules_id"):
             setTestcase(data);
-            break; 
+            break;
           default:
             break;
         }
@@ -489,23 +520,23 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
       table: 'scenario_manager',
       whereCondition: "id=?",
       whereValues: [TestScenario_id],
-      columns: ['Test_Scenario',"SSO","test_case_id","Execute","Browser","Platform","Device","Iteration_Mode","Start_Iteration","End_Iteration"],
-      values: [TestScenario,selectedSSO.id,SelectTestcase.id,selectedExecute.id,selectedBrowser.id,selectedPlatform.id,selectedDevice.id,selectedIterationMode.id,Start_Iteration,End_Iteration],
+      columns: ['Test_Scenario', "SSO", "test_case_id", "Execute", "Browser", "Platform", "Device", "Iteration_Mode", "Start_Iteration", "End_Iteration"],
+      values: [TestScenario, selectedSSO.id, SelectTestcase.id, selectedExecute.id, selectedBrowser.id, selectedPlatform.id, selectedDevice.id, selectedIterationMode.id, Start_Iteration, End_Iteration],
     });
     const handleWebSocketData = (data) => {
-      if ( data?.status== "updated" && data?.tableName == "scenario_manager" ) {
+      if (data?.status == "updated" && data?.tableName == "scenario_manager") {
         setOpen(false);
-        }
       }
+    }
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   };
 
   return (
     <div>
-       <Modal open={open} onClose={() => setOpen(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <Modal open={open} onClose={() => setOpen(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box component="form" sx={style} onSubmit={handleSubmit}>
-        <Typography fullWidth id="modal-modal-title" variant="h6" component="h2">Add Upate Scenario</Typography>
+          <Typography fullWidth id="modal-modal-title" variant="h6" component="h2">Add Upate Scenario</Typography>
           <TextField fullWidth label="Test Case Name" variant="outlined" value={TestScenario} onChange={(e) => setTestScenario(e.target.value)} />
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
