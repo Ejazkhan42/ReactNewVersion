@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
   Button,
+  Dialog,
   FormControl,
   Autocomplete,
   Paper} from '@mui/material';
@@ -98,6 +99,7 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [rows, setRows] = useState([]);
+  const [deleteId,setDeleteId]=useState(null)
   const [type, setType] = useState('flow');
   const handleAddClick = () => {
     setOpenAdd(true);
@@ -110,9 +112,15 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
     setOpenUpdate(true);
   }
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'flow_data',id:`${id}`});
-    setLoad(true);
+    setDeleteId(id)
+    
   };
+  
+  const  handleDeleteConfirm=()=>{
+    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'flow_data',id:`${deleteId}`});
+    setLoad(true);
+    setDeleteId(null)
+  }
   return (
     <div>
       <Paper>
@@ -129,6 +137,27 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
           }}
         />
       </Paper>
+      <Dialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Flow Steps?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
@@ -163,6 +192,7 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
   ];
   const [openAdd, setOpenAdd] = useState(false);
   const [rows, setRows] = useState([]);
+  const [deleteId,setDeleteId]=useState(null)
   const [type, setType] = useState('Component');
   const handleAddClick = () => {
     setOpenAdd(true);
@@ -173,9 +203,15 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
     setOpenUpdate(true);
   };
   const handleDeleteClick = (id) => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'comp_data',id:`${id}`});
-    setLoad(true);
+    setDeleteId(id)
+    
   };
+  
+  const  handleDeleteConfirm=()=>{
+    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'comp_data',id:`${deleteId}`});
+    setLoad(true);
+    setDeleteId(null)
+  }
 
   return (
     <div>
@@ -193,6 +229,27 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
           }}
         />
       </Paper>
+      <Dialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Component Steps?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
@@ -275,8 +332,7 @@ const Flow = () => {
     setComponentData([]);
     setSelectedComponent(newValue);
   };
-  var c=1
-  console.log("Render:", c+1)
+
 
   return (
     <Container>
