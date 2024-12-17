@@ -158,12 +158,12 @@ function AdminRoute({pathname}) {
   }
   return item;
 });
-  const location=useLocation()
-  console.log(router)
+  
+  
   return (
     <AppProvider
             id="backToHome"
-            navigation={NAVIGATION}
+            navigation={updatedNavigation}
             theme={demoTheme}
             session={session}
             authentication={authentication}

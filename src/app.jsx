@@ -28,10 +28,15 @@ const AppRoutes = () => {
         path="/*" 
         element={
           <PrivateRoute>
-            
-            {/* <PageContainer title="Home" breadCrumbs={breadCrumbs}/> */}
             <AdminRoute/>
-           
+          </PrivateRoute>
+        } 
+      />
+       <Route 
+        path="/dashboard" 
+        element={
+          <PrivateRoute>
+            <AdminRoute/>
           </PrivateRoute>
         } 
       />

@@ -53,7 +53,7 @@ const Menu = (role_id) => {
       if (res.data) {
         sessionStorage.setItem("menu", JSON.stringify(res.data))
 
-        window.location.href = '/';
+        window.location.href = '/dashboard';
       }
     })
     .catch((error) => {

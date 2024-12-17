@@ -86,7 +86,7 @@ const TestCasePage = ({ pathname,navigate }) => {
   const location = useLocation();
   const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const { moduleId, JOB } = location.state || {};
-  console.log(moduleId)
+
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
