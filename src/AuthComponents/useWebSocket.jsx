@@ -64,5 +64,6 @@ class WebSocketManager {
     this.websocket.send(formattedMessage);
   }
 }
-
-export default new WebSocketManager('wss://websocket.doingerp.com');
+import { base } from '../config';
+const WS_URL=base(window.env.WS)
+export default new WebSocketManager(WS_URL);
