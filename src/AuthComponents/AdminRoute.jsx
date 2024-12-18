@@ -45,7 +45,7 @@ import Types from '../pages/Business/object_type';
 import Module from '../pages/Business/modules';
 import { Box } from "@mui/material";
 import Worklist from '../pages/worklist'
-import { Route,useLocation } from "react-router-dom";
+import { Route,useLocation,Outlet } from "react-router-dom";
 
 
 const logout = () => {
@@ -158,7 +158,10 @@ function AdminRoute({pathname}) {
   }
   return item;
 });
-  
+  const location = useLocation();
+const title = location.pathname.split("/")[1].toUpperCase();
+
+
   
   return (
     <AppProvider
@@ -179,46 +182,12 @@ function AdminRoute({pathname}) {
             }}
           >
       <DashboardLayout slots={{ toolbarActions: Notifications}}>
-      
-        <PageContainer/>
-        <DemoPageContent pathname={router.pathname} navigate={router.navigate}/>
-        {pathname && router.pathname=="/" && <DemoPageContent pathname={pathname} navigate={router.navigate}/>}
-        
+      <PageContainer title={title}/>
+        <Outlet/>
       </DashboardLayout>
     </AppProvider>
   );
 }
 export default AdminRoute;
 
-
-function DemoPageContent({ pathname,navigate }) {
-  return (
-      <Box
-      sx={{
-        py: 4,
-              }}>
-      {pathname === '/*' && <Homepage pathname={pathname} navigate={navigate} />}
-      {pathname === '/' && <Homepage pathname={pathname} navigate={navigate} />}
-      {pathname === '/home' && <Homepage pathname={pathname} navigate={navigate} />}
-      {pathname === '/Instances' && <Instances />}
-      {pathname === '/customers' && <Customers pathname={pathname} navigate={navigate} />}
-      {pathname === '/business/Scenario' && <Scenario_manager />}
-      {pathname === '/business/objects' && <Objects />}
-      {pathname === '/env' && <Env pathname={pathname} navigate={navigate}/>}
-      {pathname === '/Modules' && <Modules pathname={pathname} navigate={navigate} />}
-      {pathname === '/progress' && <Progress pathname={pathname} navigate={navigate}  />}
-      {pathname === '/Jobs' && <TestCasePage pathname={pathname} navigate={navigate}  />}
-      {pathname === '/business/manager' && <FlowPage pathname={pathname} navigate={navigate}  />}
-      {pathname === '/business/Components' && <ComponentPage pathname={pathname} navigate={navigate}  />}
-      {pathname === '/business' && <Testcase pathname={pathname} navigate={navigate}  />}
-      {pathname === '/business/Testcase' && <Testcase pathname={pathname} navigate={navigate}  />}
-      {pathname === '/business/command' && <Cammands pathname={pathname} navigate={navigate}  />}
-      {pathname === '/business/types' && <Types pathname={pathname} navigate={navigate} />}
-      {pathname === '/AdminPanel' && <AdminPanel pathname={pathname} navigate={navigate} />}
-      {pathname === '/Setting/Modules' && <Module pathname={pathname} navigate={navigate} />}
-      {pathname === '/worklist' && <Worklist pathname={pathname} navigate={navigate} />}
-
-      </Box>
-  );
-}
 

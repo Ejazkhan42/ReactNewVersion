@@ -48,6 +48,7 @@
     ]
   },
   "devDependencies": {
-    "drizzle-kit": "^0.24.2"
+    "drizzle-kit": "^0.24.2",
+    "serve": "^14.2.4"
   }
 }
