@@ -21,7 +21,7 @@ $wssUrl = base64_encode($ini['WSS_URL']);
 echo "window.env = {";
 echo "    AP: '$apiUrl',";
 echo "    VP: '$vncPass',";
-echo "    VU: '$vncUrl'";
+echo "    VU: '$vncUrl',";
 echo "    WS: '$wssUrl'";
 echo "};";
 ?>
