@@ -43,9 +43,8 @@ const AppRoutes = () => {
       > 
         
         <Route path='/' element={<Homepage pathname={router.pathname} navigate={router.navigate} />} />
-        <Route path="dashboard" element={<Homepage pathname={router.pathname} navigate={router.navigate}/>} />
-        <Route path="home" element={<Homepage pathname={router.pathname} navigate={router.navigate} />} />
-        <Route path="customers" element={<Customers pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path="/dashboard" element={<Homepage pathname={router.pathname} navigate={router.navigate}/>} />
+        <Route path="/home" element={<Homepage pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Instances' element={<Instance pathname={router.pathname} navigate={router.navigate}/>} />
         <Route path='/customers' element={<Customers pathname={router.pathname} navigate={router.navigate}/>} />
         <Route path='/business/Scenario' element={<Scenario_manager />} />
