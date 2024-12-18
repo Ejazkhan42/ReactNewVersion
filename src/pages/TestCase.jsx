@@ -35,6 +35,7 @@ import { base } from '../config';
 import WebSocketManager from '../AuthComponents/useWebSocket';
 const API_URL=base(window.env.AP)
 const VIDEO_URL=base(window.env.VU)
+const WS_URL=base(window.env.WS)
 
 let JOBNAME;
 
@@ -240,6 +241,7 @@ const TestCasePage = ({ pathname,navigate }) => {
     formData.append('Username',ctx.username)
     formData.append('VIDEO_URL',servers?.url || VIDEO_URL)
     formData.append('API',API_URL)
+    formData.append('websocket',WS_URL)
 
     if (localStorage.getItem('Token') !== null) {
       formData.append('Token', localStorage.getItem('Token'));
