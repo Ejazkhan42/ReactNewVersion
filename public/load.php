@@ -15,13 +15,13 @@ header("Content-Type: application/javascript");
 $apiUrl = base64_encode($ini['API_URL']);
 $vncPass = base64_encode($ini['VNC_PASS']);
 $vncUrl = base64_encode($ini['VNC_URL']);
-$wssUrl = base64_encode($ini['WSS_URL']);
+$wssUrl = base64_encode($ini['WS_URL']);
 
 // Generate the JavaScript object with encoded values
 echo "window.env = {";
 echo "    AP: '$apiUrl',";
 echo "    VP: '$vncPass',";
-echo "    VU: '$vncUrl'";
+echo "    VU: '$vncUrl',";
 echo "    WS: '$wssUrl'";
 echo "};";
 ?>
