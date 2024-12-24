@@ -324,6 +324,12 @@ const Flow = () => {
       setComponentList(filteredComponents);
       setSelectedComponent(filteredComponents.find(f=>f.id===SelectedComponent?.id));
     }
+    else
+    {
+      setComponentList([]);
+      setSelectedComponent(null);
+    }
+
   }, [flowData, selectedTestCase,openUpdate]);
 
 
@@ -512,7 +518,7 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
               </FormControl>
               <TextField required fullWidth label="Step No" variant="outlined" value={stepNo} onChange={(e) => setStepNo(e.target.value)} />
               <TextField required fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
-              <TextField required fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
+              <TextField fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
             </>
           )}
 
