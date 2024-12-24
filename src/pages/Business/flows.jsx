@@ -391,14 +391,14 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
   const [selectedCommand, setSelectedCommand] = useState(null);
-  const [stageNo, setStageNo] = useState('');
-  const [stepNo, setStepNo] = useState('');
+  const [stageNo, setStageNo] = useState(0);
+  const [stepNo, setStepNo] = useState(0);
   const [description, setDescription] = useState('');
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(null);
   const [customerName, setCustomerName] = useState('A');
  
   useEffect(() => {
-    console.log("Render time Add :", 1)
+
     if (type === 'Component') {
       setSelectedComponent(components?.find(comp => comp?.component_name === rows?.component_name) || null);
          }
@@ -410,7 +410,11 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
     event.preventDefault();
 
     if (type === 'flow') {
-
+      if (!selectedTestCase || !selectedComponent || !stageNo) {
+        alert('Please fill all the fields');  
+        return;
+        
+      }
       WebSocketManager.sendMessage({
         path: 'data',
         type: 'insert',
@@ -421,6 +425,7 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "flow_data") {
           setOpen(false);
+          setLoad(true);
           
         }
       };
@@ -429,12 +434,16 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
 
     }
     else if (type === 'Component') {
+      if (!selectedComponent || !selectedCommand || !stepNo || !description) {
+        alert('Please fill all the fields');
+        return;
+      }
       WebSocketManager.sendMessage({
         path: 'data',
         type: 'insert',
         table: 'comp_data',
         columns: ['comp_id', 'Target', 'Cammand', 'steps', 'Description', 'Value'],
-        values: [selectedComponent.id, selectedObject.id, selectedCommand.id, stepNo, description, value],
+        values: [selectedComponent?.id, selectedObject?.id ? selectedObject.id: null, selectedCommand?.id, stepNo, description, value],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "comp_data") {
@@ -455,6 +464,7 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
             <>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
+                  aria-required={true}
                   value={selectedTestCase}
                   options={testCases}
                   getOptionLabel={(option) => option?.Test_Case || ""}
@@ -463,14 +473,15 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
 
                 />
               </FormControl>
-              <TextField fullWidth label="Stage No" variant="outlined" value={stageNo} onChange={(e) => setStageNo(e.target.value)} />
-              <TextField fullWidth label="Customer (Default is A)" variant="outlined" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+              <TextField required fullWidth label="Stage No" variant="outlined" value={stageNo} onChange={(e) => setStageNo(e.target.value)} />
+              <TextField required fullWidth label="Customer (Default is A)" variant="outlined" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
             </>
           )}
 
 
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
+            required
             value={selectedComponent}
               options={components}
               getOptionLabel={(option) => option?.component_name || ""}
@@ -492,15 +503,16 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
               </FormControl>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
+                required
                   options={commands}
                   getOptionLabel={(option) => option?.cammand || ""}
                   onChange={(event, newValue) => setSelectedCommand(newValue)}
                   renderInput={(params) => <TextField {...params} label="Command" variant="outlined" />}
                 />
               </FormControl>
-              <TextField fullWidth label="Step No" variant="outlined" value={stepNo} onChange={(e) => setStepNo(e.target.value)} />
-              <TextField fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
-              <TextField fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
+              <TextField required fullWidth label="Step No" variant="outlined" value={stepNo} onChange={(e) => setStepNo(e.target.value)} />
+              <TextField required fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
+              <TextField required fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
             </>
           )}
 
@@ -545,6 +557,10 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
     event.preventDefault();
 
     if (type === 'flow') {
+      if (!selectedTestCase || !selectedComponent || !stageNo) {
+        alert('Please fill all the fields');
+        return;
+      }
       WebSocketManager.sendMessage({
         path: 'data',
         type: 'update',
@@ -565,6 +581,10 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
     }
 
     if (type === 'Component') {
+      if (!selectedComponent || !selectedCommand || !stepNo || !description) {
+        alert('Please fill all the fields');
+        return;
+      }
       WebSocketManager.sendMessage({
         path: 'data',
         type: 'update',
@@ -598,6 +618,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
             <>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
+                required
                   value={selectedTestCase}
                   options={testCases}
                   getOptionLabel={(option) => option?.Test_Case || ""}
@@ -606,14 +627,15 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
 
                 />
               </FormControl>
-              <TextField fullWidth label="Stage No" variant="outlined" value={stageNo} onChange={(e) => setStageNo(e.target.value)} />
-              <TextField fullWidth label="Customer (Default is A)" variant="outlined" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+              <TextField required fullWidth label="Stage No" variant="outlined" value={stageNo} onChange={(e) => setStageNo(e.target.value)} />
+              <TextField required fullWidth label="Customer (Default is A)" variant="outlined" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
             </>
           )}
 
 
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
+            required
               value={selectedComponent}
               options={components}
               getOptionLabel={(option) => option?.component_name || ""}
@@ -627,6 +649,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
             <>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
+
                   value={selectedObject}
                   options={objects}
                   getOptionLabel={(option) => option?.object_name || ""}
@@ -636,6 +659,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
               </FormControl>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
+                required
                   value={selectedCommand}
                   options={commands}
                   getOptionLabel={(option) => option?.cammand || ""}
@@ -643,9 +667,9 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
                   renderInput={(params) => <TextField {...params} label="Command" variant="outlined" />}
                 />
               </FormControl>
-              <TextField fullWidth label="Step No" variant="outlined" value={stepNo} onChange={(e) => setStepNo(e.target.value)} />
-              <TextField fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
-              <TextField fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
+              <TextField required fullWidth label="Step No" variant="outlined" value={stepNo} onChange={(e) => setStepNo(e.target.value)} />
+              <TextField  fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
+              <TextField  fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
             </>
           )}
 
