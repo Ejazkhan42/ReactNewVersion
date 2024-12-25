@@ -27,27 +27,12 @@ import CasesSharpIcon from '@mui/icons-material/CasesSharp';
 import ListIcon from '@mui/icons-material/List';
 import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt"
 import { useDemoRouter } from './Route';
-import Homepage from "../pages/Homepage";
-import Scenario_manager from "../pages/Business/scenario_manager";
-import TestCasePage from "../pages/TestCase";
-import Customers from "../pages/Customers";
-import Instances from "../pages/Instances";
-import Env from "../pages/Env";
-import Objects from "../pages/Business/objects";
-import Modules from "../pages/Modules";
-import Progress from "../pages/Progress";
-import AdminPanel from "../pages/AdminPanel";
-import FlowPage from '../pages/Business/flows'; 
-import ComponentPage from '../pages/Business/components';
-import Testcase from '../pages/Business/testcases';
-import Cammands from '../pages/Business/cammand';
-import Types from '../pages/Business/object_type';
-import Module from '../pages/Business/modules';
 import { Box } from "@mui/material";
-import Worklist from '../pages/worklist'
-import { Route,useLocation,Outlet } from "react-router-dom";
-
-
+import { useLocation,Outlet } from "react-router-dom";
+import Fade from '@mui/material/Fade';
+import Fab from '@mui/material/Fab';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 const logout = () => {
   axios
     .get(`${API_URL}/logout`, { withCredentials: true })
@@ -113,6 +98,36 @@ const iconMapping = {
   "ModelTrainingSharpIcon":<ModelTrainingSharpIcon/>,
   "AppSettingsAltIcon":<AppSettingsAltIcon/>,
 };
+function ScrollTop(props) {
+  const { children, window } = props;
+  const trigger = useScrollTrigger({
+    target: window ? window() : undefined,
+    disableHysteresis: true,
+    threshold: 10,
+  });
+
+const handleClick = () => {
+    const scrollWindow = window || globalThis || document;
+    if (scrollWindow.scrollTo) {
+      scrollWindow.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return (
+    <Fade in={trigger}>
+      <Box
+        onClick={handleClick}
+        role="presentation"
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+      >
+        {children}
+      </Box>
+    </Fade>
+  );
+}
 function AdminRoute({pathname}) {
   const [user,setuser] = useState(JSON.parse(sessionStorage.getItem("user")));
   const [Menu, setMenu] = useState(JSON.parse(sessionStorage.getItem("menu")));
@@ -185,6 +200,11 @@ const title = location.pathname.split("/")[1].toUpperCase();
       <PageContainer title={title}/>
         <Outlet/>
       </DashboardLayout>
+      <ScrollTop>
+         <Fab size="small" aria-label="scroll back to top">
+           <KeyboardArrowUpIcon />
+         </Fab>
+      </ScrollTop>
     </AppProvider>
   );
 }

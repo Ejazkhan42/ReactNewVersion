@@ -8,7 +8,6 @@ import {
   InputLabel,
   MenuItem,
   Modal,
-  OutlinedInput,
   Paper,
   Select,
   Table,
@@ -21,12 +20,11 @@ import {
   TextField,
   Typography,
   CircularProgress,
-  ListItemText,
   IconButton,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { CloudUpload as CloudUploadIcon, Close as CloseIcon } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Close as CloseIcon } from '@mui/icons-material';
+import { useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -87,7 +85,6 @@ const TestCasePage = ({ pathname,navigate }) => {
   const location = useLocation();
   const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const { moduleId, JOB } = location.state || {};
-
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -307,34 +304,33 @@ const TestCasePage = ({ pathname,navigate }) => {
           <Grid size={4} sx={{
             alignItems: "center",
             display: "inline-flex",
-            justifyContent: "flex-start",
+            justifyContent: "flex-end",
             alignItems: "stretch",
             height: "53px",
           }}>
-         <Typography variant="h5" component="h5" gutterBottom>
-              Test Cases
-            </Typography>
+            
             <Button
-              variant="contained"
-              color="primary"
-              onClick={handleRunClick}
-              disabled={selectedTestCases.length === 0}
-              sx={{margin:"3px", backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
-            >
-              Run
-            </Button>
-            <Button
-            style={{ fontSize: '0.5em' }}
+            // style={{ fontSize: '0.7em' }}
+            fullWidth
               variant="contained"
               color="primary"
               href=
               {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Sample`}
               
-              sx={{margin:"3px",  backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+              sx={{margin:"3px", maxWidth:'240px',  backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
-               Dowload Test Template
+              1. Download Test Data
             </Button>
-            
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={handleRunClick}
+              disabled={selectedTestCases.length === 0}
+              sx={{margin:"3px",maxWidth:'100px' , backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+            >
+             2. Run
+            </Button>
             <TextField
               style={{ marginTop: "0px" }}
               label="Search Test Cases"
