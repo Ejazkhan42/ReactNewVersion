@@ -53,7 +53,6 @@ function CustomToolbar({ handleAddClick }) {
     );
 }
 
-
 function Menu_function() {
     const [openAdd, setOpenAdd] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
