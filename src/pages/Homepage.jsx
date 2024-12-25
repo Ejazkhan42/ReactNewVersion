@@ -83,7 +83,7 @@ function Homepage({ pathname, navigate }) {
 
   useEffect(() => {
       const handleWebSocketData = (data) => {
-      if (Array.isArray(data) && data[0]?.test_name && data[0]?.test_status) {
+      if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status") && data[0]?.username===ctx.username) {
          setDashboardData(data);
          processChartData(data);
       }
