@@ -18,6 +18,7 @@ import AdminPanel from "./pages/AdminPanel"
 import { PageContainer } from '@toolpad/core';
 import Worklist from "./pages/worklist"
 import Scenario_manager from "./pages/Business/scenario_manager"
+import Menu from './pages/Business/Menu';
 import Objects from "./pages/Business/objects"
 import FlowPage from "./pages/Business/flows"
 import ComponentPage from "./pages/Business/components"
@@ -62,6 +63,7 @@ const AppRoutes = () => {
         <Route path='/AdminPanel' element={<AdminPanel  pathname={router.pathname} navigate={router.navigate}/>} />
         <Route path='/Setting/Modules' element={<Module  pathname={router.pathname} navigate={router.navigate}/>} />
         <Route path='/worklist' element={<Worklist pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path='/Setting/Menu' element={<Menu pathname={router.pathname} navigate={router.navigate} />} />
       </Route>
 
 

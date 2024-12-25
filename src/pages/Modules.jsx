@@ -25,7 +25,7 @@ function Orders({pathname, navigate}) {
 
   useEffect(() => {
     const handleWebSocketData = (data) => {
-    if (Array.isArray(data) && data[0]?.User_id && data[0]?.JOB) {
+    if (Array.isArray(data) && data[0]?.hasOwnProperty('User_id') && data[0]?.hasOwnProperty('JOB')) {
       setModules(data);
     }
   };
