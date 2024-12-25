@@ -84,7 +84,7 @@ const VisuallyHiddenImageInput = styled('input')({
 const TestCasePage = ({ pathname,navigate }) => {
   const location = useLocation();
   const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
-  const { moduleId, JOB } = location.state || {};
+  const { moduleId, JOB,moduleName } = location.state || {};
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -315,7 +315,7 @@ const TestCasePage = ({ pathname,navigate }) => {
               variant="contained"
               color="primary"
               href=
-              {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Sample`}
+              {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Sample_${moduleName.replace(' ', '_')}`}
               
               sx={{margin:"3px", maxWidth:'240px',  backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
