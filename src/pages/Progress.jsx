@@ -162,7 +162,7 @@ const ResponsivePage = ({ pathname,navigate }) => {
     const handleWebSocketData = (data) => {
       if (data.path ==="chat" && data?.token === localStorage.getItem('Token')) {
         setSessionIds([data]);
-        sessionStorage.setItem('browsers_id',JSON.stringify(data));
+        
         
       }
     };

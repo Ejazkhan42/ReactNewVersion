@@ -263,25 +263,26 @@ const TestCasePage = ({ pathname, navigate }) => {
 
       if (response.ok) {
         const result = await response.json();
-        setMessage('Success');
+        
         const handleWebSocketData = (data) => {
           if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
-            setSessionIds([data]);
+            sessionStorage.setItem('browsers_id',JSON.stringify(data));
+            setIsLoading(false);
+            setMessage('Success');
+            navigate('/progress', { excelData, servers });
 
           }
         };
 
         WebSocketManager.subscribe(handleWebSocketData);
 
-        navigate('/progress', { excelData, servers });
+        
       } else {
         console.error('Error:', response.statusText);
       }
     } catch (error) {
       console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
 

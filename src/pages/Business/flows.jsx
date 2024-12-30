@@ -100,6 +100,7 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
       ),
     },
   ];
+
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [rows, setRows] = useState([]);
@@ -194,6 +195,7 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
       ),
     },
   ];
+
   const [openAdd, setOpenAdd] = useState(false);
   const [rows, setRows] = useState([]);
   const [deleteId,setDeleteId]=useState(null)
@@ -265,6 +267,8 @@ const Flow = () => {
   const [flowData, setFlowData] = useState([]);
   const [componentList, setComponentList] = useState([]);
   const [componentData, setComponentData] = useState([]);
+ 
+  
   const [components, setComponents] = useState([]);
   const [objects, setObjects] = useState([]);  
   const [commands, setCommands] = useState([]);
@@ -392,7 +396,7 @@ const Flow = () => {
   );
 };
 export default Flow;
-const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,testCases,objects,commands }) => {
+const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,testCases,objects,commands}) => {
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -574,7 +578,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
         whereCondition: "id=?",
         whereValues: [rows?.id],
         columns: ['Scenrio_id', 'comp_id', 'Steps_order', 'Customer'],
-        values: [selectedTestCase?.id, selectedComponent?.id, stageNo.trim(), customerName.trim()],
+        values: [selectedTestCase?.id, selectedComponent?.id, stageNo, customerName.trim()],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "updated" && data?.tableName == "flow_data") {
@@ -598,7 +602,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
         whereCondition: "id=?",
         whereValues: [rows?.id],
         columns: ['comp_id', 'Cammand', 'Target', 'Description', 'Value', 'steps'],
-        values: [selectedComponent?.id, selectedCommand?.id, selectedObject?.id, description.trim(), value.trim(), stepNo.trim()],
+        values: [selectedComponent?.id, selectedCommand?.id, selectedObject?.id, description.trim(), value.trim(), stepNo],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "updated" && data?.tableName == "comp_data") {
