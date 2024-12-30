@@ -426,7 +426,7 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
         type: 'insert',
         table: 'flow_data',
         columns: ['Scenrio_id', 'comp_id', 'Steps_order', 'Customer'],
-        values: [selectedTestCase.id, selectedComponent.id, stageNo, customerName],
+        values: [selectedTestCase.id, selectedComponent.id, stageNo, customerName.trim()],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "flow_data") {
@@ -449,7 +449,7 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
         type: 'insert',
         table: 'comp_data',
         columns: ['comp_id', 'Target', 'Cammand', 'steps', 'Description', 'Value'],
-        values: [selectedComponent?.id, selectedObject?.id ? selectedObject.id: null, selectedCommand?.id, stepNo, description, value],
+        values: [selectedComponent?.id, selectedObject?.id ? selectedObject.id: null, selectedCommand?.id, stepNo, description.trim(), value.trim()],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "comp_data") {
@@ -574,7 +574,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
         whereCondition: "id=?",
         whereValues: [rows?.id],
         columns: ['Scenrio_id', 'comp_id', 'Steps_order', 'Customer'],
-        values: [selectedTestCase?.id, selectedComponent?.id, stageNo, customerName],
+        values: [selectedTestCase?.id, selectedComponent?.id, stageNo.trim(), customerName.trim()],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "updated" && data?.tableName == "flow_data") {
@@ -598,7 +598,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
         whereCondition: "id=?",
         whereValues: [rows?.id],
         columns: ['comp_id', 'Cammand', 'Target', 'Description', 'Value', 'steps'],
-        values: [selectedComponent?.id, selectedCommand?.id, selectedObject?.id, description, value, stepNo],
+        values: [selectedComponent?.id, selectedCommand?.id, selectedObject?.id, description.trim(), value.trim(), stepNo.trim()],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "updated" && data?.tableName == "comp_data") {

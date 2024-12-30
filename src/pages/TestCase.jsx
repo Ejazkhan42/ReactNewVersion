@@ -31,9 +31,9 @@ import * as XLSX from 'xlsx';
 import { v4 as uuid } from 'uuid';
 import { base } from '../config';
 import WebSocketManager from '../AuthComponents/useWebSocket';
-const API_URL=base(window.env.AP)
-const VIDEO_URL=base(window.env.VU)
-const WS_URL=base(window.env.WS)
+const API_URL = base(window.env.AP)
+const VIDEO_URL = base(window.env.VU)
+const WS_URL = base(window.env.WS)
 
 let JOBNAME;
 
@@ -81,10 +81,10 @@ const VisuallyHiddenImageInput = styled('input')({
   width: 1,
 });
 
-const TestCasePage = ({ pathname,navigate }) => {
+const TestCasePage = ({ pathname, navigate }) => {
   const location = useLocation();
-  const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
-  const { moduleId, JOB,moduleName } = location.state || {};
+  const [ctx, setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
+  const { moduleId, JOB, moduleName } = location.state || {};
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -108,9 +108,9 @@ const TestCasePage = ({ pathname,navigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [servers, setservers] = useState({ id: 1, name: "SQ Brother Server", url: "https://gridview.doingerp.com:443", password: "selenoid" });
   const [error, seterror] = useState('')
-  let envvairable= JSON.parse(localStorage.getItem('env'))
+  let envvairable = JSON.parse(localStorage.getItem('env'))
   useEffect(() => {
-     env = JSON.parse(localStorage.getItem('env'))
+    env = JSON.parse(localStorage.getItem('env'))
 
     if (env == undefined || env == '') {
       const fetchClients = async () => {
@@ -140,13 +140,13 @@ const TestCasePage = ({ pathname,navigate }) => {
 
   useEffect(() => {
     const handleWebSocketData = (data) => {
-    if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
-      setTestCases(data);
-    }
-  };
-  WebSocketManager.subscribe(handleWebSocketData);
-  
-}, []);
+      if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
+        setTestCases(data);
+      }
+    };
+    WebSocketManager.subscribe(handleWebSocketData);
+
+  }, []);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -168,14 +168,14 @@ const TestCasePage = ({ pathname,navigate }) => {
   };
 
   const handleRunClick = () => {
-    
+
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.name && data[0]?.password) {
         setSeleniumServer(data);
       }
     };
     WebSocketManager.subscribe(handleWebSocketData);
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "server_vnc"});
+    WebSocketManager.sendMessage({ path: "data", type: "list", table: "server_vnc" });
     const selectedTestCaseNames = paginatedData
       .filter((testCase) => selectedTestCases.includes(testCase.id))
       .map((testCase) => testCase.Test_Case)
@@ -235,10 +235,10 @@ const TestCasePage = ({ pathname,navigate }) => {
     formData.append('TestCase', testCaseList.join(','));
     formData.append('GridMode', gridMode);
     formData.append('Browsers', selectedBrowser);
-    formData.append('Username',ctx.username)
-    formData.append('VIDEO_URL',servers?.url || VIDEO_URL)
-    formData.append('API',API_URL)
-    formData.append('websocket',WS_URL)
+    formData.append('Username', ctx.username)
+    formData.append('VIDEO_URL', servers?.url || VIDEO_URL)
+    formData.append('API', API_URL)
+    formData.append('websocket', WS_URL)
 
     if (localStorage.getItem('Token') !== null) {
       formData.append('Token', localStorage.getItem('Token'));
@@ -264,7 +264,16 @@ const TestCasePage = ({ pathname,navigate }) => {
       if (response.ok) {
         const result = await response.json();
         setMessage('Success');
-        navigate('/progress', { excelData,servers });
+        const handleWebSocketData = (data) => {
+          if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
+            setSessionIds([data]);
+
+          }
+        };
+
+        WebSocketManager.subscribe(handleWebSocketData);
+
+        navigate('/progress', { excelData, servers });
       } else {
         console.error('Error:', response.statusText);
       }
@@ -308,16 +317,16 @@ const TestCasePage = ({ pathname,navigate }) => {
             alignItems: "stretch",
             height: "53px",
           }}>
-            
+
             <Button
-            // style={{ fontSize: '0.7em' }}
-            fullWidth
+              // style={{ fontSize: '0.7em' }}
+              fullWidth
               variant="contained"
               color="primary"
               href=
               {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Sample_${moduleName.replace(' ', '_')}`}
-              
-              sx={{margin:"3px", maxWidth:'240px',  backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+
+              sx={{ margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
               1. Download Test Data
             </Button>
@@ -327,9 +336,9 @@ const TestCasePage = ({ pathname,navigate }) => {
               color="primary"
               onClick={handleRunClick}
               disabled={selectedTestCases.length === 0}
-              sx={{margin:"3px",maxWidth:'100px' , backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+              sx={{ margin: "3px", maxWidth: '100px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
-             2. Run
+              2. Run
             </Button>
             <TextField
               style={{ marginTop: "0px" }}
@@ -442,11 +451,11 @@ const TestCasePage = ({ pathname,navigate }) => {
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel>Selenium Server</InputLabel>
-                <Select value={servers?.id || ""}  renderValue={() => servers?.name || ""} onChange={(e) => setservers(SeleniumServer.find((s)=>s.id===e.target.value))}>
-                  {SeleniumServer.map((server)=>
-                  <MenuItem key={server.id} value={server.id}>{server.name}</MenuItem>
+                <Select value={servers?.id || ""} renderValue={() => servers?.name || ""} onChange={(e) => setservers(SeleniumServer.find((s) => s.id === e.target.value))}>
+                  {SeleniumServer.map((server) =>
+                    <MenuItem key={server.id} value={server.id}>{server.name}</MenuItem>
                   )}
-                  </Select>
+                </Select>
               </FormControl>
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
