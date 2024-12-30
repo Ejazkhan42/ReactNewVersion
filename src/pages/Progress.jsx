@@ -154,15 +154,16 @@ const ResponsivePage = ({ pathname,navigate }) => {
   const [loading, setLoading] = useState(false);
   const { excelData,servers } =location?.state?.excelData ? location?.state : { excelData: [],servers:{} };
   const [getSession,setSesssion]=useState(false)
-  const [sessionIds, setSessionIds] = useState(sessionStorage.getItem('browsers_id') ? JSON.parse(sessionStorage.getItem('browsers_id')) : []);
+  const [sessionIds, setSessionIds] = useState(sessionStorage.getItem('browsers_id') ? [JSON.parse(sessionStorage.getItem('browsers_id'))] : []);
   const [selectedSession, setSelectedSession] = useState(null);
   const [vncConnectionStatus, setVncConnectionStatus] =
   useState("disconnected");
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (data.path ==="chat" && data?.token === localStorage.getItem('Token')) {
-        setSessionIds([data]);
-        
+        const updatedSessionIds = [...sessionIds, data];
+        setSessionIds(updatedSessionIds);
+        sessionStorage.setItem('browsers_id', JSON.stringify(updatedSessionIds));
         
       }
     };
