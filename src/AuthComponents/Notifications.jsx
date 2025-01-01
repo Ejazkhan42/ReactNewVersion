@@ -18,6 +18,8 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Typography from '@mui/material/Typography';
+import {ThemeSwitcher  } from '@toolpad/core';
+
 
 function AlignItemsList({ notifications }) {
   return (
@@ -49,6 +51,7 @@ function AlignItemsList({ notifications }) {
         </React.Fragment>
       ))}
     </List>
+
   );
 }
 
@@ -102,6 +105,7 @@ function Notifications() {
   const open = Boolean(anchorEl);
 
   return (
+    <>
     <Tooltip title="Notifications" enterDelay={1000}>
       <IconButton
         aria-label="notifications"
@@ -135,6 +139,8 @@ function Notifications() {
 
       <ToastContainer position="top-center" autoClose={10000} />
     </Tooltip>
+    <ThemeSwitcher/>
+    </>
   );
 }
 

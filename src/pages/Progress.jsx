@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
+  Card,
+  CardMedia,
   Container,
   Paper,
   Table,
@@ -152,7 +154,8 @@ const ResponsivePage = ({ pathname,navigate }) => {
   
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { excelData,servers } =location?.state?.excelData ? location?.state : { excelData: [],servers:{} };
+  const { excelData,servers } =location?.state?.excelData ? location?.state : { excelData: sessionStorage.getItem('excelData') ? JSON.parse(sessionStorage.getItem('excelData')) : [],
+    servers:sessionStorage.getItem('servers') ? JSON.parse(sessionStorage.getItem('servers')) : {} };
   const [getSession,setSesssion]=useState(false)
   const [sessionIds, setSessionIds] = useState(sessionStorage.getItem('browsers_id') ? [JSON.parse(sessionStorage.getItem('browsers_id'))] : []);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -255,7 +258,7 @@ const handleDropdownOpen = () => {
     </Grid>
     <Grid>
         <Button
-            sx={{ ml: 2, fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
+            sx={{marginTop:'1%' , marginBottom:'1%', fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
                  onClick={handleConnect}
              disabled={
                      vncConnectionStatus === "connecting" ||
@@ -267,7 +270,7 @@ const handleDropdownOpen = () => {
              <Button
             style={{ marginLeft: "10px" }}
             variant="outlined"
-            sx={{ ml: 2, fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
+            sx={{ marginTop:'1%', marginBottom:'1%',fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
             onClick={handleDisconnect}
             disabled={vncConnectionStatus === "disconnected"}
         >
@@ -276,7 +279,7 @@ const handleDropdownOpen = () => {
     </Grid>
     {/* I want change marginButton on vncConnectionStatus==connecting margin 50% ==connected margin 4%  */}
     <Grid sx={{height:"100%",maxHeight:"638px",marginBottom:getMarginBottom()}}>
-    {selectedSession && (
+    {selectedSession && servers?.url &&(
         <VncScreen
           session={selectedSession}
           SELENOID_URL={servers?.url}
@@ -289,9 +292,6 @@ const handleDropdownOpen = () => {
     </Grid>
     
     <StyledPaper>
-    <Typography variant="h6" gutterBottom>
-      Data Set
-    </Typography>
     <DataSetTable excelData={excelData} />
   </StyledPaper>
     </Grid>

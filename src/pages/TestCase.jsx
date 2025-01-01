@@ -263,10 +263,11 @@ const TestCasePage = ({ pathname, navigate }) => {
 
       if (response.ok) {
         const result = await response.json();
-        
         const handleWebSocketData = (data) => {
           if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
             sessionStorage.setItem('browsers_id',JSON.stringify(data));
+            sessionStorage.setItem('servers',JSON.stringify(servers));
+            sessionStorage.setItem('excelData',JSON.stringify(excelData));
             setIsLoading(false);
             setMessage('Success');
             navigate('/progress', { excelData, servers });

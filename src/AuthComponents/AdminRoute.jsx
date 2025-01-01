@@ -1,5 +1,5 @@
 import React, {useState, } from "react";
-import {AppProvider,DashboardLayout,PageContainer } from '@toolpad/core';
+import {AppProvider,DashboardLayout,PageContainer,ThemeSwitcher  } from '@toolpad/core';
 
 import axios from "axios";
 import { createTheme } from '@mui/material/styles';
@@ -48,24 +48,7 @@ const demoTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: 'data-toolpad-color-scheme',
   },
-  colorSchemes: {
-    light: {
-      palette: {
-        background: {
-          default: '#F9F9FE',
-          paper: '#EEEEF9',
-        },
-      },
-    },
-    dark: {
-      palette: {
-        background: {
-          default: '#2A4364',
-          paper: '#112E4D',
-        },
-      },
-    },
-  },
+  colorSchemes: { light: true, dark: true },
   breakpoints: {
     values: {
       xs: 0,
@@ -182,7 +165,7 @@ const title = location.pathname.split("/")[1].toUpperCase();
     <AppProvider
             id="backToHome"
             navigation={updatedNavigation}
-            theme={demoTheme}
+            
             session={session}
             authentication={authentication}
             router={router}
@@ -195,6 +178,7 @@ const title = location.pathname.split("/")[1].toUpperCase();
               ),
               title: '',
             }}
+            theme={demoTheme}
           >
       <DashboardLayout slots={{ toolbarActions: Notifications}}>
       <PageContainer title={title}/>

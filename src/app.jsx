@@ -56,7 +56,7 @@ const AppRoutes = () => {
         <Route path='/Jobs' element={<TestCasePage pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/business/manager' element={<FlowPage pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/business/Components' element={<ComponentPage pathname={router.pathname} navigate={router.navigate} />} />
-        <Route path='/business' element={<Testcase pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path='/business' element={<FlowPage pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/business/Testcase' element={<Testcase pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/business/command' element={<Cammands  pathname={router.pathname} navigate={router.navigate}/>} />
         <Route path='/business/types' element={<Types pathname={router.pathname} navigate={router.navigate} />} />
@@ -64,6 +64,8 @@ const AppRoutes = () => {
         <Route path='/Setting/Modules' element={<Module  pathname={router.pathname} navigate={router.navigate}/>} />
         <Route path='/worklist' element={<Worklist pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Setting/Menu' element={<Menu pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path='/Setting' element={<Module pathname={router.pathname} navigate={router.navigate} />} />
+
       </Route>
 
 
