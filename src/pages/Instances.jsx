@@ -23,18 +23,19 @@ import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
 import { AuthLoginInfo } from "../AuthComponents/AuthLogin";
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
+import { DataGrid } from '@mui/x-data-grid';
 import { base } from '../config';
-const API_URL=base(window.env.AP)
+const API_URL = base(window.env.AP)
 
 function Clients() {
-  const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
+  const [ctx, setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const [data, setData] = useState([]);
-  const [customerUpdate,setCustomerUpdate]=useState(false)
+  const [customerUpdate, setCustomerUpdate] = useState(false)
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [currentClient, setCurrentClient] = useState(null);
   const [formData, setFormData] = useState({
-    customer_id:"",
+    customer_id: "",
     clientName: "",
     envName: "",
     id: ctx.id,
@@ -64,7 +65,7 @@ function Clients() {
     };
     fetchClients();
   }, [customerUpdate]);
-  
+
   const handleClickOpen = (clientIndex = null) => {
     if (clientIndex !== null) {
       setIsEdit(true);
@@ -73,8 +74,8 @@ function Clients() {
     } else {
       setIsEdit(false);
       setFormData({
-        customer_id:"",
-        clientName:"",
+        customer_id: "",
+        clientName: "",
         envName: "",
         id: ctx.id,
         instance_url: "",
@@ -88,8 +89,8 @@ function Clients() {
   const handleClose = () => {
     setOpen(false);
     setFormData({
-      customer_id:"",
-      clientName:"",
+      customer_id: null,
+      clientName: "",
       envName: "",
       id: ctx.id,
       instance_url: "",
@@ -106,7 +107,7 @@ function Clients() {
   const handleSubmit = async () => {
     try {
       if (isEdit) {
-        await axios.put(`${API_URL}/customerupdate`, formData, { withCredentials: true });
+        await axios.put(`${API_URL}/updatecustomer`, formData, { withCredentials: true });
         const updatedData = [...data];
         updatedData[currentClient] = formData;
         setData(updatedData);
@@ -115,7 +116,7 @@ function Clients() {
         const response = await axios.post(`${API_URL}/addcustomer`, formData, { withCredentials: true });
         setData([...data, response.data]);
         setCustomerUpdate(true)
-        
+
       }
       handleClose();
     } catch (error) {
@@ -135,111 +136,160 @@ function Clients() {
       console.error("Error deleting client:", error);
     }
   };
+  const rows = data.map((client, index) => ({ id: index, ...client }));
+  const columns = [
+    {
+      field: 'id', headerName: 'ID', width: 80, flex: 0.3, 
+      resizable: false,
+      // filterable: false, 
+      // sortable: false,
+      // filter: false,
+    },
+    { field: 'clientName', headerName: 'Customer', width: 100, flex: 0.3, resizable: false },
+    { field: 'envName', headerName: 'Env Name', width: 100, flex: 0.3, resizable: false },
+    { field: 'instance_url', headerName: 'Instance', width: 100, flex: 1, resizable: false },
+    { field: 'instance_username', headerName: 'Username', width: 100, flex: 0.5, resizable: false },
+    { field: 'instance_password', headerName: 'Password', width: 100, flex: 0.5, resizable: false },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      resizable: false,
+      filterable: false, 
+      sortable: false,
+      filter: false,
+      width: 100,
+      flex: 0.6,
+      renderCell: (params) => (
+        <strong>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            style={{ marginLeft: 16 }}
+            onClick={() => handleClickOpen(params.row.id)}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            style={{ marginLeft: 16 }}
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </Button>
+        </strong>
+      ),
+    },
+  ]
 
   return (
     <Container>
-        <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 1, sm: 1, md: 4 }}>
+      <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 1, sm: 1, md: 4 }}>
         <Grid size={{ xs: 1, sm: 4, md: 4 }}>
-        <Button variant="contained" sx={{backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} startIcon={<AddIcon />} onClick={() => handleClickOpen()}>
-          Add Instance
-        </Button>
+          <Button variant="contained" sx={{ backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} startIcon={<AddIcon />} onClick={() => handleClickOpen()}>
+            Add Instance
+          </Button>
         </Grid>
         <Grid size={{ xs: 2, sm: 3, md: 4 }}>
-        <TableContainer component={Paper}>
-        <Table  sx={{ minWidth: 1 }} stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Customer</TableCell>
-              <TableCell>Env Name</TableCell>
-              <TableCell>Instance URL</TableCell>
-              <TableCell>Instance Username</TableCell>
-              <TableCell>Instance Password</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((client, index) => (
-              <TableRow key={index}>
-                <TableCell>{client.customer_id}</TableCell>
-                <TableCell>{client.clientName}</TableCell>
-                <TableCell>{client.envName}</TableCell>
-                <TableCell>{client.instance_url}</TableCell>
-                <TableCell>{client.instance_username}</TableCell>
-                <TableCell>{client.instance_password}</TableCell>
-                <TableCell>
-                  <Button startIcon={<EditIcon />} onClick={() => handleClickOpen(index)} />
-                  <Button startIcon={<DeleteIcon />} onClick={() => handleDelete(index)} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-          </Grid>
-          <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{isEdit ? "Edit Instance" : "Add Instance"}</DialogTitle>
-        <Box >
-        <DialogContent>
-        <TextField
-            margin="dense"
-            label="ID"
-            name="customer_id"
-            value={formData.customer_id}
-            onChange={handleChange}
-            fullWidth
-          />
-        <TextField
-            margin="dense"
-            label="Customer Name"
-            name="clientName"
-            value={formData.clientName}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Env Name"
-            name="envName"
-            value={formData.envName}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Instance URL"
-            name="instance_url"
-            value={formData.instance_url}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Instance Username"
-            name="instance_username"
-            value={formData.instance_username}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            margin="dense"
-            label="Instance Password"
-            name="instance_password"
-            value={formData.instance_password}
-            onChange={handleChange}
-            fullWidth
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} sx={{ ml: 2, fontSize: '1.2rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }}>Cancel</Button>
-          <Button onClick={handleSubmit} sx={{ ml: 2, fontSize: '1.2rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} variant="contained">
-            {isEdit ? "Update" : "Add"}
-          </Button>
-        </DialogActions>
-        </Box>
+          <DataGrid rows={rows} columns={columns} pageSize={5} />
+          {/* <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 1 }} stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Customer</TableCell>
+                  <TableCell>Env Name</TableCell>
+                  <TableCell>Instance URL</TableCell>
+                  <TableCell>Instance Username</TableCell>
+                  <TableCell>Instance Password</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((client, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{client.customer_id}</TableCell>
+                    <TableCell>{client.clientName}</TableCell>
+                    <TableCell>{client.envName}</TableCell>
+                    <TableCell>{client.instance_url}</TableCell>
+                    <TableCell>{client.instance_username}</TableCell>
+                    <TableCell>{client.instance_password}</TableCell>
+                    <TableCell>
+                      <Button startIcon={<EditIcon />} onClick={() => handleClickOpen(index)} />
+                      <Button startIcon={<DeleteIcon />} onClick={() => handleDelete(index)} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer> */}
+        </Grid>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>{isEdit ? "Edit Instance" : "Add Instance"}</DialogTitle>
+          <Box >
+            <DialogContent>
+              {isEdit && (<TextField
+                margin="dense"
+                label="ID"
+                name="customer_id"
+                value={formData.customer_id}
+                onChange={handleChange}
+                fullWidth
+              />)}
 
-      </Dialog>
-        </Grid>     
+              <TextField
+                margin="dense"
+                label="Customer Name"
+                name="clientName"
+                value={formData.clientName}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Env Name"
+                name="envName"
+                value={formData.envName}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Instance URL"
+                name="instance_url"
+                value={formData.instance_url}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Instance Username"
+                name="instance_username"
+                value={formData.instance_username}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Instance Password"
+                name="instance_password"
+                value={formData.instance_password}
+                onChange={handleChange}
+                fullWidth
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} sx={{ ml: 2, fontSize: '1.2rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }}>Cancel</Button>
+              <Button onClick={handleSubmit} sx={{ ml: 2, fontSize: '1.2rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} variant="contained">
+                {isEdit ? "Update" : "Add"}
+              </Button>
+            </DialogActions>
+          </Box>
+
+        </Dialog>
+      </Grid>
     </Container>
   );
 }

@@ -322,6 +322,7 @@ const TestCasePage = ({ pathname, navigate }) => {
 
             <Button
               // style={{ fontSize: '0.7em' }}
+              title="Please download the test data file before running the test cases"
               fullWidth
               variant="contained"
               color="primary"
@@ -333,6 +334,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               1. Download Test Data
             </Button>
             <Button
+              title='Please select the test cases to run'
               fullWidth
               variant="contained"
               color="primary"
@@ -343,6 +345,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               2. Run
             </Button>
             <TextField
+              title='Search for test cases'
               style={{ marginTop: "0px" }}
               label="Search Test Cases"
               variant="outlined"

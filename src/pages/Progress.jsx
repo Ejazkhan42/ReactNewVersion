@@ -19,6 +19,7 @@ import {
   InputLabel,
   CircularProgress
 } from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
 import VncScreen from "./Browser";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
@@ -26,7 +27,7 @@ import Grid from '@mui/material/Grid2';
 import { useLocation } from "react-router-dom";
 import { base } from '../config';
 import WebSocketManager from '../AuthComponents/useWebSocket';
-const API_URL=base(window.env.AP)
+const API_URL = base(window.env.AP)
 
 const StyledPaper = styled(Paper)({
   padding: "16px",
@@ -61,7 +62,7 @@ function Item(props) {
 const styles = theme => ({
   disabledButton: {
     backgroundColor: '#173B45',
-    color:"#FF8225"
+    color: "#FF8225"
   }
 });
 const SystemLog = styled("div")({
@@ -89,29 +90,29 @@ const LogItem = styled("div")(({ theme, active }) => ({
 }));
 
 const DataSetTable = ({ excelData }) => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  // const [page, setPage] = useState(0);
+  // const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  // };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10));
+  //   setPage(0);
+  // };
 
-  const paginatedData = excelData.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage,
-  );
+  // const paginatedData = excelData.slice(
+  //   page * rowsPerPage,
+  //   page * rowsPerPage + rowsPerPage,
+  // );
 
   return (
     <Paper>
       <Typography variant="h4" align="center" gutterBottom>
         Excel Data
       </Typography>
-      <TableContainer>
+      {/* <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
@@ -135,8 +136,8 @@ const DataSetTable = ({ excelData }) => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
-      <TablePagination
+      </TableContainer> */}
+      {/* <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
         count={excelData.length}
@@ -145,29 +146,37 @@ const DataSetTable = ({ excelData }) => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{ marginTop: "16px", fontSize: "1.2rem" }}
+      /> */}
+      <DataGrid
+        rows={excelData.map((row, index) => ({ ...row, id: index }))}
+        columns={Object.keys(excelData[0]).map((key) => ({ field: key, headerName: key, width: 150 }))}
+        pageSize={10}
+        checkboxSelection
       />
     </Paper>
   );
 };
 
-const ResponsivePage = ({ pathname,navigate }) => {
-  
+const ResponsivePage = ({ pathname, navigate }) => {
+
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { excelData,servers } =location?.state?.excelData ? location?.state : { excelData: sessionStorage.getItem('excelData') ? JSON.parse(sessionStorage.getItem('excelData')) : [],
-    servers:sessionStorage.getItem('servers') ? JSON.parse(sessionStorage.getItem('servers')) : {} };
-  const [getSession,setSesssion]=useState(false)
+  const { excelData, servers } = location?.state?.excelData ? location?.state : {
+    excelData: sessionStorage.getItem('excelData') ? JSON.parse(sessionStorage.getItem('excelData')) : [],
+    servers: sessionStorage.getItem('servers') ? JSON.parse(sessionStorage.getItem('servers')) : {}
+  };
+  const [getSession, setSesssion] = useState(false)
   const [sessionIds, setSessionIds] = useState(sessionStorage.getItem('browsers_id') ? [JSON.parse(sessionStorage.getItem('browsers_id'))] : []);
   const [selectedSession, setSelectedSession] = useState(null);
   const [vncConnectionStatus, setVncConnectionStatus] =
-  useState("disconnected");
+    useState("disconnected");
   useEffect(() => {
     const handleWebSocketData = (data) => {
-      if (data.path ==="chat" && data?.token === localStorage.getItem('Token')) {
+      if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
         const updatedSessionIds = [...sessionIds, data];
         setSessionIds(updatedSessionIds);
         sessionStorage.setItem('browsers_id', JSON.stringify(updatedSessionIds));
-        
+
       }
     };
 
@@ -179,7 +188,7 @@ const ResponsivePage = ({ pathname,navigate }) => {
     if (selectedSession) {
       setVncConnectionStatus("connecting");
     }
-    
+
   };
 
   const handleDisconnect = () => {
@@ -191,18 +200,18 @@ const ResponsivePage = ({ pathname,navigate }) => {
   const handleSessionChange = (event) => {
     setLoading(false)
     setSelectedSession(event.target.value)
-    
+
   };
-const handleDropdownOpen = () => {
-   const handleWebSocketData = (data) => {
-      if ( data.path ==="chat" && data?.token === localStorage.getItem('Token')) {
+  const handleDropdownOpen = () => {
+    const handleWebSocketData = (data) => {
+      if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
         setSessionIds([data]);
       }
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-};
+  };
 
   const getMarginBottom = () => {
     switch (vncConnectionStatus) {
@@ -211,7 +220,7 @@ const handleDropdownOpen = () => {
       case "connecting":
         return "50%";
       case "connected":
-          return "4%";  
+        return "4%";
       default:
         return "50%";
     }
@@ -219,84 +228,84 @@ const handleDropdownOpen = () => {
 
   return (
     <Container>
-     <Box sx={{
+      <Box sx={{
         display: 'grid',
         columnGap: 1,
         rowGap: 1,
         gridTemplateColumns: 'repeat(1, 1fr)',
-        }}>
+      }}>
         <Grid>
-        <Grid>
-            <InputLabel id="demo-multiple-checkbox-label" sx={{fontSize: "1.2rem"}}>
-        Select Session
+          <Grid>
+            <InputLabel id="demo-multiple-checkbox-label" sx={{ fontSize: "1.2rem" }}>
+              Select Session
             </InputLabel>
-        <Select
-            value={selectedSession}
-            onChange={handleSessionChange}
-            onOpen={handleDropdownOpen}
-            displayEmpty
-            fullWidth
-            variant="outlined"
-            disabled={
-          vncConnectionStatus === "connecting" ||
-          vncConnectionStatus === "connected"
-            }
-      >
-        {loading ? (
-              <MenuItem disabled>
-                    <CircularProgress size={24} style={{ marginRight: '10px' }} />
-                    Session ID
-              </MenuItem>
-            ) : (
-              sessionIds.map((session) => (
-                <MenuItem key={session.browserId} value={session.browserId}>
-                  {session.testcase}
+            <Select
+              value={selectedSession}
+              onChange={handleSessionChange}
+              onOpen={handleDropdownOpen}
+              displayEmpty
+              fullWidth
+              variant="outlined"
+              disabled={
+                vncConnectionStatus === "connecting" ||
+                vncConnectionStatus === "connected"
+              }
+            >
+              {loading ? (
+                <MenuItem disabled>
+                  <CircularProgress size={24} style={{ marginRight: '10px' }} />
+                  Session ID
                 </MenuItem>
-              ))
+              ) : (
+                sessionIds.map((session) => (
+                  <MenuItem key={session.browserId} value={session.browserId}>
+                    {session.testcase}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </Grid>
+          <Grid>
+            <Button
+              sx={{ marginTop: '1%', marginBottom: '1%', fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' }, '&:disabled': { backgroundColor: "#FF8225" } }}
+              onClick={handleConnect}
+              disabled={
+                vncConnectionStatus === "connecting" ||
+                vncConnectionStatus === "connected"
+              }
+            >
+              LIVE VIEW
+            </Button>
+            <Button
+              style={{ marginLeft: "10px" }}
+              variant="outlined"
+              sx={{ marginTop: '1%', marginBottom: '1%', fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' }, '&:disabled': { backgroundColor: "#FF8225" } }}
+              onClick={handleDisconnect}
+              disabled={vncConnectionStatus === "disconnected"}
+            >
+              Disconnect
+            </Button>
+          </Grid>
+          {/* I want change marginButton on vncConnectionStatus==connecting margin 50% ==connected margin 4%  */}
+          <Grid sx={{ height: "100%", maxHeight: "638px", marginBottom: getMarginBottom() }}>
+            {selectedSession && servers?.url && (
+              <VncScreen
+                session={selectedSession}
+                SELENOID_URL={servers?.url}
+                SELENOID_PASSWORD={servers?.password}
+                onUpdateState={setVncConnectionStatus}
+              />
             )}
-          </Select>
-    </Grid>
-    <Grid>
-        <Button
-            sx={{marginTop:'1%' , marginBottom:'1%', fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
-                 onClick={handleConnect}
-             disabled={
-                     vncConnectionStatus === "connecting" ||
-                     vncConnectionStatus === "connected"
-          }
-        >
-          LIVE VIEW
-        </Button>
-             <Button
-            style={{ marginLeft: "10px" }}
-            variant="outlined"
-            sx={{ marginTop:'1%', marginBottom:'1%',fontSize: '1rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' },'&:disabled':{backgroundColor:"#FF8225"}}}
-            onClick={handleDisconnect}
-            disabled={vncConnectionStatus === "disconnected"}
-        >
-          Disconnect
-        </Button>
-    </Grid>
-    {/* I want change marginButton on vncConnectionStatus==connecting margin 50% ==connected margin 4%  */}
-    <Grid sx={{height:"100%",maxHeight:"638px",marginBottom:getMarginBottom()}}>
-    {selectedSession && servers?.url &&(
-        <VncScreen
-          session={selectedSession}
-          SELENOID_URL={servers?.url}
-          SELENOID_PASSWORD={servers?.password}
-          onUpdateState={setVncConnectionStatus}
-        />
-      )}
-    </Grid>
-    <Grid sx={{with:"70%",maxWidth:"1200px"}}>
-    </Grid>
-    
-    <StyledPaper>
-    <DataSetTable excelData={excelData} />
-  </StyledPaper>
-    </Grid>
+          </Grid>
+          <Grid sx={{ with: "70%", maxWidth: "1200px" }}>
+          </Grid>
 
-     </Box>
+          <StyledPaper>
+            <DataSetTable excelData={excelData} />
+          </StyledPaper>
+        </Grid>
+
+      </Box>
     </Container>
   );
 };

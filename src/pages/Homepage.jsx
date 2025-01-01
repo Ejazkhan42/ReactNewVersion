@@ -210,6 +210,7 @@ function ButtonComponent() {
     return (
       <Container>
       <a
+      title="Please click to run the test case"
         className={`btn ${isClicked ? 'is-clicked' : ''}`}
         onClick={handleClick}
       >
@@ -228,7 +229,7 @@ function ButtonComponent() {
           <Grid size={{ xs: 2, sm: 4, md: 3 }}>
             <Item onClick={scrollToTable}>
               <div>
-                <h3>Total Cases in Library</h3>
+                <h3>Total Cases in list</h3>
                 <div>
                   <LibraryBooksRoundedIcon />
                 </div>

@@ -29,7 +29,6 @@ export default function Signup() {
     if (!newUserDetails.LastName) errorMessage += 'Last Name is required. ';
     if (!newUserDetails.username) errorMessage += 'Username is required. ';
     if (!newUserDetails.Email) errorMessage += 'Email is required. ';
-    if (!newUserDetails.PhoneNumber) errorMessage += 'Phone Number is required. ';
     if (!newUserDetails.password) errorMessage += 'Password is required. ';
     if (!confirmPassword) errorMessage += 'Confirm Password is required. ';
 
@@ -50,7 +49,7 @@ export default function Signup() {
       })
       .catch(err => {
         console.error('Signup error:', err);
-        setError('Sign Up Failed');
+        setError(`An error occurred. Please try again later. ${res.data} `);
       });
   };
 
@@ -146,7 +145,6 @@ export default function Signup() {
                 variant="standard"
                 type='tel'
                 fullWidth
-                required
                 margin="dense"
                 value={newUserDetails.PhoneNumber}
                 onChange={(e) => setNewUserDetails({ ...newUserDetails, PhoneNumber: e.target.value })}
