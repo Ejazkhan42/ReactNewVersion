@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Card,
-  CardMedia,
   Container,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  TextField,
   Typography,
-  Select,
-  MenuItem,
   Button,
-  TablePagination,
-  InputLabel,
+  Autocomplete,
   CircularProgress
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
@@ -95,15 +85,15 @@ const DataSetTable = ({ excelData }) => {
       <Typography variant="h4" align="center" gutterBottom>
         Excel Data
       </Typography>
-    {excelData.length === 0 && <Typography variant="h6" align="center" gutterBottom> No Data Found</Typography>}
-    {excelData.length > 0 && 
-    
-      <DataGrid
-        rows={excelData?.map((row, index) => ({ ...row, id: index }))}
-        columns={Object.keys(excelData?.[0]).map((key) => ({ field: key, headerName: key, width: 150 }))}
-        pageSize={10}
-        checkboxSelection
-      />}
+      {excelData.length === 0 && <Typography variant="h6" align="center" gutterBottom> No Data Found</Typography>}
+      {excelData.length > 0 &&
+
+        <DataGrid
+          rows={excelData?.map((row, index) => ({ ...row, id: index }))}
+          columns={Object.keys(excelData?.[0]).map((key) => ({ field: key, headerName: key, width: 150 }))}
+          pageSize={10}
+          checkboxSelection
+        />}
     </Paper>
   );
 };
@@ -112,28 +102,28 @@ const ResponsivePage = ({ pathname, navigate }) => {
 
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { excelData, servers } = location?.state?.excelData ? location?.state : {
-    excelData: sessionStorage.getItem('excelData') ? JSON.parse(sessionStorage.getItem('excelData')) : [],
-    servers: sessionStorage.getItem('servers') ? JSON.parse(sessionStorage.getItem('servers')) : {}
+  const { excelData } = location?.state?.excelData ? location?.state : {
+    excelData: sessionStorage.getItem('excelData') ? JSON.parse(sessionStorage.getItem('excelData')) : []
   };
-  const [getSession, setSesssion] = useState(false)
-  const [sessionIds, setSessionIds] = useState(sessionStorage.getItem('browsers_id') ? [JSON.parse(sessionStorage.getItem('browsers_id'))] : []);
+  const [serverDetails, setServerDetails] = useState({ server: "", password: "" });
+  const [sessionIds, setSessionIds] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
-  const [vncConnectionStatus, setVncConnectionStatus] =
-    useState("disconnected");
+  const [vncConnectionStatus, setVncConnectionStatus] = useState("disconnected");
   useEffect(() => {
     const handleWebSocketData = (data) => {
-      if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
+      if (data.path === "chat" && data?.token === localStorage.getItem('Token') && data?.hasOwnProperty('browserId')) {
         const updatedSessionIds = [...sessionIds, data];
         setSessionIds(updatedSessionIds);
+        console.log("updatedSessionIds", updatedSessionIds);
         sessionStorage.setItem('browsers_id', JSON.stringify(updatedSessionIds));
+        setSessionIds(JSON.parse(sessionStorage.getItem('browsers_id')));
 
       }
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, [getSession]);
+  }, [sessionIds]);
 
   const handleConnect = () => {
     if (selectedSession) {
@@ -145,25 +135,16 @@ const ResponsivePage = ({ pathname, navigate }) => {
   const handleDisconnect = () => {
     setSelectedSession(null);
     setVncConnectionStatus("disconnected");
-    setSesssion(true)
+    setServerDetails({ server: "", password: "" });
   };
 
-  const handleSessionChange = (event) => {
-    setLoading(false)
-    setSelectedSession(event.target.value)
-
+  const handleSessionChange = (event, value) => {
+    setSelectedSession(value);
+    const session = sessionIds?.find((session) => session.browserId === value?.browserId);
+    if (session) {
+      setServerDetails({ server: session.server, password: session.password });
+    }
   };
-  const handleDropdownOpen = () => {
-    const handleWebSocketData = (data) => {
-      if (data.path === "chat" && data?.token === localStorage.getItem('Token')) {
-        setSessionIds([data]);
-      }
-    };
-
-    WebSocketManager.subscribe(handleWebSocketData);
-    return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  };
-
   const getMarginBottom = () => {
     switch (vncConnectionStatus) {
       case "disconnected":
@@ -187,34 +168,30 @@ const ResponsivePage = ({ pathname, navigate }) => {
       }}>
         <Grid>
           <Grid>
-            <InputLabel id="demo-multiple-checkbox-label" sx={{ fontSize: "1.2rem" }}>
-              Select Session
-            </InputLabel>
-            <Select
+            <Autocomplete
+              options={sessionIds}
               value={selectedSession}
+              getOptionLabel={(option) => option?.testcase || ""}
               onChange={handleSessionChange}
-              onOpen={handleDropdownOpen}
-              displayEmpty
-              fullWidth
-              variant="outlined"
-              disabled={
-                vncConnectionStatus === "connecting" ||
-                vncConnectionStatus === "connected"
-              }
-            >
-              {loading ? (
-                <MenuItem disabled>
-                  <CircularProgress size={24} style={{ marginRight: '10px' }} />
-                  Session ID
-                </MenuItem>
-              ) : (
-                sessionIds.map((session) => (
-                  <MenuItem key={session.browserId} value={session.browserId}>
-                    {session.testcase}
-                  </MenuItem>
-                ))
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Session"
+                  variant="outlined"
+                  fullWidth
+                  disabled={vncConnectionStatus === "connecting" || vncConnectionStatus === "connected"}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
               )}
-            </Select>
+            />
           </Grid>
           <Grid>
             <Button
@@ -239,11 +216,11 @@ const ResponsivePage = ({ pathname, navigate }) => {
           </Grid>
           {/* I want change marginButton on vncConnectionStatus==connecting margin 50% ==connected margin 4%  */}
           <Grid sx={{ height: "100%", maxHeight: "638px", marginBottom: getMarginBottom() }}>
-            {selectedSession && servers?.url && (
+            {selectedSession && serverDetails?.server && (
               <VncScreen
-                session={selectedSession}
-                SELENOID_URL={servers?.url}
-                SELENOID_PASSWORD={servers?.password}
+                session={selectedSession.browserId}
+                SELENOID_URL={serverDetails.server}
+                SELENOID_PASSWORD={serverDetails.password}
                 onUpdateState={setVncConnectionStatus}
               />
             )}
