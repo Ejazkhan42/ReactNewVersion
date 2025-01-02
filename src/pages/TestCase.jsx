@@ -266,6 +266,7 @@ const TestCasePage = ({ pathname, navigate }) => {
         const handleWebSocketData = (data) => {
           if (data.path === "chat" && data?.token === localStorage.getItem('Token') && data?.hasOwnProperty('browserId')) {
             sessionStorage.setItem('excelData',JSON.stringify(excelData));
+            sessionStorage.setItem('browsers_id', JSON.stringify([data]));
             setIsLoading(false);
             setMessage('Success');
             navigate('/progress', { excelData, servers });

@@ -106,7 +106,7 @@ const ResponsivePage = ({ pathname, navigate }) => {
     excelData: sessionStorage.getItem('excelData') ? JSON.parse(sessionStorage.getItem('excelData')) : []
   };
   const [serverDetails, setServerDetails] = useState({ server: "", password: "" });
-  const [sessionIds, setSessionIds] = useState([]);
+  const [sessionIds, setSessionIds] = useState(sessionStorage.getItem('browsers_id') ? JSON.parse(sessionStorage.getItem('browsers_id')) : []);
   const [selectedSession, setSelectedSession] = useState(null);
   const [vncConnectionStatus, setVncConnectionStatus] = useState("disconnected");
   useEffect(() => {
@@ -114,9 +114,7 @@ const ResponsivePage = ({ pathname, navigate }) => {
       if (data.path === "chat" && data?.token === localStorage.getItem('Token') && data?.hasOwnProperty('browserId')) {
         const updatedSessionIds = [...sessionIds, data];
         setSessionIds(updatedSessionIds);
-        console.log("updatedSessionIds", updatedSessionIds);
         sessionStorage.setItem('browsers_id', JSON.stringify(updatedSessionIds));
-        setSessionIds(JSON.parse(sessionStorage.getItem('browsers_id')));
 
       }
     };
