@@ -90,69 +90,20 @@ const LogItem = styled("div")(({ theme, active }) => ({
 }));
 
 const DataSetTable = ({ excelData }) => {
-  // const [page, setPage] = useState(0);
-  // const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-
-  // const handleChangeRowsPerPage = (event) => {
-  //   setRowsPerPage(parseInt(event.target.value, 10));
-  //   setPage(0);
-  // };
-
-  // const paginatedData = excelData.slice(
-  //   page * rowsPerPage,
-  //   page * rowsPerPage + rowsPerPage,
-  // );
-
   return (
     <Paper>
       <Typography variant="h4" align="center" gutterBottom>
         Excel Data
       </Typography>
-      {/* <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {excelData.length > 0 &&
-                Object.keys(excelData[0]).map((key) => (
-                  <TableCell key={key} sx={{ fontSize: "0.9rem" }}>
-                    {key}
-                  </TableCell>
-                ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.map((row, index) => (
-              <TableRow key={index}>
-                {Object.values(row).map((value, cellIndex) => (
-                  <TableCell key={cellIndex} sx={{ fontSize: "0.7rem" }}>
-                    {value}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
-      {/* <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={excelData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        sx={{ marginTop: "16px", fontSize: "1.2rem" }}
-      /> */}
+    {excelData.length === 0 && <Typography variant="h6" align="center" gutterBottom> No Data Found</Typography>}
+    {excelData.length > 0 && 
+    
       <DataGrid
-        rows={excelData.map((row, index) => ({ ...row, id: index }))}
-        columns={Object.keys(excelData[0]).map((key) => ({ field: key, headerName: key, width: 150 }))}
+        rows={excelData?.map((row, index) => ({ ...row, id: index }))}
+        columns={Object.keys(excelData?.[0]).map((key) => ({ field: key, headerName: key, width: 150 }))}
         pageSize={10}
         checkboxSelection
-      />
+      />}
     </Paper>
   );
 };

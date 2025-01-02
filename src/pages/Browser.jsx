@@ -129,11 +129,6 @@ export default class VncScreen extends Component {
     render() {
         const { loading, connectionError, errorMessage,reason } = this.state;
         const reasonmessage = reason? "\n\t Reason: "+reason :"";
-        if(errorMessage==="Failed when connecting: Connection closed"){
-            sessionStorage.setItem('browsers_id', JSON.stringify([]));
-            sessionStorage.setItem('excelData', JSON.stringify([]));
-            sessionStorage.setItem('servers', JSON.stringify({}));
-        }
         return (
             <Card
                 sx={{

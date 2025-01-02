@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  DialogContentText,
   Table,
   TableBody,
   TableCell,
@@ -23,7 +24,8 @@ import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
 import { AuthLoginInfo } from "../AuthComponents/AuthLogin";
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
-import { DataGrid } from '@mui/x-data-grid';
+
+import { DataGrid, GridActionsCellItem, } from '@mui/x-data-grid';
 import { base } from '../config';
 const API_URL = base(window.env.AP)
 
@@ -33,6 +35,8 @@ function Clients() {
   const [customerUpdate, setCustomerUpdate] = useState(false)
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [clientIndex, setClientIndex] = useState(null);
   const [currentClient, setCurrentClient] = useState(null);
   const [formData, setFormData] = useState({
     customer_id: "",
@@ -124,26 +128,32 @@ function Clients() {
     }
   };
 
-  const handleDelete = async (clientIndex) => {
+  const handleDelete = (clientIndex) => {
     try {
       const idToDelete = data[clientIndex].customer_id;
-      console.log(idToDelete)
-      await axios.delete(`${API_URL}/deletecustomer/?deletecustomer=${idToDelete}`, { withCredentials: true });
-      const updatedData = data.filter((_, index) => index !== clientIndex);
-      setData(updatedData);
-      setCustomerUpdate(true)
+      setClientIndex(clientIndex);
+      setDeleteId(idToDelete)
     } catch (error) {
       console.error("Error deleting client:", error);
     }
   };
+ const handleDeleteConfirm=async()=>{
+    try {
+     
+      await axios.delete(`${API_URL}/deletecustomer/?deletecustomer=${deleteId}`, { withCredentials: true });
+      const updatedData = data.filter((_, index) => index !== clientIndex);
+      setData(updatedData);
+      setCustomerUpdate(true)
+      setDeleteId(null);
+    } catch (error) {
+      console.error("Error deleting client:", error);
+    }
+  }
   const rows = data.map((client, index) => ({ id: index, ...client }));
   const columns = [
     {
-      field: 'id', headerName: 'ID', width: 80, flex: 0.3, 
+      field: 'id', headerName: 'ID', width: 80, flex: 0.3,
       resizable: false,
-      // filterable: false, 
-      // sortable: false,
-      // filter: false,
     },
     { field: 'clientName', headerName: 'Customer', width: 100, flex: 0.3, resizable: false },
     { field: 'envName', headerName: 'Env Name', width: 100, flex: 0.3, resizable: false },
@@ -154,32 +164,30 @@ function Clients() {
       field: 'actions',
       headerName: 'Actions',
       resizable: false,
-      filterable: false, 
+      filterable: false,
       sortable: false,
       filter: false,
       width: 100,
       flex: 0.6,
-      renderCell: (params) => (
-        <strong>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            style={{ marginLeft: 16 }}
-            onClick={() => handleClickOpen(params.row.id)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="small"
-            style={{ marginLeft: 16 }}
-            onClick={() => handleDelete(params.row.id)}
-          >
-            Delete
-          </Button>
-        </strong>
+      renderCell: (params) => ([
+
+        <GridActionsCellItem
+          variant="contained"
+          color="primary"
+          size="small"
+          label="Edit"
+          icon={<EditIcon />}
+          onClick={() => handleClickOpen(params.row.id)}
+        />,
+        <GridActionsCellItem
+          variant="contained"
+          color="secondary"
+          size="small"
+          label="Delete"
+          icon={<DeleteIcon />}
+          onClick={() => handleDelete(params.row.id)}
+        />]
+
       ),
     },
   ]
@@ -194,38 +202,28 @@ function Clients() {
         </Grid>
         <Grid size={{ xs: 2, sm: 3, md: 4 }}>
           <DataGrid rows={rows} columns={columns} pageSize={5} />
-          {/* <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 1 }} stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Customer</TableCell>
-                  <TableCell>Env Name</TableCell>
-                  <TableCell>Instance URL</TableCell>
-                  <TableCell>Instance Username</TableCell>
-                  <TableCell>Instance Password</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.map((client, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{client.customer_id}</TableCell>
-                    <TableCell>{client.clientName}</TableCell>
-                    <TableCell>{client.envName}</TableCell>
-                    <TableCell>{client.instance_url}</TableCell>
-                    <TableCell>{client.instance_username}</TableCell>
-                    <TableCell>{client.instance_password}</TableCell>
-                    <TableCell>
-                      <Button startIcon={<EditIcon />} onClick={() => handleClickOpen(index)} />
-                      <Button startIcon={<DeleteIcon />} onClick={() => handleDelete(index)} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer> */}
         </Grid>
+        <Dialog
+          open={deleteId !== null}
+          onClose={() => setDeleteId(null)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to delete this Component Steps?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteId(null)} color="primary">
+              No
+            </Button>
+            <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>{isEdit ? "Edit Instance" : "Add Instance"}</DialogTitle>
           <Box >
@@ -243,6 +241,7 @@ function Clients() {
                 margin="dense"
                 label="Customer Name"
                 name="clientName"
+                required
                 value={formData.clientName}
                 onChange={handleChange}
                 fullWidth
@@ -251,6 +250,7 @@ function Clients() {
                 margin="dense"
                 label="Env Name"
                 name="envName"
+                required
                 value={formData.envName}
                 onChange={handleChange}
                 fullWidth
@@ -259,6 +259,7 @@ function Clients() {
                 margin="dense"
                 label="Instance URL"
                 name="instance_url"
+                required
                 value={formData.instance_url}
                 onChange={handleChange}
                 fullWidth
@@ -267,6 +268,7 @@ function Clients() {
                 margin="dense"
                 label="Instance Username"
                 name="instance_username"
+                required
                 value={formData.instance_username}
                 onChange={handleChange}
                 fullWidth
@@ -275,6 +277,7 @@ function Clients() {
                 margin="dense"
                 label="Instance Password"
                 name="instance_password"
+                required
                 value={formData.instance_password}
                 onChange={handleChange}
                 fullWidth

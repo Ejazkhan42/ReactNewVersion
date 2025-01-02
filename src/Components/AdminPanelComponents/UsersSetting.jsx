@@ -29,7 +29,7 @@ import {
   AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
 } from "@mui/icons-material";
 import Grid from '@mui/material/Grid2';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
 
 import { base } from "../../config"
 const API_URL = base(window.env.AP)
@@ -155,6 +155,7 @@ function UsersSetting() {
         headerName: "Actions",
         width: 150,
         renderCell: (params) => (
+          
           <IconButton
             color="error"
             onClick={() => handleDelete(params.row.id)}
@@ -227,7 +228,7 @@ function UsersSetting() {
           <Button
             variant="contained"
             color="primary"
-            sx={{ ml: 2, fontSize: "1.2rem", backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }}
+            sx={{ ml: 2, fontSize: "1rem", backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }}
             startIcon={<AddCircleOutlineRoundedIcon />}
             onClick={() => setNewUserPopup(true)}
           >
@@ -240,9 +241,10 @@ function UsersSetting() {
 
   return (
     <div>
-      <AddNewUserSection />
+      
       <Paper 
        sx={{  width: '100%', padding:5 }}>
+        <AddNewUserSection />
       <AdminUsers />
       <NormalUsers />
       </Paper>
@@ -389,6 +391,7 @@ function UsersSetting() {
                 id="password"
                 label="Password"
                 type="password"
+                required={true}
                 fullWidth
                 value={newUserDetails.password}
                 onChange={(e) =>
