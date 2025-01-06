@@ -492,7 +492,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               </Button>
               {selectedFile && <Typography variant="caption">{selectedFile.name}</Typography>}
             </Grid>
-            <Grid size={{ xs: 4, sm: 4, md: 4 }}>
+            {/* <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <Button
                 variant="contained"
                 component="label"
@@ -503,7 +503,7 @@ const TestCasePage = ({ pathname, navigate }) => {
                 <VisuallyHiddenImageInput type="file" accept="image/*" onChange={handleImageFileChange} />
               </Button>
               {selectedImageFile && <Typography variant="caption">{selectedImageFile.name}</Typography>}
-            </Grid>
+            </Grid> */}
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <Button
                 variant="contained"
