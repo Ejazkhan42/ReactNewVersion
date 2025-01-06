@@ -88,12 +88,11 @@ const signIn = async (provider, formData, setStep,setUser) => {
 
     if (response.data === 'success') {
       const user = await axios.get(`${API_URL}/user`, { withCredentials: true });
-
+      setUser(user.data);
       if (user.data.isTwoFAEnabled) {
         //i want to send the user as body
         const sendUser = await axios.post(`${API_URL}/send-2fa`, user.data, { withCredentials: true });
         setStep({ stage: '2fa', userId: user.data.id });
-        setUser(user.data);
       } else {
         User(user);
       }
@@ -125,7 +124,7 @@ export default function CredentialsSignInPage() {
         </Box>
         {step.stage === 'login' ? (
           <SignInPage
-            signIn={(provider, formData) => signIn(provider, formData, setStep)}
+            signIn={(provider, formData) => signIn(provider, formData, setStep,setUser)}
             slots={{
               emailField: CustomEmailField,
               signUpLink: SignUpLink,
@@ -133,7 +132,7 @@ export default function CredentialsSignInPage() {
             providers={providers}
           />
         ) : (
-          <TwoFA userId={step.userId} onVerifySuccess={handle2FASuccess} />
+          <TwoFA userId={step.userId} onVerifySuccess={handle2FASuccess} user={user} />
         )}
       </div>
     </AppProvider>
