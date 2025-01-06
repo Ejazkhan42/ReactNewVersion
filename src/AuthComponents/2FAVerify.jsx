@@ -24,7 +24,7 @@ export default function TwoFA({ userId, onVerifySuccess }) {
   };
 
   return (
-    <Box className="two-fa-container">
+    <>
       <Typography variant="h6">Enter 2FA Code</Typography>
       <TextField
         label="2FA Code"
@@ -44,6 +44,6 @@ export default function TwoFA({ userId, onVerifySuccess }) {
       >
         Verify
       </Button>
-    </Box>
+      </>
   );
 }

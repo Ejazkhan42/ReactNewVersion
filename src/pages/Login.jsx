@@ -6,12 +6,12 @@ import {
 
 
 
-import React, { useState} from 'react';
-import { AppProvider, SignInPage} from '@toolpad/core';
+import React, { useState } from 'react';
+import { AppProvider, SignInPage } from '@toolpad/core';
 import { Typography, Box, IconButton } from '@mui/material';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import TwoFA  from '../AuthComponents/2FAVerify';
+import TwoFA from '../AuthComponents/2FAVerify';
 import axios from 'axios';
 import './styles/login.css';
 import { base } from '../config';
@@ -56,18 +56,14 @@ const Menu = (role_id) => {
     });
 };
 
-const User = () => {
-  axios
-    .get(`${API_URL}/user`, { withCredentials: true })
-    .then((res) => {
-      if (res.data) {
-        sessionStorage.setItem("user", JSON.stringify(res.data))
-        Menu(res.data.role_id)
-      }
-    })
-    .catch((error) => {
-      console.error('Login error:', error);
-    });
+const User = (user) => {
+  if (user) {
+    sessionStorage.setItem("user", JSON.stringify(user))
+    Menu(user.role_id)
+  }
+  else{
+    console.error('Login error:');
+  }
 };
 
 
@@ -80,7 +76,7 @@ function SignUpLink() {
 }
 
 
-const signIn = async (provider, formData,setStep) => {
+const signIn = async (provider, formData, setStep,setUser) => {
   const username = formData.get('username');
   const password = formData.get('password');
 
@@ -92,12 +88,14 @@ const signIn = async (provider, formData,setStep) => {
 
     if (response.data === 'success') {
       const user = await axios.get(`${API_URL}/user`, { withCredentials: true });
-      
+
       if (user.data.isTwoFAEnabled) {
-        // Proceed to 2FA step
+        //i want to send the user as body
+        const sendUser = await axios.post(`${API_URL}/send-2fa`, user.data, { withCredentials: true });
         setStep({ stage: '2fa', userId: user.data.id });
+        setUser(user.data);
       } else {
-        User();
+        User(user);
       }
     } else {
       throw new Error('Login failed. Please check your username and password.');
@@ -111,8 +109,9 @@ const signIn = async (provider, formData,setStep) => {
 
 export default function CredentialsSignInPage() {
   const [step, setStep] = useState({ stage: 'login', userId: null });
+  const [user, setUser] = useState(null);
   const handle2FASuccess = () => {
-    User(); // Proceed to dashboard after successful 2FA verification
+    User(user); // Proceed to dashboard after successful 2FA verification
   };
 
 
