@@ -6,19 +6,14 @@ import {
 
 
 
-import React, { useState, useEffect, useMemo, useContext } from 'react';
-import { AppProvider, SignInPage, SessionContext } from '@toolpad/core';
-import { useTheme } from '@mui/material/styles';
-import { Container, Typography, Box, IconButton } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import React, { useState} from 'react';
+import { AppProvider, SignInPage} from '@toolpad/core';
+import { Typography, Box, IconButton } from '@mui/material';
+
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import TwoFA  from '../AuthComponents/2FAVerify';
 import axios from 'axios';
 import './styles/login.css';
-import Signup from "./Signup"
-import { useLocalStorageState } from '@toolpad/core';
-import { AuthLoginInfo } from '../AuthComponents/AuthLogin';
 import { base } from '../config';
 const API_URL = base(window.env.AP)
 
@@ -85,7 +80,7 @@ function SignUpLink() {
 }
 
 
-const signIn = async (provider, formData) => {
+const signIn = async (provider, formData,setStep) => {
   const username = formData.get('username');
   const password = formData.get('password');
 
@@ -96,7 +91,14 @@ const signIn = async (provider, formData) => {
     }, { withCredentials: true });
 
     if (response.data === 'success') {
-      User();
+      const user = await axios.get(`${API_URL}/user`, { withCredentials: true });
+      
+      if (user.data.isTwoFAEnabled) {
+        // Proceed to 2FA step
+        setStep({ stage: '2fa', userId: user.data.id });
+      } else {
+        User();
+      }
     } else {
       throw new Error('Login failed. Please check your username and password.');
     }
@@ -108,20 +110,32 @@ const signIn = async (provider, formData) => {
 
 
 export default function CredentialsSignInPage() {
-
+  const [step, setStep] = useState({ stage: 'login', userId: null });
+  const handle2FASuccess = () => {
+    User(); // Proceed to dashboard after successful 2FA verification
+  };
 
 
   return (
     <AppProvider>
-      <div className="login-container" sx={{ padding: "0px", maxWidth: "1500px" }}>
+      <div className="login-container">
         <Box className="login-header">
           <Typography variant="h2" className="login-subtitle">
             DoingERP.com
           </Typography>
         </Box>
-        <SignInPage signIn={signIn} slots={{
-          emailField: CustomEmailField, signUpLink: SignUpLink,
-        }} providers={providers} />
+        {step.stage === 'login' ? (
+          <SignInPage
+            signIn={(provider, formData) => signIn(provider, formData, setStep)}
+            slots={{
+              emailField: CustomEmailField,
+              signUpLink: SignUpLink,
+            }}
+            providers={providers}
+          />
+        ) : (
+          <TwoFA userId={step.userId} onVerifySuccess={handle2FASuccess} />
+        )}
       </div>
     </AppProvider>
   );

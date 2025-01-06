@@ -326,7 +326,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               variant="contained"
               color="primary"
               href=
-              {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Sample_${moduleName.replace(' ', '_')}`}
+              {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${moduleName.replace(' ', '_')}`}
 
               sx={{ margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
