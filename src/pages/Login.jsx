@@ -41,29 +41,20 @@ function CustomEmailField() {
     />
   );
 }
-const Menu = (role_id) => {
+
+const User = (user) => {
   axios
-    .get(`${API_URL}/menuLevel?role=${role_id}`, { withCredentials: true })
+    .get(`${API_URL}/menuLevel?role=${user.role_id}`, { withCredentials: true })
     .then((res) => {
       if (res.data) {
         sessionStorage.setItem("menu", JSON.stringify(res.data))
-
+        sessionStorage.setItem("user", JSON.stringify(user))
         window.location.href = '/dashboard';
       }
     })
     .catch((error) => {
       console.error('Login error:', error);
     });
-};
-
-const User = (user) => {
-  if (user) {
-    sessionStorage.setItem("user", JSON.stringify(user))
-    Menu(user.role_id)
-  }
-  else{
-    console.error('Login error:');
-  }
 };
 
 
@@ -94,7 +85,7 @@ const signIn = async (provider, formData, setStep,setUser) => {
         const sendUser = await axios.post(`${API_URL}/send-2fa`, user.data, { withCredentials: true });
         setStep({ stage: '2fa', userId: user.data.id });
       } else {
-        User(user);
+        User(user.data);
       }
     } else {
       throw new Error('Login failed. Please check your username and password.');
