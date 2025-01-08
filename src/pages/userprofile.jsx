@@ -42,26 +42,6 @@ const UserProfile = () => {
     const [profileData, setProfileData] = useState(sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem("user")) : {});
     const [update, setUpdate] = useState(false);
     const [image, setImage] = useState(null);
-
-    useEffect(() => {
-        WebSocketManager.sendMessage({
-            path: 'data',
-            type: 'find',
-            table: 'users',
-            whereCondition: 'id= ?',
-            whereValues: [profileData.id],
-            columns: [],
-        });
-        const handleWebSocketData = (data) => {
-            if (data[0]?.hasOwnProperty('username') && data[0]?.hasOwnProperty('password') && data[0]?.hasOwnProperty('Email')) {
-                setProfileData(data[0])
-                sessionStorage.setItem("user", JSON.stringify(data[0]));
-                setUpdate(false);
-            }
-        }
-        WebSocketManager.subscribe(handleWebSocketData);
-        return () => WebSocketManager.unsubscribe(handleWebSocketData);
-    }, [update, image]);
     const [passwordData, setPasswordData] = useState({
         id: profileData.id || "",
         currentPassword: "",
@@ -82,9 +62,6 @@ const UserProfile = () => {
     });
     const [verify2FA, setVerify2FA] = useState(false);
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-    useEffect(() => {
-        setTwoFactorEnabled(profileData.isTwoFAEnabled == 1);
-    }, [twoFactorEnabled]);
     const [qrCode, setQrCode] = useState(null);
     const [token, setOtpCode] = useState(null);
 
@@ -98,7 +75,25 @@ const UserProfile = () => {
         message: "",
         severity: "success",
     });
-
+    useEffect(() => {
+        WebSocketManager.sendMessage({
+            path: 'data',
+            type: 'find',
+            table: 'users',
+            whereCondition: 'id= ?',
+            whereValues: [profileData.id],
+            columns: [],
+        });
+        const handleWebSocketData = (data) => {
+            if (data[0]?.hasOwnProperty('username') && data[0]?.hasOwnProperty('password') && data[0]?.hasOwnProperty('Email')) {
+                setProfileData(data[0])
+                setTwoFactorEnabled(data[0].isTwoFAEnabled === 1 ? true : false);
+                sessionStorage.setItem("user", JSON.stringify(data[0]));
+            }
+        }
+        WebSocketManager.subscribe(handleWebSocketData);
+        return () => WebSocketManager.unsubscribe(handleWebSocketData);
+    }, [update,image]);
     const handleProfileUpdate = (e) => {
         e.preventDefault();
         WebSocketManager.sendMessage({
@@ -218,29 +213,23 @@ const UserProfile = () => {
         }
     };
 
+
     const handleEnable2FA = async () => {
-        if (profileData.isTwoFAEnabled == 1) {
-            setTwoFactorEnabled(true);
-            setSnackbar({
-                open: true,
-                message: "2FA is already enabled.",
-                severity: "success",
-            });
-            return;
-        }
-        if (profileData.isTwoFAEnabled == 0) {
-            setVerify2FA(false);
+        if (profileData.isTwoFAEnabled === 0) {  // If 2FA is not enabled
             try {
                 const { data } = await axios.post(`${API_URL}/enable-2fa`, null, {
                     params: { id: profileData.id },
-                });
+                }, { withCredentials: true });
+
                 const qrResponse = await axios.get(`${API_URL}/generate_QR`, {
                     params: { secret: data.secret },
                 });
-                setUserId(profileData.id);
 
-                setTwoFactorEnabled(true);
+                setUserId(profileData.id);
                 setQrCode(qrResponse.data.imageUrl);
+
+                // Update state to reflect that 2FA has been enabled
+                setTwoFactorEnabled(true);
                 setSnackbar({
                     open: true,
                     message: "2FA enabled successfully! Scan the QR code below.",
@@ -256,6 +245,7 @@ const UserProfile = () => {
             }
         }
     };
+
     const handleOtpVerify = async () => {
 
         try {
@@ -281,8 +271,31 @@ const UserProfile = () => {
         }
     };
     const handleDisable2FA = async () => {
-        setTwoFactorEnabled(false);
-    }
+        try {
+            const res = await axios.post(`${API_URL}/disable-2fa`, null, {
+                params: { id: profileData.id },
+            }, { withCredentials: true });
+
+            if (res.data.message === '2FA disabled successfully') {
+                // Update state to reflect that 2FA has been disabled
+                setTwoFactorEnabled(false);
+                setSnackbar({
+                    open: true,
+                    message: "2FA disabled successfully.",
+                    severity: "success",
+                });
+            } else {
+                throw new Error('Failed to disable 2FA');
+            }
+        } catch (error) {
+            console.error("Error disabling 2FA:", error);
+            setSnackbar({
+                open: true,
+                message: "Failed to disable 2FA. Please try again.",
+                severity: "error",
+            });
+        }
+    };
     return (
         <Container maxWidth="md" sx={{ py: 4 }}>
             <Grid container spacing={3}>
@@ -394,9 +407,13 @@ const UserProfile = () => {
                             control={
                                 <Switch
                                     checked={twoFactorEnabled}
-                                    onChange={(e) => {
-                                        if (e.target.checked) handleEnable2FA();
-                                        else handleDisable2FA();
+                                    onChange={(event) => {
+                                        // Toggle 2FA based on the switch position
+                                        if (event.target.checked) {
+                                            handleEnable2FA(); // Enable 2FA
+                                        } else {
+                                            handleDisable2FA(); // Disable 2FA
+                                        }
                                     }}
                                 />
                             }
