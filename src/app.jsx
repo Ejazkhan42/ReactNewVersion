@@ -66,7 +66,7 @@ const AppRoutes = () => {
         <Route path='/worklist' element={<Worklist pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Setting/Menu' element={<Menu pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Setting' element={<Module pathname={router.pathname} navigate={router.navigate} />} />
-        <Route path='/user' element={<UserProfile pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path='/profile' element={<UserProfile pathname={router.pathname} navigate={router.navigate} />} />
 
       </Route>
 
