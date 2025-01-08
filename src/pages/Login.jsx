@@ -81,8 +81,6 @@ const signIn = async (provider, formData, setStep,setUser) => {
       const user = await axios.get(`${API_URL}/user`, { withCredentials: true });
       setUser(user.data);
       if (user.data.isTwoFAEnabled) {
-        //i want to send the user as body
-        const sendUser = await axios.post(`${API_URL}/send-2fa`, user.data, { withCredentials: true });
         setStep({ stage: '2fa', userId: user.data.id });
       } else {
         User(user.data);
@@ -101,7 +99,7 @@ export default function CredentialsSignInPage() {
   const [step, setStep] = useState({ stage: 'login', userId: null });
   const [user, setUser] = useState(null);
   const handle2FASuccess = () => {
-    User(user); // Proceed to dashboard after successful 2FA verification
+    User(user);
   };
 
 

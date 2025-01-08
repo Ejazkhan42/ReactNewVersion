@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { TextField, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Switch } from '@mui/material';
 import axios from 'axios';
 import { base } from '../config';
 
@@ -11,7 +11,11 @@ export default function TwoFA({ userId, onVerifySuccess, user }) {
   const [resendTimeout, setResendTimeout] = useState(30); // Start with 1 minute
   const [canResend, setCanResend] = useState(false);
   const [loading, setLoading] = useState(false); // Add loading state for Verify button
+  const [checked, setChecked] = useState(false);
 
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+  };
   useEffect(() => {
     if (!canResend && resendTimeout > 0) {
       const timer = setTimeout(() => {
@@ -54,15 +58,18 @@ export default function TwoFA({ userId, onVerifySuccess, user }) {
     if (!canResend) return;
 
     try {
-      await axios.post(`${API_URL}/send-2fa`, user, { withCredentials: true });
-      setResendTimeout(60); // Reset timeout to 1 minute after resend
-      setCanResend(false); // Disable resend
+      if (checked) {
+        await axios.post(`${API_URL}/send-2fa`, user, { withCredentials: true });
+        setResendTimeout(60); // Reset timeout to 1 minute after resend
+        setCanResend(false); // Disable resend
+      }
     } catch (err) {
       setError('Error resending 2FA code');
     }
   };
 
   return (
+
     <Dialog
       open={userId !== null}
       aria-labelledby="alert-dialog-title"
@@ -76,9 +83,16 @@ export default function TwoFA({ userId, onVerifySuccess, user }) {
         <Typography variant="h6" sx={{ textAlign: 'center' }}>
           Enter 2FA Code
         </Typography>
-        <Typography variant="body2">
-          Please enter the 6-digit code sent to your Email
-        </Typography>
+        {checked && (
+          <Typography variant="body2">
+            Please check your email for the 6-digit code to verify your identity.
+          </Typography>)
+        }
+        {!checked && (
+          <Typography variant="body2">
+            Please enter the 6-digit code of the authenticator app to verify your identity.
+          </Typography>)
+        }
         <TextField
           label="2FA Code"
           sx={{ textAlign: 'center' }}
@@ -90,13 +104,21 @@ export default function TwoFA({ userId, onVerifySuccess, user }) {
           error={!!error}
           helperText={error}
         />
-        <Box sx={{ textAlign: 'center', mt: 2 }}>
-          <Typography variant="body2" color="textSecondary">
-            {canResend
-              ? 'You can resend the code now.'
-              : `Resend code in ${resendTimeout} seconds`}
-          </Typography>
-        </Box>
+        <Switch
+          label="Email"
+          checked={checked}
+          onChange={handleChange}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+        {checked && (
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <Typography variant="body2" color="textSecondary">
+              {canResend
+                ? 'You can resend the code to email'
+                : `Resend code in ${resendTimeout} seconds`}
+            </Typography>
+          </Box>)
+        }
       </DialogContent>
       <DialogActions>
         <Button

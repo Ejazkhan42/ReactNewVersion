@@ -28,6 +28,7 @@ import Types from "./pages/Business/object_type"
 import Module from "./pages/Business/modules"
 import { createTheme } from '@mui/material/styles';
 import { useDemoRouter } from './AuthComponents/Route';
+import UserProfile from './pages/userprofile';
 
 
 const AppRoutes = () => {
@@ -65,6 +66,7 @@ const AppRoutes = () => {
         <Route path='/worklist' element={<Worklist pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Setting/Menu' element={<Menu pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Setting' element={<Module pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path='/user' element={<UserProfile pathname={router.pathname} navigate={router.navigate} />} />
 
       </Route>
 

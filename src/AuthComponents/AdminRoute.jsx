@@ -119,7 +119,7 @@ function AdminRoute({pathname}) {
         id: String(user.id),
         name: user.FirstName,
         email: user.Email,
-        image: 'https://avatars.githubusercontent.com/u/19550456',
+        image: user.image,
       }
     });
 
