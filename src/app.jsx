@@ -29,7 +29,8 @@ import Module from "./pages/Business/modules"
 import { createTheme } from '@mui/material/styles';
 import { useDemoRouter } from './AuthComponents/Route';
 import UserProfile from './pages/userprofile';
-
+// import AdminReport from './pages/Business/AdminReport';
+import AdminReports from "./pages/Business/AdminReports"
 
 const AppRoutes = () => {
   const router = useDemoRouter('/');
@@ -67,7 +68,7 @@ const AppRoutes = () => {
         <Route path='/Setting/Menu' element={<Menu pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Setting' element={<Module pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/profile' element={<UserProfile pathname={router.pathname} navigate={router.navigate} />} />
-
+        <Route path='/AdminReport' element={<AdminReports pathname={router.pathname} navigate={router.navigate} />} />
       </Route>
 
 

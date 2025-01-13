@@ -26,9 +26,14 @@ import ModelTrainingSharpIcon from '@mui/icons-material/ModelTrainingSharp';
 import CasesSharpIcon from '@mui/icons-material/CasesSharp';
 import ListIcon from '@mui/icons-material/List';
 import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt"
+import SettingsIcon from '@mui/icons-material/Settings';
+import Person3Icon from '@mui/icons-material/Person3';
+import DangerousIcon from '@mui/icons-material/Dangerous';
+import LiveTvIcon from '@mui/icons-material/LiveTv';
 import { useDemoRouter } from './Route';
 import { Box } from "@mui/material";
 import { useLocation,Outlet } from "react-router-dom";
+
 import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -80,6 +85,10 @@ const iconMapping = {
   "CasesSharpIcon":<CasesSharpIcon/>,
   "ModelTrainingSharpIcon":<ModelTrainingSharpIcon/>,
   "AppSettingsAltIcon":<AppSettingsAltIcon/>,
+  "Person3Icon":<Person3Icon/>,
+  "SettingsIcon":<SettingsIcon/>,
+  "DangerousIcon":<DangerousIcon/>,
+  "LiveTvIcon":<LiveTvIcon/>
 };
 function ScrollTop(props) {
   const { children, window } = props;

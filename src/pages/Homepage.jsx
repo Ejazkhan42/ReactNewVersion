@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext,useMemo } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import axios from "axios";
 import {
   LineChart,
@@ -15,17 +15,14 @@ import {
 } from "recharts";
 import {
   Button,
-  TableCell,
-  TextField,
-  TableContainer,
-  Table,
-  TableSortLabel, 
-  TableHead,
-  TableBody,
-  TableRow,
   Paper,
-  TablePagination,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Container,
+  CardMedia,
   Link,
 } from "@mui/material";
 import LibraryBooksRoundedIcon from "@mui/icons-material/LibraryBooksRounded";
@@ -40,13 +37,15 @@ import { AuthLoginInfo } from "../AuthComponents/AuthLogin";
 import Grid from '@mui/material/Grid2';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Box from '@mui/material/Box';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import "./styles/home.css";
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Fade from '@mui/material/Fade';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import { base } from '../config';
 import WebSocketManager from '../AuthComponents/useWebSocket';
 import {
@@ -55,44 +54,84 @@ import {
   GridToolbarContainer, GridToolbarExport
 } from '@mui/x-data-grid';
 import clsx from 'clsx';
-const API_URL=base(window.env.AP)
+const API_URL = base(window.env.AP)
 
 
+function VideoView({ video, setOpen, open }) {
+  const [fullWidth, setFullWidth] = useState(true);
+  const [maxWidth, setMaxWidth] = useState('sm');
+  const handlfullScreen = () => {
+    setMaxWidth('xl');
+  }
+  const handleClose = () => {
+    setOpen(false);
+  };
+  return (
+    <Dialog fullWidth={fullWidth}
+      maxWidth={maxWidth}
+      open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+      <DialogTitle id="alert-dialog-title">{"Image"}</DialogTitle>
+      <DialogContent >
+        <DialogContentText sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} id="alert-dialog-description">
+          <CardMedia component="iframe" src={video} alt="Video" />
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="primary">
+          Close
+        </Button>
+        <Button onClick={() => handlfullScreen()} color="primary" autoFocus>Full Screen</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
 
 
 function Homepage({ pathname, navigate }) {
   const ctx = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
-  const [data,setdata]=useState(true)
+  const [data, setdata] = useState(true)
   const [Focus, setFocus] = useState(false);
-  const [order, setOrder] = useState('desc'); 
-  const [orderBy, setOrderBy] = useState('start_time'); 
+  const [order, setOrder] = useState('desc');
+  const [orderBy, setOrderBy] = useState('start_time');
   const [dashboardData, setDashboardData] = useState([]);
   const [pieData, setPieData] = useState([]);
   const [lineData, setLineData] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
+
+
+
   const headCells = [
-  { id: 'id', label: 'Job Id' },
-  { id: 'test_name', label: 'Name' },
-  { id: 'video_url', label: 'Videos' },
-  { id: 'report', label: 'Excel' },
-  { id: 'start_time', label: 'Date' },
-  { id: 'test_status', label: 'Status' },
-];
+    { id: 'id', label: 'Job Id' },
+    { id: 'test_name', label: 'Name' },
+    { id: 'video_url', label: 'Videos' },
+    { id: 'report', label: 'Excel' },
+    { id: 'start_time', label: 'Date' },
+    { id: 'test_status', label: 'Status' },
+  ];
 
   useEffect(() => {
+    if (ctx.role_id === 1) {
       const handleWebSocketData = (data) => {
-      if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status") && data[0]?.username===ctx.username) {
-         setDashboardData(data);
-         processChartData(data);
-      }
-    };
-    WebSocketManager.subscribe(handleWebSocketData);
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "logs",whereCondition:"username=?",whereValues:[ctx.username] });
+        if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status")) {
+          setDashboardData(data);
+          processChartData(data);
+        }
+      };
+      WebSocketManager.subscribe(handleWebSocketData);
+      WebSocketManager.sendMessage({ path: "data", type: "list", table: "logs" });
+    }
+    else {
+      const handleWebSocketData = (data) => {
+        if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status") && data[0]?.username === ctx.username) {
+          setDashboardData(data);
+          processChartData(data);
+        }
+      };
+      WebSocketManager.subscribe(handleWebSocketData);
+      WebSocketManager.sendMessage({ path: "data", type: "list", table: "logs", whereCondition: "username=?", whereValues: [ctx.username] });
+    }
   }, []);
-  
-  
+
+
 
   const processChartData = (data) => {
     const pieCounts = { pass: 0, fail: 0, Running: 0 };
@@ -159,10 +198,10 @@ function Homepage({ pathname, navigate }) {
     const tableElement = document.getElementById("table-component");
     tableElement.scrollIntoView({ behavior: "smooth" });
   };
-  
- 
- 
- const handleSort = (column) => {
+
+
+
+  const handleSort = (column) => {
     const isAsc = orderBy === column && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(column);
@@ -177,16 +216,16 @@ function Homepage({ pathname, navigate }) {
       if (order === 'asc') {
         return a[orderBy] < b[orderBy] ? -1 : 1;
       } else {
-          
+
         return a[orderBy] > b[orderBy] ? -1 : 1;
       }
     });
   };
- 
- 
- 
- 
-function ButtonComponent() {
+
+
+
+
+  function ButtonComponent() {
     const [isClicked, setIsClicked] = useState(false);
     // const navigate = useNavigate();
 
@@ -209,13 +248,13 @@ function ButtonComponent() {
 
     return (
       <Container>
-      <a
-      title="Please click to run the test case"
-        className={`btn ${isClicked ? 'is-clicked' : ''}`}
-        onClick={handleClick}
-      >
-        Run Test Case
-      </a>
+        <a
+          title="Please click to run the test case"
+          className={`btn ${isClicked ? 'is-clicked' : ''}`}
+          onClick={handleClick}
+        >
+          Run Test Case
+        </a>
 
       </Container>
 
@@ -303,7 +342,7 @@ function ButtonComponent() {
 
     return (
 
-      <Box sx={{paddingTop:"10px"}} >
+      <Box sx={{ paddingTop: "10px" }} >
         <Grid container spacing={{ xs: 4, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
           <Grid size={{ xs: 4, sm: 4, md: 8 }}>
             <Item>
@@ -362,7 +401,7 @@ function ButtonComponent() {
               </ResponsiveContainer>
               <div className="legend">
                 {pieData.map((entry, index) => (
-                  <span key={`legend-${index}`} style={{paddingInline:"4px"}}>
+                  <span key={`legend-${index}`} style={{ paddingInline: "4px" }}>
                     <span
                       className="legend-color"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
@@ -378,106 +417,109 @@ function ButtonComponent() {
     );
   };
 
-const formatDate = (dateString) => {
-  console.log(dateString)
-  const date = new Date(dateString);
-  
-  // Get the day, month, and year
-  const day = String(date.getDate()).padStart(2, '0'); // Adds leading zero if needed
-  const month = date.toLocaleString('default', { month: 'short' }).toLowerCase(); // 'oct' for October
-  const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
-  
-  return `${day}-${month}-${year}`;
-};
- 
-const columns = [
-    {
-      field: "id",
-      headerName: 'Id',
-      flex: 0.2,
-      resizable: false,
-      minWidth: 80,
-    },
-    {
-      field: "test_name",
-      headerName: 'Job Name',
-      flex: 1,
-      resizable: false,
-      minWidth: 150,
-    },
-    
-    {
-      field: "Video",
-      headerName: 'Video',
-      flex: 0.2,
-          resizable: false,
-      minWidth: 80,
-      renderCell: (params) => (
-    <Link 
-      variant="contained" 
-      href={params.row.Video}
-      target="_blank" 
-      rel="noopener noreferrer"
-      startIcon={<PlayCircleOutlineIcon />}
-    >
-      Watch Video
-    </Link>
-  ),
-    },
-    {
-      field: "jenkinsPath",
-      headerName: 'Excel Report',
-      flex: 0.2,
-          resizable: false,
-      minWidth: 80,
-      renderCell: (params) => (
-    <Link 
-      variant="contained" 
-      href={`${API_URL}/download?path=${params.row.jenkinsPath}&build=${params.row.build}`}
-      target="_blank" 
-      rel="noopener noreferrer"
-      
-    >
-     Excel Report
-    </Link>
-  ),
-    },
-     {
-      field: "end_time",
-      headerName: 'Date',
-      flex: 0.2,
-          resizable: false,
-      minWidth: 80,
-      type:'date',
-      valueGetter: (value) => value && new Date(value)
-    },
-    {
+  const formatDate = (dateString) => {
+    console.log(dateString)
+    const date = new Date(dateString);
+
+    // Get the day, month, and year
+    const day = String(date.getDate()).padStart(2, '0'); // Adds leading zero if needed
+    const month = date.toLocaleString('default', { month: 'short' }).toLowerCase(); // 'oct' for October
+    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
+
+    return `${day}-${month}-${year}`;
+  };
+
+
+  const TableComponent = () => {
+    const [openview, setOpenview] = useState(false);
+    const [video, setvideo] = useState("");
+
+    const handleVideoView = (video) => {
+      setvideo(video)
+      setOpenview(true)
+    }
+    const columns = [
+      {
+        field: "id",
+        headerName: 'Id',
+        flex: 0.2,
+        resizable: false,
+        minWidth: 80,
+      },
+      {
+        field: "test_name",
+        headerName: 'Job Name',
+        flex: 1,
+        resizable: false,
+        minWidth: 150,
+      },
+
+      {
+        field: "Video",
+        headerName: 'Video View',
+        flex: 0.2,
+        resizable: false,
+        minWidth: 80,
+        renderCell: (params) => (
+          <GridActionsCellItem
+            icon={<PlayCircleOutlineIcon />}
+            label="Video"
+            title="Click to view video"
+            onClick={() => handleVideoView(params.row.Video)}
+          />),
+      },
+      {
+        field: "jenkinsPath",
+        headerName: 'Excel Report',
+        flex: 0.2,
+        resizable: false,
+        minWidth: 80,
+        renderCell: (params) => (
+          <Link
+            variant="contained"
+            href={`${API_URL}/download?path=${params.row.jenkinsPath}&build=${params.row.build}`}
+            target="_blank"
+            rel="noopener noreferrer"
+
+          >
+            Excel Report
+          </Link>
+        ),
+      },
+      {
+        field: "end_time",
+        headerName: 'Date',
+        flex: 0.2,
+        resizable: false,
+        minWidth: 80,
+        type: 'date',
+        valueGetter: (value) => value && new Date(value)
+      },
+      {
         field: "test_status",
         headerName: 'Status',
         flex: 0.2,
         resizable: false,
         minWidth: 80,
         cellClassName: (params) => {
-      if (params.value == null) {
-        return '';
-      }
+          if (params.value == null) {
+            return '';
+          }
 
-      return clsx('super-app', {
-        fail: params.value == 'fail',
-        pass: params.value == 'pass',
-        running:params.value   == "Running"
-      });
-    },
+          return clsx('super-app', {
+            fail: params.value == 'fail',
+            pass: params.value == 'pass',
+            running: params.value == "Running"
+          });
+        },
       },
-  ];
-const paginationModel = { page: 0, pageSize: 20 };
-
-const TableComponent = () => {
-    
+    ];
+    const paginationModel = { page: 0, pageSize: 10 };
     return (
-      <Box  sx={{paddingTop:"10px",
+      <Box sx={{
+        paddingTop: "10px",
         width: '100%',
-      '& .super-app-theme--cell': {
+        '& .super-app-theme--cell': {
           backgroundColor: 'rgba(224, 183, 60, 0.55)',
           color: '#1a3e72',
           fontWeight: '600',
@@ -485,34 +527,40 @@ const TableComponent = () => {
         '& .super-app.fail': {
           color: 'floralwhite',
           backgroundColor: "darkred",
-           textTransform:'uppercase',
+          textTransform: 'uppercase',
           fontWeight: '600',
         },
         '& .super-app.running': {
-          color: "floralwhite", 
+          color: "floralwhite",
           backgroundColor: "darkorange",
-          textTransform:'uppercase',
+          textTransform: 'uppercase',
           fontWeight: '600',
         },
         '& .super-app.pass': {
           color: "floralwhite",
           backgroundColor: 'green',
-           textTransform:'uppercase',
+          textTransform: 'uppercase',
           fontWeight: '600',
-        },}} id="table-component">
+        },
+      }} id="table-component">
 
         <Grid>
+
           <Item>
-          <h3>Recent Run Test Case</h3>
-             <DataGrid
-          columns={columns}
-          rows={dashboardData}
-           initialState={{ pagination: { paginationModel } ,sorting: {
-      sortModel: [{ field: 'end_time', sort: 'desc' }],},}}
-          pageSizeOptions={[20, 40, 80, 100]}/>
-            
-            </Item>
-   
+            <h3>Recent Run Test Case</h3>
+
+            <DataGrid
+              columns={columns}
+              rows={dashboardData}
+              initialState={{
+                pagination: { paginationModel }, sorting: {
+                  sortModel: [{ field: 'end_time', sort: 'desc' }],
+                },
+              }}
+              pageSizeOptions={[20, 40, 80, 100]} />
+
+          </Item>
+          <VideoView video={video} setOpen={setOpenview} open={openview} />
         </Grid>
       </Box>
     );
@@ -521,15 +569,16 @@ const TableComponent = () => {
   return (
 
     <Box sx={{
-        padding: "10px",
-      
-        
-      }}>
-      <ButtonComponent/>
-      <TopPanel/>
+      padding: "10px",
+
+
+    }}>
+      <ButtonComponent />
+      <TopPanel />
       <ChartComponent />
       <TableComponent />
-     
+
+
     </Box>
 
   );
