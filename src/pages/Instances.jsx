@@ -51,7 +51,9 @@ function Clients() {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axios.get(`${API_URL}/getbycustomer?user_id=${ctx.id}`, { withCredentials: true });
+        const token = sessionStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const response = await axios.get(`${API_URL}/getbycustomer`, { withCredentials: true });
         // Assuming the response contains multiple clients with client names as keys
         const clientsData = [];
         Object.keys(response.data).forEach(clientName => {
@@ -111,12 +113,16 @@ function Clients() {
   const handleSubmit = async () => {
     try {
       if (isEdit) {
+        const token = sessionStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         await axios.put(`${API_URL}/updatecustomer`, formData, { withCredentials: true });
         const updatedData = [...data];
         updatedData[currentClient] = formData;
         setData(updatedData);
         setCustomerUpdate(true);
       } else {
+        const token = sessionStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         const response = await axios.post(`${API_URL}/addcustomer`, formData, { withCredentials: true });
         setData([...data, response.data]);
         setCustomerUpdate(true)
@@ -137,9 +143,10 @@ function Clients() {
       console.error("Error deleting client:", error);
     }
   };
- const handleDeleteConfirm=async()=>{
+  const handleDeleteConfirm = async () => {
     try {
-     
+      const token = sessionStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       await axios.delete(`${API_URL}/deletecustomer/?deletecustomer=${deleteId}`, { withCredentials: true });
       const updatedData = data.filter((_, index) => index !== clientIndex);
       setData(updatedData);

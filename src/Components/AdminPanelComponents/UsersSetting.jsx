@@ -41,6 +41,7 @@ function formatIsoDate(date) {
 
 function UsersSetting() {
   const [usersData, setUsersData] = useState([]);
+  const tokens = sessionStorage.getItem('token');
   const [usersUpdated, setUsersUpdated] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [newUserDetails, setNewUserDetails] = useState({
@@ -67,6 +68,7 @@ function UsersSetting() {
       });
   }, []);
   useEffect(() => {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
     axios
       .get(`${API_URL}/getusers`, { withCredentials: true })
       .then((res) => {
@@ -99,6 +101,7 @@ function UsersSetting() {
   };
 
   const handleAddNewUser = () => {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
     axios
       .post(
         `${API_URL}/newuser`,

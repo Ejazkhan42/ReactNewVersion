@@ -59,6 +59,8 @@ export default function TwoFA({ userId, onVerifySuccess, user }) {
 
     try {
       if (checked) {
+        const token = sessionStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         await axios.post(`${API_URL}/send-2fa`, user, { withCredentials: true });
         setResendTimeout(60); // Reset timeout to 1 minute after resend
         setCanResend(false); // Disable resend

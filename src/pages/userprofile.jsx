@@ -42,6 +42,7 @@ const UserProfile = () => {
     const [profileData, setProfileData] = useState(sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem("user")) : {});
     const [update, setUpdate] = useState(false);
     const [image, setImage] = useState(null);
+    const tokens = sessionStorage.getItem('token');
     const [passwordData, setPasswordData] = useState({
         id: profileData.id || "",
         currentPassword: "",
@@ -93,7 +94,7 @@ const UserProfile = () => {
         }
         WebSocketManager.subscribe(handleWebSocketData);
         return () => WebSocketManager.unsubscribe(handleWebSocketData);
-    }, [update,image]);
+    }, [update, image]);
     const handleProfileUpdate = (e) => {
         e.preventDefault();
         WebSocketManager.sendMessage({
@@ -217,10 +218,13 @@ const UserProfile = () => {
     const handleEnable2FA = async () => {
         if (profileData.isTwoFAEnabled === 0) {  // If 2FA is not enabled
             try {
+                
+                axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
                 const { data } = await axios.post(`${API_URL}/enable-2fa`, null, {
                     params: { id: profileData.id },
                 }, { withCredentials: true });
 
+                axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
                 const qrResponse = await axios.get(`${API_URL}/generate_QR`, {
                     params: { secret: data.secret },
                 });
@@ -249,6 +253,7 @@ const UserProfile = () => {
     const handleOtpVerify = async () => {
 
         try {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
             await axios.post(`${API_URL}/verify-2fa`, { userId, token }, { withCredentials: true }).then((res) => {
                 if (res.data.message === 'Login successful') {
                     setVerify2FA(true);
@@ -272,6 +277,7 @@ const UserProfile = () => {
     };
     const handleDisable2FA = async () => {
         try {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
             const res = await axios.post(`${API_URL}/disable-2fa`, null, {
                 params: { id: profileData.id },
             }, { withCredentials: true });

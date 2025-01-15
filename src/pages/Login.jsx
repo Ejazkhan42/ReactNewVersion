@@ -76,8 +76,10 @@ const signIn = async (provider, formData, setStep,setUser) => {
       username,
       password,
     }, { withCredentials: true });
-
-    if (response.data === 'success') {
+    if (response.data.message === 'success') {
+      sessionStorage.setItem('token', response.data.token);
+      const token = sessionStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const user = await axios.get(`${API_URL}/user`, { withCredentials: true });
       setUser(user.data);
       if (user.data.isTwoFAEnabled) {

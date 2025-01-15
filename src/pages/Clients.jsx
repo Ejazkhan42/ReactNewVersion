@@ -26,6 +26,7 @@ const API_URL=base(window.env.AP)
 function Clients() {
   const ctx = useContext(AuthLoginInfo);
   const [data, setData] = useState([]);
+  const tokens = sessionStorage.getItem('token');
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [currentClient, setCurrentClient] = useState(null);
@@ -99,11 +100,13 @@ function Clients() {
   const handleSubmit = async () => {
     try {
       if (isEdit) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
         await axios.put(`${API_URL}/customerupdate/${data[currentClient]._id}`, formData, { withCredentials: true });
         const updatedData = [...data];
         updatedData[currentClient] = formData;
         setData(updatedData);
       } else {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
         const response = await axios.post(`${API_URL}/addcustomer`, formData, { withCredentials: true });
         setData([...data, response.data]);
       }
@@ -116,6 +119,7 @@ function Clients() {
   const handleDelete = async (clientIndex) => {
     try {
       const idToDelete = data[clientIndex]._id;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
       await axios.delete(`${API_URL}/deletecustomer/${idToDelete}`, { withCredentials: true });
       const updatedData = data.filter((_, index) => index !== clientIndex);
       setData(updatedData);
