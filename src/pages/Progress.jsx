@@ -112,16 +112,18 @@ const ResponsivePage = ({ pathname, navigate }) => {
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (data.path === "chat" && data?.token === localStorage.getItem('Token') && data?.hasOwnProperty('browserId')) {
-        const updatedSessionIds = [...sessionIds, data];
-        setSessionIds(updatedSessionIds);
-        sessionStorage.setItem('browsers_id', JSON.stringify(updatedSessionIds));
+        setSessionIds((prevSessionIds) => {
+          const updatedSessionIds = [...prevSessionIds, data];
+          sessionStorage.setItem("browsers_id", JSON.stringify(updatedSessionIds));
+          return updatedSessionIds;
+        });
 
       }
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, [sessionIds]);
+  }, []);
 
   const handleConnect = () => {
     if (selectedSession) {
@@ -215,12 +217,17 @@ const ResponsivePage = ({ pathname, navigate }) => {
           {/* I want change marginButton on vncConnectionStatus==connecting margin 50% ==connected margin 4%  */}
           <Grid sx={{ height: "100%", maxHeight: "638px", marginBottom: getMarginBottom() }}>
             {selectedSession && serverDetails?.server && (
+              <>
+              <Typography variant="h5" align="center" >
+                Live View of {selectedSession?.testcase}
+              </Typography>
               <VncScreen
                 session={selectedSession.browserId}
                 SELENOID_URL={serverDetails.server}
                 SELENOID_PASSWORD={serverDetails.password}
                 onUpdateState={setVncConnectionStatus}
               />
+              </>
             )}
           </Grid>
           <Grid sx={{ with: "70%", maxWidth: "1200px" }}>
