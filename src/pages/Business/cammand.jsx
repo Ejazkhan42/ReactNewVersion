@@ -15,7 +15,8 @@ import {
   FormControl,
   Autocomplete,
   Paper,
-
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 import EditIcon from '@mui/icons-material/Edit';
@@ -54,6 +55,7 @@ function CustomToolbar({ handleAddClick }) {
 
 
 function Cammands() {
+  const token = sessionStorage.getItem('token');
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [lodding, setLodding] = useState(false);
@@ -70,10 +72,10 @@ function Cammands() {
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "cammand" });
+    WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "cammand" });
 
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-  }, [openAdd,openUpdate,lodding]);
+  }, [openAdd, openUpdate, lodding]);
 
   const handleUpdateClick = (row) => {
     setSelectedRow(row);
@@ -83,11 +85,11 @@ function Cammands() {
   const handleDeleteClick = (id) => {
     setDeleteId(id)
   };
-   const handleDeleteConfirm = () => {
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'cammand',id:`${deleteId}`});
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'cammand', id: `${deleteId}` });
     setLodding(true);
-      setDeleteId(null)
-    }
+    setDeleteId(null)
+  }
   const handleAddClick = () => {
     setOpenAdd(true);
   };
@@ -107,12 +109,12 @@ function Cammands() {
       minWidth: 150,
     },
     {
-        field: "description",
-        headerName: 'Description',
-        flex: 1,
-        // resizable: false,
-        minWidth: 150,
-      },
+      field: "description",
+      headerName: 'Description',
+      flex: 1,
+      // resizable: false,
+      minWidth: 150,
+    },
     {
       field: 'actions',
       sortable: false,
@@ -142,8 +144,8 @@ function Cammands() {
   const paginationModel = { page: 0, pageSize: 5 };
   return (
     <Container>
-<AddModal Open={openAdd} setOpen={setOpenAdd} />
-<UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} token={token} />
+      <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} token={token} />
       <Paper color="primary"
         variant="outlined"
         shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -158,55 +160,61 @@ function Cammands() {
         />
       </Paper>
       <Dialog
-              open={deleteId !== null}
-              onClose={() => setDeleteId(null)}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-            >
-              <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                  Are you sure you want to delete this Command?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setDeleteId(null)} color="primary">
-                  No
-                </Button>
-                <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
-                  Yes
-                </Button>
-              </DialogActions>
-            </Dialog>
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this Command?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteId(null)} color="primary">
+            No
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 export default Cammands
 
-const AddModal = ({Open,setOpen}) => {
-  
+const AddModal = ({ Open, setOpen, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [cammand_name, setcammand_name] = useState('');
-  const [Description,setDescription] = useState('');
+  const [Description, setDescription] = useState('');
 
 
   const handleSubmit = (event) => {
     event.preventDefault();
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'insert',
       table: 'cammand',
-      columns: ['cammand','description'],
-      values: [cammand_name,Description],
+      columns: ['cammand', 'description'],
+      values: [cammand_name, Description],
     });
 
     const handleWebSocketData = (data) => {
-      if (data?.status== "inserted" && data?.tableName == "cammand") {
-         setOpen(false);
-        }
+      if (data?.status == "inserted" && data?.tableName == "cammand") {
+        setSnackbar({ open: true, message: "Cammand Added Successfully", severity: "success" });
+        setOpen(false);
       }
+    }
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
-    };
+  };
 
   return (
     <div>
@@ -218,15 +226,32 @@ const AddModal = ({Open,setOpen}) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
 
-const UpdatesModal = ({ rows, Open, setOpen }) => {
+const UpdatesModal = ({ rows, Open, setOpen, token }) => {
   const [cammand_name, setcammand_name] = useState('');
-  const [Description,setDescription] = useState('');
+  const [Description, setDescription] = useState('');
   const [cammand, setcammand] = useState([])
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
 
   useEffect(() => {
@@ -238,20 +263,22 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'update',
       table: 'cammand',
       whereCondition: "id=?",
       whereValues: [cammand.id],
-      columns: ['cammand','description'],
-      values: [cammand_name,Description],
+      columns: ['cammand', 'description'],
+      values: [cammand_name, Description],
     });
 
     const handleWebSocketData = (data) => {
-      if (data?.status== "updated" && data?.tableName == "cammand" ) {
+      if (data?.status == "updated" && data?.tableName == "cammand") {
+        setSnackbar({ open: true, message: "Cammand Updated Successfully", severity: "success" });
         setOpen(false);
-        }
       }
+    }
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   };
@@ -266,6 +293,19 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

@@ -20,6 +20,7 @@ const iconMap = {
 
 function Orders({pathname, navigate}) {
   // const navigate = useNavigate();
+  const token = sessionStorage.getItem('token');
   const [modules, setModules] = useState([]);
   const [ctx,setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
 
@@ -30,7 +31,7 @@ function Orders({pathname, navigate}) {
     }
   };
   WebSocketManager.subscribe(handleWebSocketData);
-  WebSocketManager.sendMessage({ path: "data", type: "find", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
+  WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
 }, [ctx.id]);
   // useEffect(() => {
   //   const fetchModules = async () => {
@@ -45,7 +46,7 @@ function Orders({pathname, navigate}) {
   // }, [ctx.id]);
 
   const handleCardClick = (moduleId, moduleName,JOB) => {
-    WebSocketManager.sendMessage({ path: "data", type: "find", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
+    WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
     navigate('/Jobs', { moduleId, moduleName,JOB});
   };
 

@@ -15,6 +15,8 @@ import {
   FormControl,
   Autocomplete,
   Paper,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 import EditIcon from '@mui/icons-material/Edit';
@@ -51,6 +53,12 @@ function CustomToolbar({ handleAddClick }) {
   );
 }
 function Objects() {
+  const token = sessionStorage.getItem('token');
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [lodding, setLodding] = useState(false);
@@ -71,8 +79,8 @@ function Objects() {
       setLodding(false);
     };
     WebSocketManager.subscribe(handleWebSocketData);
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "object_repo" });
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "object_types" });
+    WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "object_repo" });
+    WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "object_types" });
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   }, [openUpdate, openAdd, lodding]);
 
@@ -88,15 +96,24 @@ function Objects() {
     setOpenAdd(true);
   };
   const handleDeleteClick = (id) => {
-  
+
     setDeleteId(id)
   };
   const handleDeleteConfirm = () => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'object_repo', id: `${deleteId}` });
-      setLodding(true);
-      setDeleteId(null)
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'object_repo', id: `${deleteId}` });
+    const handleWebSocketData = (data) => {
+      if (data?.status == "deleted" && data?.tableName == "object_repo") {
+        setSnackbar({ open: true, message: "Object deleted successfully", severity: "success" });
+        setLodding(true);
+        setDeleteId(null)
+
+      }
+
     }
-  
+    WebSocketManager.subscribe(handleWebSocketData);
+    return () => WebSocketManager.unsubscribe(handleWebSocketData);
+  }
+
   const columns = [
     {
       field: "id",
@@ -164,8 +181,8 @@ function Objects() {
 
   return (
     <Container>
-      <AddModal Open={openAdd} setOpen={setOpenAdd} />
-      <UpdatesModal open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} token={token} />
+      <UpdatesModal open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} token={token} />
       <Paper color="primary"
         variant="outlined"
         shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -201,13 +218,31 @@ function Objects() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
 
 export default Objects
 
-const AddModal = ({ Open, setOpen }) => {
+const AddModal = ({ Open, setOpen, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [Object_types, setObject_types] = useState([]);
   const [Objects_name, setObjects_name] = useState('');
   const [Objects_value, setObjects_value] = useState('');
@@ -234,11 +269,12 @@ const AddModal = ({ Open, setOpen }) => {
     event.preventDefault();
 
     if (!Objects_name || !Selectedobject_types) {
-      alert('Please fill in all fields.');
+      setSnackbar({ open: true, message: "Please fill in all fields", severity: "error" });
       return;
     }
 
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'insert',
       table: 'object_repo',
@@ -247,6 +283,7 @@ const AddModal = ({ Open, setOpen }) => {
     });
     const handleWebSocketData = (data) => {
       if (data?.status == "inserted" && data.tableName == "object_repo") {
+        setSnackbar({ open: true, message: "Object added successfully", severity: "success" });
         setOpen(false);
       }
     }
@@ -276,11 +313,29 @@ const AddModal = ({ Open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
 
-const UpdatesModal = ({ rows, open, setOpen }) => {
+const UpdatesModal = ({ rows, open, setOpen, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [Object_types, setObject_types] = useState([]);
   const [Objects_name, setObjects_name] = useState('');
   const [Objects_value, setObjects_value] = useState('');
@@ -322,6 +377,7 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
     }
 
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'update',
       table: 'object_repo',
@@ -332,6 +388,7 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
     });
     const handleWebSocketData = (data) => {
       if (data?.status == "updated" && data?.tableName == "object_repo") {
+        setSnackbar({ open: true, message: "Object updated successfully", severity: "success" });
         setOpen(false);
       }
     }
@@ -361,6 +418,19 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

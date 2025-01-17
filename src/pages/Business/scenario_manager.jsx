@@ -15,6 +15,8 @@ import {
   FormControl,
   Autocomplete,
   Paper,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 import EditIcon from '@mui/icons-material/Edit';
@@ -52,6 +54,12 @@ function CustomToolbar({ handleAddClick }) {
 }
 
 function scenario_manager() {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const token = sessionStorage.getItem('token');
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [lodding, setLodding] = useState(false);
@@ -71,8 +79,8 @@ function scenario_manager() {
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "testcase" });
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "scenario_manager" });
+    WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "testcase" });
+    WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "scenario_manager" });
 
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   }, [openAdd, openUpdate, lodding]);
@@ -88,9 +96,17 @@ function scenario_manager() {
 
   };
   const handleDeleteConfirm = () => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'scenario_manager', id: `${deleteId}` });
-    setLodding(true);
-    setDeleteId(null)
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'scenario_manager', id: `${deleteId}` });
+    const handleWebSocketData = (data) => {
+      if (data?.status == "deleted" && data?.tableName == "scenario_manager") {
+        setSnackbar({ open: true, message: "Scenario Deleted Successfully", severity: "success" });
+        setLodding(true);
+        setDeleteId(null)
+      }
+    }
+    WebSocketManager.subscribe(handleWebSocketData);
+    return () => WebSocketManager.unsubscribe(handleWebSocketData);
+
   }
 
   const handleAddClick = () => {
@@ -202,8 +218,8 @@ function scenario_manager() {
   const paginationModel = { page: 0, pageSize: 5 };
   return (
     <Container>
-      <AddModal Open={openAdd} setOpen={setOpenAdd} />
-      <UpdatesModal open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} token={token} />
+      <UpdatesModal open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} token={token} />
       <Paper color="primary"
         variant="outlined"
         shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -238,12 +254,30 @@ function scenario_manager() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
 export default scenario_manager
 
-const AddModal = ({ Open, setOpen }) => {
+const AddModal = ({ Open, setOpen, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [TestScenario, setTestScenario] = useState('Sample');
   const [SSO, setSSO] = useState([{ id: 'NO' }, { id: 'YES' }]);
   const [selectedSSO, setSelectedSSO] = useState(SSO[0]); // Default selection for SSO
@@ -294,7 +328,7 @@ const AddModal = ({ Open, setOpen }) => {
   const [SelectTestcase, setSelectTescase] = useState(null);
   const [Testcase, setTestcase] = useState([]);
   useEffect(() => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'testcase' });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'list', table: 'testcase' });
 
   }, []);
 
@@ -322,6 +356,7 @@ const AddModal = ({ Open, setOpen }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'insert',
       table: 'scenario_manager',
@@ -330,6 +365,7 @@ const AddModal = ({ Open, setOpen }) => {
     });
     const handleWebSocketData = (data) => {
       if (data?.status == "inserted" && data?.tableName == "scenario_manager") {
+        setSnackbar({ ...snackbar, open: true, message: "Scenario Added Successfully", severity: "success" });
         setOpen(false);
       }
     }
@@ -421,11 +457,29 @@ const AddModal = ({ Open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
 
-const UpdatesModal = ({ rows, open, setOpen }) => {
+const UpdatesModal = ({ rows, open, setOpen, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [TestScenario, setTestScenario] = useState('Sample');
   const [SSO, setSSO] = useState([{ id: 'NO' }, { id: 'YES' }]);
   const [selectedSSO, setSelectedSSO] = useState(SSO[0]); // Default selection for SSO
@@ -478,7 +532,7 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
   const [Testcase, setTestcase] = useState([]);
   const [TestScenario_id, setTestScenario_id] = useState([])
   useEffect(() => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'testcase' });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'list', table: 'testcase' });
 
   }, []);
 
@@ -515,6 +569,7 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'update',
       table: 'scenario_manager',
@@ -525,6 +580,11 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
     });
     const handleWebSocketData = (data) => {
       if (data?.status == "updated" && data?.tableName == "scenario_manager") {
+        setSnackbar({
+          open: true,
+          message: "Scenario Updated Successfully",
+          severity: "success",
+        });
         setOpen(false);
       }
     }
@@ -613,6 +673,19 @@ const UpdatesModal = ({ rows, open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

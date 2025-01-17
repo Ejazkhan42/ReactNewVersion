@@ -20,6 +20,8 @@ import {
   TextField,
   Typography,
   CircularProgress,
+  Snackbar,
+  Alert,
   IconButton,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -82,7 +84,13 @@ const VisuallyHiddenImageInput = styled('input')({
 });
 
 const TestCasePage = ({ pathname, navigate }) => {
+  const token = sessionStorage.getItem('token');
   const location = useLocation();
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [ctx, setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const { moduleId, JOB, moduleName } = location.state || {};
   const [testCases, setTestCases] = useState([]);
@@ -239,14 +247,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     formData.append('VIDEO_URL', servers?.url || VIDEO_URL)
     formData.append('API', API_URL)
     formData.append('websocket', WS_URL)
-
-    if (localStorage.getItem('Token') !== null) {
-      formData.append('Token', localStorage.getItem('Token'));
-    } else {
-      const id = uuidFromUuidV4();
-      localStorage.setItem('Token', id);
-      formData.append('Token', id);
-    }
+    formData.append('Token', token);
 
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -262,10 +263,11 @@ const TestCasePage = ({ pathname, navigate }) => {
       });
 
       if (response.ok) {
+        setSnackbar({ open: true, message: 'Test cases are running', severity: 'success' });
         const result = await response.json();
         const handleWebSocketData = (data) => {
-          if (data.path === "chat" && data?.token === localStorage.getItem('Token') && data?.hasOwnProperty('browserId')) {
-            sessionStorage.setItem('excelData',JSON.stringify(excelData));
+          if (data.path === "chat" && data?.token === token && data?.hasOwnProperty('browserId')) {
+            sessionStorage.setItem('excelData', JSON.stringify(excelData));
             sessionStorage.setItem('browsers_id', JSON.stringify([data]));
             setIsLoading(false);
             setMessage('Success');
@@ -276,13 +278,13 @@ const TestCasePage = ({ pathname, navigate }) => {
 
         WebSocketManager.subscribe(handleWebSocketData);
 
-        
+
       } else {
         console.error('Error:', response.statusText);
       }
     } catch (error) {
       console.error('Error:', error);
-    } 
+    }
   };
 
 
@@ -530,6 +532,19 @@ const TestCasePage = ({ pathname, navigate }) => {
           </Grid>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

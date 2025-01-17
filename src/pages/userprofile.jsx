@@ -78,6 +78,7 @@ const UserProfile = () => {
     });
     useEffect(() => {
         WebSocketManager.sendMessage({
+            token:tokens,
             path: 'data',
             type: 'find',
             table: 'users',
@@ -98,6 +99,7 @@ const UserProfile = () => {
     const handleProfileUpdate = (e) => {
         e.preventDefault();
         WebSocketManager.sendMessage({
+            token:tokens,
             path: 'data',
             type: 'update',
             table: 'users',

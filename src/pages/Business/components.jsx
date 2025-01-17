@@ -14,7 +14,8 @@ import {
   DialogTitle,
   FormControl,
   Paper,
-
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 import EditIcon from '@mui/icons-material/Edit';
@@ -53,6 +54,7 @@ function CustomToolbar({ handleAddClick }) {
 
 
 function Componenets() {
+  const token = sessionStorage.getItem('token');
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [lodding, setLodding] = useState(false);
@@ -69,7 +71,7 @@ function Componenets() {
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
-    WebSocketManager.sendMessage({ path: "data", type: "list", table: "comp" });
+    WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "comp" });
 
     return () => WebSocketManager.unsubscribe(handleWebSocketData);
   }, [openAdd, openUpdate, lodding]);
@@ -87,7 +89,7 @@ function Componenets() {
     setOpenAdd(true);
   };
   const handleDeleteConfirm = () => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'comp', id: `${deleteId}` });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'comp', id: `${deleteId}` });
     setLodding(true);
     setDeleteId(null)
   }
@@ -135,8 +137,8 @@ function Componenets() {
   const paginationModel = { page: 0, pageSize: 5 };
   return (
     <Container>
-      <AddModal Open={openAdd} setOpen={setOpenAdd} />
-      <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} token={token} />
+      <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} token={token} />
       <Paper color="primary"
         variant="outlined"
         shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -176,8 +178,12 @@ function Componenets() {
 };
 export default Componenets
 
-const AddModal = ({ Open, setOpen }) => {
-
+const AddModal = ({ Open, setOpen, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [component_name, setcomponent_name] = useState('');
 
   const handleOpen = () => {
@@ -189,6 +195,7 @@ const AddModal = ({ Open, setOpen }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'insert',
       table: 'comp',
@@ -198,6 +205,7 @@ const AddModal = ({ Open, setOpen }) => {
 
     const handleWebSocketData = (data) => {
       if (data?.status == "inserted" && data?.tableName == "comp") {
+        setSnackbar({ open: true, message: "Component added successfully", severity: "success" });
         setOpen(false);
       }
     }
@@ -214,14 +222,31 @@ const AddModal = ({ Open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
 
-const UpdatesModal = ({ rows, Open, setOpen }) => {
+const UpdatesModal = ({ rows, Open, setOpen, token }) => {
   const [component_name, setcomponent_name] = useState('');
   const [comp, setcomp] = useState([])
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   useEffect(() => {
     setcomp(rows || null);
@@ -231,6 +256,7 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     WebSocketManager.sendMessage({
+      token: token,
       path: 'data',
       type: 'update',
       table: 'comp',
@@ -242,6 +268,7 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
 
     const handleWebSocketData = (data) => {
       if (data?.status == "updated" && data?.tableName == "comp") {
+        setSnackbar({ open: true, message: "Component updated successfully", severity: "success" });
         setOpen(false);
       }
     }
@@ -258,6 +285,19 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
           <Button variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

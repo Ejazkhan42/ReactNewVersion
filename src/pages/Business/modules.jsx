@@ -15,6 +15,8 @@ import {
     FormControl,
     Autocomplete,
     Paper,
+    Snackbar,
+    Alert,
 
 
 } from '@mui/material';
@@ -55,6 +57,7 @@ function CustomToolbar({ handleAddClick }) {
 
 
 function Modules() {
+    const token = sessionStorage.getItem('token');
     const [openAdd, setOpenAdd] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [lodding, setLodding] = useState(false);
@@ -65,9 +68,9 @@ function Modules() {
     const [types, settype] = useState(null)
     const [deleteId, setDeleteId] = useState(null)
     useEffect(() => {
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "modules" });
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "users" });
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "usermodulesaccess" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "modules" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "users" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "usermodulesaccess" });
 
     }, [openUpdate, openAdd, lodding])
     useEffect(() => {
@@ -102,10 +105,10 @@ function Modules() {
     };
     const handleDeleteConfirm = () => {
         if (types == "Modules") {
-            WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'modules', id: `${deleteId}` });
+            WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'modules', id: `${deleteId}` });
         }
         else if (types == "Access") {
-            WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'usermodulesaccess', id: `${deleteId}` });
+            WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'usermodulesaccess', id: `${deleteId}` });
         }
         setLodding(true);
         setDeleteId(null)
@@ -228,8 +231,8 @@ function Modules() {
     const paginationModel = { page: 0, pageSize: 5 };
     return (
         <Container>
-            <AddModal Open={openAdd} setOpen={setOpenAdd} users={username} type={types} Modules={modulesData} />
-            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} users={username} type={types} Modules={modulesData} />
+            <AddModal Open={openAdd} setOpen={setOpenAdd} users={username} type={types} Modules={modulesData} token={token} />
+            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} users={username} type={types} Modules={modulesData} token={token} />
             <Paper color="primary"
                 variant="outlined"
                 shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -285,7 +288,12 @@ function Modules() {
 };
 export default Modules
 
-const AddModal = ({ Open, setOpen, users, type, Modules }) => {
+const AddModal = ({ Open, setOpen, users, type, Modules, token }) => {
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
     const [selectedUsers, setSelectedUsers] = useState(null);
     const [module_name, setmodule_name] = useState(null);
     const [modulename, setmodulename] = useState(null);
@@ -295,6 +303,7 @@ const AddModal = ({ Open, setOpen, users, type, Modules }) => {
         if (type == "Modules") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'insert',
                 table: 'modules',
@@ -304,6 +313,7 @@ const AddModal = ({ Open, setOpen, users, type, Modules }) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "inserted" && data?.tableName == "modules") {
+                    setSnackbar({ open: true, message: "Modules added successfully", severity: "success" });
                     setOpen(false);
                 }
             }
@@ -313,6 +323,7 @@ const AddModal = ({ Open, setOpen, users, type, Modules }) => {
         else if (type == "Access") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'insert',
                 table: 'usermodulesaccess',
@@ -322,6 +333,11 @@ const AddModal = ({ Open, setOpen, users, type, Modules }) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "inserted" && data?.tableName == "usermodulesaccess") {
+                    setSnackbar({
+                        open: true,
+                        message: "User Access added successfully",
+                        severity: "success",
+                    });
                     setOpen(false);
                 }
             }
@@ -372,11 +388,29 @@ const AddModal = ({ Open, setOpen, users, type, Modules }) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
 
-const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules }) => {
+const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules, token }) => {
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
     const [selectedUsers, setSelectedUsers] = useState(null);
     const [module_name, setmodule_name] = useState(null);
     const [imagepath, setimagepath] = useState('');
@@ -401,6 +435,7 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules }) => {
         if (type == "Modules") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'update',
                 table: 'modules',
@@ -412,6 +447,11 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules }) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "updated" && data?.tableName == "modules") {
+                    setSnackbar({
+                        open: true,
+                        message: "Modules updated successfully",
+                        severity: "success",
+                    });
                     setOpen(false);
                 }
             }
@@ -421,6 +461,7 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules }) => {
         else if (type == "Access") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'update',
                 table: 'usermodulesaccess',
@@ -432,6 +473,11 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules }) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "updated" && data?.tableName == "usermodulesaccess") {
+                    setSnackbar({
+                        open: true,
+                        message: "User Access updated successfully",
+                        severity: "success",
+                    });
                     setOpen(false);
                 }
             }
@@ -483,6 +529,19 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules }) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

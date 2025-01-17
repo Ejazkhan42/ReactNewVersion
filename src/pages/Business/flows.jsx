@@ -14,7 +14,10 @@ import {
   DialogTitle,
   FormControl,
   Autocomplete,
-  Paper} from '@mui/material';
+  Paper,
+  Snackbar,
+  Alert,
+} from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
 const style = {
   position: 'absolute',
@@ -50,7 +53,7 @@ function CustomToolbar({ handleAddClick }) {
     </GridToolbarContainer>
   );
 }
-const useWebSocketData = (subscriptions,Load,setLoad) => {
+const useWebSocketData = (subscriptions, Load, setLoad) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -66,15 +69,15 @@ const useWebSocketData = (subscriptions,Load,setLoad) => {
     };
 
     WebSocketManager.subscribe(handleWebSocketData);
-    
+
     return () => {
       WebSocketManager.unsubscribe(handleWebSocketData);
     };
-  }, [subscriptions,Load]);
+  }, [subscriptions, Load]);
 
   return data;
 };
-const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flowData, paginationModel, setPaginationModel, setLoad }) => {
+const TestFlow = ({ token, selectedTestCase, objects, commands, components, testCases, flowData, paginationModel, setPaginationModel, setLoad }) => {
   const columns = [
     { field: "id", headerName: 'Id', flex: 0.3, minWidth: 100 },
     { field: "Test_Case", headerName: 'Name', flex: 1, minWidth: 150 },
@@ -104,7 +107,7 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
   const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [rows, setRows] = useState([]);
-  const [deleteId,setDeleteId]=useState(null)
+  const [deleteId, setDeleteId] = useState(null)
   const [type, setType] = useState('flow');
   const handleAddClick = () => {
     setOpenAdd(true);
@@ -118,19 +121,19 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
   }
   const handleDeleteClick = (id) => {
     setDeleteId(id)
-    
+
   };
-  
-  const  handleDeleteConfirm=()=>{
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'flow_data',id:`${deleteId}`});
+
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'flow_data', id: `${deleteId}` });
     setLoad(true);
     setDeleteId(null)
   }
   return (
     <div>
       <Paper>
-        <AddModal Open={openAdd} setOpen={setOpenAdd} setLoad={setLoad} objects={objects} testCases={testCases} commands={commands} components={components} rows={selectedTestCase} type={type} />
-        <UpdatesModal rows={rows} open={openUpdate} setOpen={setOpenUpdate} testCases={testCases} components={components} objects={objects} commands={commands} type={type} setLoad={setLoad} />
+        <AddModal Open={openAdd} setOpen={setOpenAdd} setLoad={setLoad} objects={objects} testCases={testCases} commands={commands} components={components} rows={selectedTestCase} type={type} token={token} />
+        <UpdatesModal rows={rows} open={openUpdate} setOpen={setOpenUpdate} testCases={testCases} components={components} objects={objects} commands={commands} type={type} setLoad={setLoad} token={token} />
         <DataGrid
           columns={columns}
           rows={flowData}
@@ -167,7 +170,7 @@ const TestFlow = ({ selectedTestCase,objects,commands,components ,testCases, flo
   );
 };
 
-const ComponentFlow = ({ SelectedComponent,components,objects,commands, componentData, paginationModel1, setPaginationModel1, setLoad }) => {
+const ComponentFlow = ({ token, SelectedComponent, components, objects, commands, componentData, paginationModel1, setPaginationModel1, setLoad }) => {
   const columns = [
     { field: "id", headerName: 'Id', flex: 0.3, minWidth: 100 },
     { field: "component_name", headerName: 'Name', flex: 1, minWidth: 150 },
@@ -198,7 +201,7 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
 
   const [openAdd, setOpenAdd] = useState(false);
   const [rows, setRows] = useState([]);
-  const [deleteId,setDeleteId]=useState(null)
+  const [deleteId, setDeleteId] = useState(null)
   const [type, setType] = useState('Component');
   const handleAddClick = () => {
     setOpenAdd(true);
@@ -210,19 +213,19 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
   };
   const handleDeleteClick = (id) => {
     setDeleteId(id)
-    
+
   };
-  
-  const  handleDeleteConfirm=()=>{
-    WebSocketManager.sendMessage({path: 'data', type: 'delete', table: 'comp_data',id:`${deleteId}`});
+
+  const handleDeleteConfirm = () => {
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'comp_data', id: `${deleteId}` });
     setLoad(true);
     setDeleteId(null)
   }
 
   return (
     <div>
-      <AddModal Open={openAdd} setOpen={setOpenAdd} components={components} commands={commands} objects={objects}  setLoad={setLoad} type={type} rows={SelectedComponent} />
-      <UpdatesModal rows={rows} open={openUpdate}  components={components} objects={objects} commands={commands} SelectedComponent={SelectedComponent} setOpen={setOpenUpdate} type={type} setLoad={setLoad} />
+      <AddModal Open={openAdd} setOpen={setOpenAdd} components={components} commands={commands} objects={objects} setLoad={setLoad} type={type} rows={SelectedComponent} token={token} />
+      <UpdatesModal rows={rows} open={openUpdate} components={components} objects={objects} commands={commands} SelectedComponent={SelectedComponent} setOpen={setOpenUpdate} type={type} setLoad={setLoad} token={token} />
       <Paper>
         <DataGrid
           columns={columns}
@@ -260,6 +263,7 @@ const ComponentFlow = ({ SelectedComponent,components,objects,commands, componen
   );
 };
 const Flow = () => {
+  const token = sessionStorage.getItem('token');
   const [openAdd, setOpenAdd] = useState(false);
   const [Load, setLoad] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
@@ -267,20 +271,20 @@ const Flow = () => {
   const [flowData, setFlowData] = useState([]);
   const [componentList, setComponentList] = useState([]);
   const [componentData, setComponentData] = useState([]);
- 
-  
+
+
   const [components, setComponents] = useState([]);
-  const [objects, setObjects] = useState([]);  
+  const [objects, setObjects] = useState([]);
   const [commands, setCommands] = useState([]);
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [SelectedComponent, setSelectedComponent] = useState(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
   const [paginationModel1, setPaginationModel1] = useState({ page: 0, pageSize: 5 });
   useEffect(() => {
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'testcase' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'comp' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'object_repo' });
-    WebSocketManager.sendMessage({ path: 'data', type: 'list', table: 'cammand' });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'list', table: 'testcase' });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'list', table: 'comp' });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'list', table: 'object_repo' });
+    WebSocketManager.sendMessage({ token: token, path: 'data', type: 'list', table: 'cammand' });
   }, []);
   const subscriptions = [
     { condition: data => data[0]?.hasOwnProperty('Modules_id'), stateSetter: setTestCases },
@@ -291,11 +295,12 @@ const Flow = () => {
     { condition: data => data[0]?.hasOwnProperty('steps'), stateSetter: setComponentData },
   ];
 
-  const data = useWebSocketData(subscriptions,Load,setLoad);
+  const data = useWebSocketData(subscriptions, Load, setLoad);
 
   useEffect(() => {
     if (selectedTestCase) {
       WebSocketManager.sendMessage({
+        token: token,
         path: 'data',
         type: 'find',
         table: 'flow_data_view',
@@ -304,11 +309,12 @@ const Flow = () => {
         columns: [],
       });
     }
-  }, [selectedTestCase,openUpdate,openAdd,Load]);
+  }, [selectedTestCase, openUpdate, openAdd, Load]);
 
   useEffect(() => {
     if (SelectedComponent) {
       WebSocketManager.sendMessage({
+        token: token,
         path: 'data',
         type: 'find',
         table: 'comp_data_view',
@@ -316,9 +322,9 @@ const Flow = () => {
         whereValues: [SelectedComponent.id],
         columns: [],
       });
-      
+
     }
-  }, [SelectedComponent,openUpdate,openAdd,Load]);
+  }, [SelectedComponent, openUpdate, openAdd, Load]);
 
   useEffect(() => {
     if (selectedTestCase?.id && flowData.length > 0) {
@@ -326,15 +332,14 @@ const Flow = () => {
         .filter(f => f.testcase_id === selectedTestCase.id)
         .map(f => ({ id: f.comp_id, component_name: f.component_name }));
       setComponentList(filteredComponents);
-      setSelectedComponent(filteredComponents.find(f=>f.id===SelectedComponent?.id));
+      setSelectedComponent(filteredComponents.find(f => f.id === SelectedComponent?.id));
     }
-    else
-    {
+    else {
       setComponentList([]);
       setSelectedComponent(null);
     }
 
-  }, [flowData, selectedTestCase,openUpdate]);
+  }, [flowData, selectedTestCase, openUpdate]);
 
 
   const handleSelectionChange = (event, newValue) => {
@@ -360,6 +365,7 @@ const Flow = () => {
         />
       </FormControl>
       <TestFlow
+        token={token}
         setLoad={setLoad}
         selectedTestCase={selectedTestCase}
         testCases={testCases}
@@ -383,6 +389,7 @@ const Flow = () => {
       </FormControl>
 
       <ComponentFlow
+        token={token}
         setLoad={setLoad}
         SelectedComponent={SelectedComponent}
         components={components}
@@ -396,7 +403,12 @@ const Flow = () => {
   );
 };
 export default Flow;
-const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,testCases,objects,commands}) => {
+const AddModal = ({ Open, setOpen, components, selectedComp, rows, setLoad, type, testCases, objects, commands, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -404,28 +416,33 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
   const [stageNo, setStageNo] = useState(0);
   const [stepNo, setStepNo] = useState(0);
   const [description, setDescription] = useState('');
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState('');
   const [customerName, setCustomerName] = useState('A');
- 
+
   useEffect(() => {
 
     if (type === 'Component') {
       setSelectedComponent(components?.find(comp => comp?.component_name === rows?.component_name) || null);
-         }
+    }
     else if (type === 'flow') {
       setSelectedTestCase(testCases?.find(testCase => testCase?.Test_Case === rows?.Test_Case) || null);
     }
-  }, [rows,type]);
+  }, [rows, type]);
   const handleSubmit = (event) => {
     event.preventDefault();
 
     if (type === 'flow') {
       if (!selectedTestCase || !selectedComponent || !stageNo) {
-        alert('Please fill all the fields');  
+        setSnackbar({
+          open: true,
+          message: "Please fill all the fields",
+          severity: "error",
+        });
         return;
-        
+
       }
       WebSocketManager.sendMessage({
+        token: token,
         path: 'data',
         type: 'insert',
         table: 'flow_data',
@@ -434,9 +451,14 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "flow_data") {
+          setSnackbar({
+            open: true,
+            message: "Flow Inserted Successfully",
+            severity: "success",
+          });
           setOpen(false);
           setLoad(true);
-          
+
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
@@ -445,18 +467,29 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
     }
     else if (type === 'Component') {
       if (!selectedComponent || !selectedCommand || !stepNo || !description) {
-        alert('Please fill all the fields');
+        setSnackbar
+          ({
+            open: true,
+            message: "Please fill all the fields",
+            severity: "error",
+          });
         return;
       }
       WebSocketManager.sendMessage({
+        token: token,
         path: 'data',
         type: 'insert',
         table: 'comp_data',
         columns: ['comp_id', 'Target', 'Cammand', 'steps', 'Description', 'Value'],
-        values: [selectedComponent?.id, selectedObject?.id ? selectedObject.id: null, selectedCommand?.id, stepNo, description.trim(), value.trim()],
+        values: [selectedComponent?.id, selectedObject?.id ? selectedObject.id : null, selectedCommand?.id, stepNo, description.trim(), value ? value.trim() : null],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "inserted" && data?.tableName == "comp_data") {
+          setSnackbar({
+            open: true,
+            message: "Comp Flow Inserted Successfully",
+            severity: "success",
+          });
           setOpen(false);
           setLoad(true);
         }
@@ -491,8 +524,8 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
 
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
-            required
-            value={selectedComponent}
+              required
+              value={selectedComponent}
               options={components}
               getOptionLabel={(option) => option?.component_name || ""}
               onChange={(event, newValue) => setSelectedComponent(newValue)}
@@ -513,7 +546,7 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
               </FormControl>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
-                required
+                  required
                   options={commands}
                   getOptionLabel={(option) => option?.cammand || ""}
                   onChange={(event, newValue) => setSelectedCommand(newValue)}
@@ -530,12 +563,29 @@ const AddModal = ({ Open, setOpen,components,selectedComp, rows, setLoad, type,t
           <Button startIcon={<SaveIcon />} variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
 
-const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,objects,commands, type }) => {
-
+const UpdatesModal = ({ rows, open, setOpen, setLoad, testCases, components, objects, commands, type, token }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [selectedTestCase, setSelectedTestCase] = useState(null);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -546,7 +596,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
   const [value, setValue] = useState('');
   const [customerName, setCustomerName] = useState('A');
   useEffect(() => {
-    
+
     if (type === 'Component') {
       setSelectedComponent(components?.find(comp => comp?.component_name === rows?.component_name) || null);
       setSelectedObject(objects?.find(object => object?.object_name === rows?.object_name) || null);
@@ -561,17 +611,22 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
       setStageNo(rows?.flow || '');
       setCustomerName(rows?.Customer || 'A');
     }
-  }, [rows,type]);
+  }, [rows, type]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     if (type === 'flow') {
       if (!selectedTestCase || !selectedComponent || !stageNo) {
-        alert('Please fill all the fields');
+        setSnackbar({
+          open: true,
+          message: "Please fill all the fields",
+          severity: "error",
+        });
         return;
       }
       WebSocketManager.sendMessage({
+        token: token,
         path: 'data',
         type: 'update',
         table: 'flow_data',
@@ -582,6 +637,11 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "updated" && data?.tableName == "flow_data") {
+          setSnackbar({
+            open: true,
+            message: "Flow Updated Successfully",
+            severity: "success",
+          });
           setOpen(false);
           setLoad(true);
         }
@@ -592,21 +652,31 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
 
     if (type === 'Component') {
       if (!selectedComponent || !selectedCommand || !stepNo || !description) {
-        alert('Please fill all the fields');
+        setSnackbar
+          ({
+            open: true,
+            message: "Please fill all the fields",
+            severity: "error",
+          });
         return;
       }
       WebSocketManager.sendMessage({
+        token: token,
         path: 'data',
         type: 'update',
         table: 'comp_data',
         whereCondition: "id=?",
         whereValues: [rows?.id],
         columns: ['comp_id', 'Cammand', 'Target', 'Description', 'Value', 'steps'],
-        values: [selectedComponent?.id, selectedCommand?.id, selectedObject?.id, description.trim(), value.trim(), stepNo],
+        values: [selectedComponent?.id, selectedCommand?.id, selectedObject?.id, description.trim(), value ? value.trim() : null, stepNo],
       });
       const handleWebSocketData = (data) => {
         if (data?.status == "updated" && data?.tableName == "comp_data") {
-
+          setSnackbar({
+            open: true,
+            message: "Comp Flow Updated Successfully",
+            severity: "success",
+          });
           setOpen(false);
           setLoad(true);
 
@@ -628,7 +698,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
             <>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
-                required
+                  required
                   value={selectedTestCase}
                   options={testCases}
                   getOptionLabel={(option) => option?.Test_Case || ""}
@@ -645,7 +715,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
 
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
-            required
+              required
               value={selectedComponent}
               options={components}
               getOptionLabel={(option) => option?.component_name || ""}
@@ -669,7 +739,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
               </FormControl>
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
-                required
+                  required
                   value={selectedCommand}
                   options={commands}
                   getOptionLabel={(option) => option?.cammand || ""}
@@ -678,8 +748,8 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
                 />
               </FormControl>
               <TextField required fullWidth label="Step No" variant="outlined" value={stepNo} onChange={(e) => setStepNo(e.target.value)} />
-              <TextField  fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
-              <TextField  fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
+              <TextField fullWidth label="Description" variant="outlined" multiline rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
+              <TextField fullWidth label="Value" variant="outlined" value={value} onChange={(e) => setValue(e.target.value)} />
             </>
           )}
 
@@ -687,6 +757,19 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad,testCases,components,object
           <Button startIcon={<SaveIcon />} variant="contained" color="secondary" type="submit">Submit</Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

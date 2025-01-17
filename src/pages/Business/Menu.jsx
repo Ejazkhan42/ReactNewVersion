@@ -15,7 +15,8 @@ import {
     FormControl,
     Autocomplete,
     Paper,
-
+    Snackbar,
+    Alert,
 
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
@@ -54,6 +55,7 @@ function CustomToolbar({ handleAddClick }) {
 }
 
 function Menu_function() {
+    const token = sessionStorage.getItem('token');
     const [openAdd, setOpenAdd] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [lodding, setLodding] = useState(false);
@@ -64,9 +66,9 @@ function Menu_function() {
     const [types, settype] = useState(null)
     const [deleteId, setDeleteId] = useState(null)
     useEffect(() => {
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "menu" });
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "role" });
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "menu_level" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "menu" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "role" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "menu_level" });
 
     }, [openUpdate, openAdd, lodding])
     useEffect(() => {
@@ -101,10 +103,10 @@ function Menu_function() {
     };
     const handleDeleteConfirm = () => {
         if (types == "Menu") {
-            WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'menu', id: `${deleteId}` });
+            WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'menu', id: `${deleteId}` });
         }
         else if (types == "Access") {
-            WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'menu_level', id: `${deleteId}` });
+            WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'menu_level', id: `${deleteId}` });
         }
         setLodding(true);
         setDeleteId(null)
@@ -202,8 +204,8 @@ function Menu_function() {
     const paginationModel = { page: 0, pageSize: 5 };
     return (
         <Container>
-            <AddModal Open={openAdd} setOpen={setOpenAdd} roles={rolesname} type={types} Menu={menudata} />
-            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} roles={rolesname} type={types} Menu={menudata} />
+            <AddModal Open={openAdd} setOpen={setOpenAdd} roles={rolesname} type={types} Menu={menudata} token={token} />
+            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} roles={rolesname} type={types} Menu={menudata} token={token} />
             <Paper color="primary"
                 variant="outlined"
                 shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -213,7 +215,7 @@ function Menu_function() {
 
                     initialState={{ pagination: { paginationModel } }}
                     pageSizeOptions={[5, 10, 25, 100]}
-                    
+
                 />
             </Paper>
             <Paper
@@ -257,7 +259,13 @@ function Menu_function() {
 };
 export default Menu_function;
 
-const AddModal = ({ Open, setOpen, roles, type, Menu}) => {
+const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
+
     const [selectedRoles, setSelectedRoles] = useState(null);
     const [menu_name, setmenu_name] = useState(null);
     const [modulename, setmodulename] = useState(null);
@@ -276,6 +284,11 @@ const AddModal = ({ Open, setOpen, roles, type, Menu}) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "inserted" && data?.tableName == "Menu") {
+                    setSnackbar({
+                        open: true,
+                        message: "Menu added successfully",
+                        severity: "success",
+                    })
                     setOpen(false);
                 }
             }
@@ -294,6 +307,11 @@ const AddModal = ({ Open, setOpen, roles, type, Menu}) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "inserted" && data?.tableName == "menu_level") {
+                    setSnackbar({
+                        open: true,
+                        message: "User Access added successfully",
+                        severity: "success",
+                    })
                     setOpen(false);
                 }
             }
@@ -333,11 +351,29 @@ const AddModal = ({ Open, setOpen, roles, type, Menu}) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
 
-const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu }) => {
+const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
     const [selectedRoles, setSelectedRoles] = useState(null);
     const [menu_name, setmenu_name] = useState(null);
     const [segment, setsegment] = useState('');
@@ -362,17 +398,23 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu }) => {
         if (type == "Menu") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'update',
                 table: 'Menu',
                 whereCondition: "id=?",
                 whereValues: [Menu.id],
                 columns: ['kind', 'segment', 'title', 'icon', 'Children'],
-                values: [menu_name, segment, title,icon,Children],
+                values: [menu_name, segment, title, icon, Children],
             });
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "updated" && data?.tableName == "Menu") {
+                    setSnackbar({
+                        open: true,
+                        message: "Menu updated successfully",
+                        severity: "success",
+                    })
                     setOpen(false);
                 }
             }
@@ -382,6 +424,7 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu }) => {
         else if (type == "Access") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'update',
                 table: 'menu_level',
@@ -393,6 +436,11 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu }) => {
 
             const handleWebSocketData = (data) => {
                 if (data?.status == "updated" && data?.tableName == "userMenuaccess") {
+                    setSnackbar({
+                        open: true,
+                        message: "User Access updated successfully",
+                        severity: "success",
+                    })
                     setOpen(false);
                 }
             }
@@ -444,6 +492,19 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu }) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

@@ -16,7 +16,8 @@ import {
     CardMedia,
     Autocomplete,
     Paper,
-
+    Snackbar,
+    Alert,
 
 } from '@mui/material';
 import WebSocketManager from '../../AuthComponents/useWebSocket';
@@ -80,6 +81,7 @@ function ImageView({ image, open, setOpen }) {
 }
 
 function Modules() {
+    const token = sessionStorage.getItem('token');
     const [openview, setOpenview] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [lodding, setLodding] = useState(false);
@@ -88,8 +90,8 @@ function Modules() {
     const [image, setimage] = useState(null)
     const [deleteId, setDeleteId] = useState(null)
     useEffect(() => {
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "reports" });
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "reports" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "" });
 
     }, [openUpdate, lodding])
     useEffect(() => {
@@ -114,7 +116,7 @@ function Modules() {
 
     };
     const handleDeleteConfirm = () => {
-        WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'reports', id: `${deleteId}` });
+        WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'reports', id: `${deleteId}` });
         setLodding(true);
         setDeleteId(null)
     };
@@ -160,7 +162,7 @@ function Modules() {
             minWidth: 150,
             renderCell: (params) => (
                 <GridActionsCellItem
-                    icon={<PhotoSharpIcon/>}
+                    icon={<PhotoSharpIcon />}
                     label="View Image"
                     title='View Image'
                     onClick={() => handleImageViwe(params.row.image)}
@@ -215,7 +217,7 @@ function Modules() {
     const paginationModel = { page: 0, pageSize: 5 };
     return (
         <Container>
-            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} Modules={modulesData} />
+            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} Modules={modulesData} token={token} />
             <ImageView image={image} open={openview} setOpen={setOpenview} />
             <Paper color="primary"
                 variant="outlined"
@@ -261,7 +263,8 @@ function Modules() {
 };
 export default Modules
 
-const UpdatesModal = ({ rows, Open, setOpen }) => {
+const UpdatesModal = ({ rows, Open, setOpen, token }) => {
+    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
     const [selectedUsers, setSelectedUsers] = useState(null);
     const [module_name, setmodule_name] = useState(null);
     const [ExpectionsDetails, SetExpectionsDetails] = useState('');
@@ -276,6 +279,7 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         WebSocketManager.sendMessage({
+            token: token,
             path: 'data',
             type: 'update',
             table: 'reports',
@@ -287,6 +291,7 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
 
         const handleWebSocketData = (data) => {
             if (data?.status == "updated" && data?.tableName == "reports") {
+                setSnackbar({ open: true, message: "Reports Updated Successfully", severity: "success" });
                 setOpen(false);
             }
         }
@@ -314,6 +319,19 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

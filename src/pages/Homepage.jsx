@@ -88,6 +88,7 @@ function VideoView({ video, setOpen, open }) {
 
 
 function Homepage({ pathname, navigate }) {
+  const token = sessionStorage.getItem('token');
   const ctx = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null;
   const [data, setdata] = useState(true)
   const [Focus, setFocus] = useState(false);
@@ -117,7 +118,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({ path: "data", type: "list", table: "logs" });
+      WebSocketManager.sendMessage({token:token, path: "data", type: "list", table: "logs" });
     }
     else {
       const handleWebSocketData = (data) => {

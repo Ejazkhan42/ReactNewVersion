@@ -14,6 +14,8 @@ import {
     DialogTitle,
     FormControl,
     Autocomplete,
+    Snackbar,
+    Alert,
     Paper,
 
 } from '@mui/material';
@@ -54,6 +56,12 @@ function CustomToolbar({ handleAddClick }) {
 
 
 function Types() {
+    const token = sessionStorage.getItem('token');
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
     const [openAdd, setOpenAdd] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [lodding, setLodding] = useState(false);
@@ -70,7 +78,7 @@ function Types() {
         };
 
         WebSocketManager.subscribe(handleWebSocketData);
-        WebSocketManager.sendMessage({ path: "data", type: "list", table: "object_types" });
+        WebSocketManager.sendMessage({ token: token, path: "data", type: "list", table: "object_types" });
 
         return () => WebSocketManager.unsubscribe(handleWebSocketData);
     }, [openAdd, openUpdate, lodding]);
@@ -82,13 +90,20 @@ function Types() {
     };
     const handleDeleteClick = (id) => {
         setDeleteId(id);
-        
+
     };
     const handleDeleteConfirm = () => {
-    
-        WebSocketManager.sendMessage({ path: 'data', type: 'delete', table: 'object_types', id: `${deleteId}` });
-        setLodding(true);
-        setDeleteId(null);
+
+        WebSocketManager.sendMessage({ token: token, path: 'data', type: 'delete', table: 'object_types', id: `${deleteId}` });
+        const handleWebSocketData = (data) => {
+            if (data?.status == "deleted" && data?.tableName == "object_types") {
+                setSnackbar({ open: true, message: "Type Deleted Successfully", severity: "success" });
+                setLodding(true);
+                setDeleteId(null);
+            }
+        }
+        WebSocketManager.subscribe(handleWebSocketData);
+        return () => WebSocketManager.unsubscribe(handleWebSocketData);
 
     };
     const handleAddClick = () => {
@@ -145,8 +160,8 @@ function Types() {
     const paginationModel = { page: 0, pageSize: 5 };
     return (
         <Container>
-            <AddModal Open={openAdd} setOpen={setOpenAdd} />
-            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} />
+            <AddModal Open={openAdd} setOpen={setOpenAdd} token={token} />
+            <UpdatesModal Open={openUpdate} setOpen={setOpenUpdate} rows={selectedRow} token={token} />
             <Paper color="primary"
                 variant="outlined"
                 shape="rounded" sx={{ height: 410, width: '100%' }}>
@@ -161,33 +176,50 @@ function Types() {
                 />
             </Paper>
             <Dialog
-                    open={deleteId !== null}
-                    onClose={() => setDeleteId(null)}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                  >
-                    <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
-                    <DialogContent>
-                      <DialogContentText id="alert-dialog-description">
+                open={deleteId !== null}
+                onClose={() => setDeleteId(null)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Confirm deletion"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
                         Are you sure you want to delete this Types?
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={() => setDeleteId(null)} color="primary">
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteId(null)} color="primary">
                         No
-                      </Button>
-                      <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
+                    </Button>
+                    <Button onClick={handleDeleteConfirm} color="primary" autoFocus>
                         Yes
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
 export default Types
 
-const AddModal = ({ Open, setOpen }) => {
-
+const AddModal = ({ Open, setOpen, token }) => {
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
     const [object_type, setobject_type] = useState('');
     const [Description, setDescription] = useState('');
 
@@ -200,6 +232,7 @@ const AddModal = ({ Open, setOpen }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         WebSocketManager.sendMessage({
+            token: token,
             path: 'data',
             type: 'insert',
             table: 'object_types',
@@ -209,6 +242,7 @@ const AddModal = ({ Open, setOpen }) => {
 
         const handleWebSocketData = (data) => {
             if (data?.status == "inserted" && data?.tableName == "object_types") {
+                setSnackbar({ open: true, message: "Type Added Successfully", severity: "success" });
                 setOpen(false);
             }
         }
@@ -226,17 +260,34 @@ const AddModal = ({ Open, setOpen }) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
 
-const UpdatesModal = ({ rows, Open, setOpen }) => {
+const UpdatesModal = ({ rows, Open, setOpen, token }) => {
     const [type_name, settype_name] = useState('');
     const [Description, setDescription] = useState('');
     const [object_type, setobject_type] = useState([])
 
-
-   useEffect(() => {
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
+    useEffect(() => {
         setobject_type(rows || null);
         settype_name(rows?.type || '')
         setDescription(rows?.description || '')
@@ -245,6 +296,7 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         WebSocketManager.sendMessage({
+            token: token,
             path: 'data',
             type: 'update',
             table: 'object_types',
@@ -256,6 +308,7 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
 
         const handleWebSocketData = (data) => {
             if (data?.status == "updated" && data?.tableName == "object_types") {
+                setSnackbar({ open: true, message: "Type Updated Successfully", severity: "success" });
                 setOpen(false);
             }
         }
@@ -273,6 +326,19 @@ const UpdatesModal = ({ rows, Open, setOpen }) => {
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
