@@ -70,17 +70,16 @@ function VideoView({ video, setOpen, open }) {
     <Dialog fullWidth={fullWidth}
       maxWidth={maxWidth}
       open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">{"Image"}</DialogTitle>
+      <DialogTitle id="alert-dialog-title" style={{textAlign:"center"}}>{"TEST CASE VIDEO"}</DialogTitle>
       <DialogContent >
         <DialogContentText sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} id="alert-dialog-description">
-          <CardMedia component="iframe" src={video} alt="Video" />
+          <video component="iframe" src={video} alt="Video"  width={"600"} style={{width:"550px",height:"300px",background:"black"}}  controls></video>
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
           Close
         </Button>
-        <Button onClick={() => handlfullScreen()} color="primary" autoFocus>Full Screen</Button>
       </DialogActions>
     </Dialog>
   );
