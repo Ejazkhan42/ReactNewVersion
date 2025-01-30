@@ -58,166 +58,7 @@ export default function Signup() {
   };
 
   return (
-    // <div className="login-container" sx={{padding:"0px",maxWidth:"1500px"}}>
-    //   <div className="login-header">
-    //     <Typography variant="h4" className="login-title">
-    //       Sign Up
-    //     </Typography>
-    //     <Typography variant="h2" className="login-subtitle">
-    //       DoingERP.com
-    //     </Typography>
-    //   </div>
-    //   <Container className="login-content" style={{ display: 'flex', justifyContent: 'center' }}>
-    //     <Paper elevation={3} className="login-paper">
-    //       <Box px={2} pt={2}>
-    //         {error && (
-    //           <Box mb={2} textAlign="center">
-    //             <Typography color="error" variant="body2">
-    //               {error}
-    //             </Typography>
-    //           </Box>
-    //         )}
-    //         <Box display="flex" alignItems="flex-end" mb={1}>
-    //           <TextField
-    //             id="username"
-    //             label="UserName"
-    //             variant="standard"
-    //             fullWidth
-    //             margin="dense"
-    //             required
-    //             value={newUserDetails.username}
-    //             onChange={(e) => setNewUserDetails({ ...newUserDetails, username: e.target.value })}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10 }}
-    //             sx={{ fontSize: "1.2rem" }}
-    //           />
-    //         </Box>
-    //         <Box display="flex" alignItems="flex-end" mb={1}>
-    //           <TextField
-    //             id="FirstName"
-    //             label="First Name"
-    //             variant="standard"
-    //             fullWidth
-    //             margin="dense"
-    //             required
-    //             value={newUserDetails.FirstName}
-    //             onChange={(e) => setNewUserDetails({ ...newUserDetails, FirstName: e.target.value })}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10 }}
-    //             sx={{ fontSize: "1.2rem" }}
-    //           />
-    //         </Box>
-    //         <Box display="flex" alignItems="flex-end" mb={2}>
-    //           <TextField
-    //             id="LastName"
-    //             label="Last Name"
-    //             variant="standard"
-    //             fullWidth
-    //             required
-    //             margin="dense"
-    //             value={newUserDetails.LastName}
-    //             onChange={(e) => setNewUserDetails({ ...newUserDetails, LastName: e.target.value })}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10 }}
-    //             sx={{ fontSize: "1.2rem" }}
-    //           />
-    //         </Box>
-    //         <Box display="flex" alignItems="flex-end" mb={2}>
-    //           <TextField
-    //             id="Email"
-    //             label="Email"
-    //             variant="standard"
-    //             type='email'
-    //             fullWidth
-    //             required
-    //             margin="dense"
-    //             value={newUserDetails.Email}
-    //             onChange={(e) => setNewUserDetails({ ...newUserDetails, Email: e.target.value })}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10 }}
-    //             sx={{ fontSize: "1.2rem" }}
-    //           />
-    //         </Box>
-    //         <Box display="flex" alignItems="flex-end" mb={2}>
-    //           <TextField
-    //             id="PhoneNumber"
-    //             label="Phone Number"
-    //             variant="standard"
-    //             type='tel'
-    //             fullWidth
-    //             margin="dense"
-    //             value={newUserDetails.PhoneNumber}
-    //             onChange={(e) => setNewUserDetails({ ...newUserDetails, PhoneNumber: e.target.value })}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10 }}
-    //             sx={{ fontSize: "0.9rem" }}
-    //           />
-    //         </Box>
-    //         <Box display="flex" alignItems="flex-end" mb={2}>
-    //           <TextField
-    //             label="Password"
-    //             id="password"
-    //             variant="standard"
-    //             fullWidth
-    //             required
-    //             margin="dense"
-    //             type={showPassword ? "text" : "password"}
-    //             value={newUserDetails.password}
-    //             onChange={(e) => setNewUserDetails({ ...newUserDetails, password: e.target.value })}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10, fontSize: "0.9rem" }}
-    //             sx={{ fontSize: "0.9rem" }}
-    //             InputProps={{
-    //               endAdornment: (
-    //                 <IconButton onClick={togglePasswordVisibility}>
-    //                   {showPassword ? <Visibility /> : <VisibilityOff />}
-    //                 </IconButton>
-    //               )
-    //             }}
-    //           />
-    //         </Box>
-    //         <Box display="flex" alignItems="flex-end" mb={2}>
-    //           <TextField
-    //             label="Confirm Password"
-    //             id="confirmpassword"
-    //             variant="standard"
-    //             fullWidth
-    //             required
-    //             margin="dense"
-    //             type={showPassword ? "text" : "password"}
-    //             value={confirmPassword}
-    //             onChange={(e) => setConfirmPassword(e.target.value)}
-    //             InputLabelProps={{ shrink: true }}
-    //             style={{ marginLeft: 10, fontSize: "0.9rem" }}
-    //             sx={{ fontSize: "0.9rem" }}
-    //             InputProps={{
-    //               endAdornment: (
-    //                 <IconButton onClick={togglePasswordVisibility}>
-    //                   {showPassword ? <Visibility /> : <VisibilityOff />}
-    //                 </IconButton>
-    //               )
-    //             }}
-    //           />
-    //         </Box>
-    //         <Box mt={3} textAlign="center">
-    //           <Button
-    //             variant="contained"
-    //             onClick={handleSubmit}
-    //             onKeyDown={(e) => {
-    //               if (e.key === 'Enter') {
-    //                 handleSubmit();
-    //               }
-    //             }}
-    //             className="sign-in-button"
-    //             style={{ background: "#333", fontSize: "0.9rem" }}
-    //           >
-    //             Sign Up
-    //           </Button>
-    //         </Box>
-    //       </Box>
-    //     </Paper>
-    //   </Container>
-    // </div>
+    
     <div className="login-container" sx={{ padding: "0px", maxWidth: "1500px" }}>
       <div className="login-header">
         <Typography variant="h4" className="login-title">
@@ -238,7 +79,7 @@ export default function Signup() {
               </Box>
             )}
             <Box mb={2}>
-              <Typography variant="h4" sx={{ textAlign: "center", fontWeight: "bold" }}>SIGN UP</Typography>
+              <Typography variant="h6" sx={{ textAlign: "center", fontWeight: "" }}>SIGN UP</Typography>
             </Box>
 
             {/* First Name & Last Name Row */}
@@ -306,44 +147,7 @@ export default function Signup() {
 
             {/* Password & Confirm Password Row */}
             <Box display="flex" gap={2} mb={2}>
-              {/* <TextField
-              label="Password"
-              id="password"
-              variant="outlined"
-              fullWidth
-              required
-              type={showPassword ? "text" : "password"}
-              value={newUserDetails.password}
-              onChange={(e) => setNewUserDetails({ ...newUserDetails, password: e.target.value })}
-               defaultValue="Small"
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={togglePasswordVisibility}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                )
-              }}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              label="Confirm Password"
-              id="confirmpassword"
-             variant="outlined"
-              fullWidth
-              required
-               defaultValue="Small"
-              type={showPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={togglePasswordVisibility}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                )
-              }}
-              sx={{ flex: 1 }}
-            /> */}
+        
               <FormControl fullWidth variant="outlined"> 
                 <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                 <OutlinedInput
