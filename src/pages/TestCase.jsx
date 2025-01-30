@@ -253,6 +253,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     formData.append('Instance_URL', envvairable[0].instance_url);
     formData.append('Instance_Username', envvairable[0].instance_username);
     formData.append('Instance_Name', envvairable[0].envName);
+    formData.append('Instance_Password', envvairable[0].instance_password);
 
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -262,6 +263,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     }
 
     try {
+      setButtonDisableImage(true);
       const response = await fetch(`${API_URL}/build`, {
         method: 'POST',
         body: formData,
@@ -274,6 +276,7 @@ const TestCasePage = ({ pathname, navigate }) => {
           if (data.path === "chat" && data?.token === token && data?.hasOwnProperty('browserId')) {
             sessionStorage.setItem('excelData', JSON.stringify(excelData));
             sessionStorage.setItem('browsers_id', JSON.stringify([data]));
+            setButtonDisableImage(false);
             setIsLoading(false);
             setMessage('Success');
             navigate('/progress', { excelData, servers });
@@ -516,6 +519,7 @@ const TestCasePage = ({ pathname, navigate }) => {
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <Button
                 variant="contained"
+                disabled={buttonDisableImage}
                 color="primary"
                 type="submit"
                 fullWidth
