@@ -182,7 +182,7 @@ const title = location.pathname.split("/")[1].toUpperCase();
               logo: (
                 <img
                   src="https://doingerp.com/wp-content/uploads/2023/11/New-Project-1-1.png"
-                  alt="MUI logo"
+                  alt="KAIROS FUNCATIOANAL VISUAL SUITE"
                 />
               ),
               title: '',
