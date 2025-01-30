@@ -110,11 +110,12 @@ export default function CredentialsSignInPage() {
       <div className="login-container">
         <Box className="login-header">
           <Typography variant="h2" className="login-subtitle">
-            DoingERP.com
+            
           </Typography>
         </Box>
         {step.stage === 'login' ? (
           <SignInPage
+          sx={{minHeight: '70vh'}}
             signIn={(provider, formData) => signIn(provider, formData, setStep,setUser)}
             slots={{
               emailField: CustomEmailField,
