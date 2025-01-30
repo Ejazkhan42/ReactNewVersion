@@ -24,9 +24,10 @@ import {
   Alert,
   IconButton,
 } from '@mui/material';
+import LINK from '@mui/material/Link';
 import Grid from '@mui/material/Grid2';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -117,6 +118,7 @@ const TestCasePage = ({ pathname, navigate }) => {
   const [servers, setservers] = useState({ id: 1, name: "SQ Brother Server", url: "https://gridview.doingerp.com:443", password: "selenoid" });
   const [error, seterror] = useState('')
   let envvairable = JSON.parse(localStorage.getItem('env'))
+  console.log(envvairable)
   useEffect(() => {
     env = JSON.parse(localStorage.getItem('env'))
 
@@ -248,6 +250,9 @@ const TestCasePage = ({ pathname, navigate }) => {
     formData.append('API', API_URL)
     formData.append('websocket', WS_URL)
     formData.append('Token', token);
+    formData.append('Instance_URL', envvairable[0].instance_url);
+    formData.append('Instance_Username', envvairable[0].instance_username);
+    formData.append('Instance_Name', envvairable[0].envName);
 
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -442,9 +447,11 @@ const TestCasePage = ({ pathname, navigate }) => {
           <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 4, sm: 4, md: 4 }}>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               {filePopUp && <Filepopup />}
-              <Typography variant="h6" component="h2" gutterBottom>
+              <Typography variant="h6" component="h2" sx={{textAlign:"center"}} gutterBottom>
                 Run Configuration
               </Typography>
+              <Typography sx={{textAlign:"center"}} variant='subtitle1' color='warning'>Please Check Your User Name,Password of Intance Before Run, <LINK color='warning' href="/Instances">Click and Change</LINK></Typography>
+              
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <TextField
