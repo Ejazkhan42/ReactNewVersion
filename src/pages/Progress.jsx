@@ -16,6 +16,7 @@ import axios from "axios";
 import Grid from '@mui/material/Grid2';
 import { useLocation } from "react-router-dom";
 import { base } from '../config';
+import {debounce} from 'lodash';
 import WebSocketManager from '../AuthComponents/useWebSocket';
 const API_URL = base(window.env.AP)
 
@@ -111,7 +112,8 @@ const ResponsivePage = ({ pathname, navigate }) => {
   const [vncConnectionStatus, setVncConnectionStatus] = useState("disconnected");
   useEffect(() => {
     const handleWebSocketData = (data) => {
-      if (data.path === "chat" && data?.token === localStorage.getItem('Token') && data?.hasOwnProperty('browserId')) {
+      if (data.path === "chat" && data?.token === sessionStorage.getItem('token') && data?.hasOwnProperty('browserId')) {
+       console.log(data)
         setSessionIds((prevSessionIds) => {
           const updatedSessionIds = [...prevSessionIds, data];
           sessionStorage.setItem("browsers_id", JSON.stringify(updatedSessionIds));
@@ -119,7 +121,7 @@ const ResponsivePage = ({ pathname, navigate }) => {
         });
 
       }
-    };
+    }
 
     WebSocketManager.subscribe(handleWebSocketData);
     return () => WebSocketManager.unsubscribe(handleWebSocketData);

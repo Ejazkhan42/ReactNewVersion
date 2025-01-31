@@ -117,8 +117,8 @@ const TestCasePage = ({ pathname, navigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [servers, setservers] = useState({ id: 1, name: "SQ Brother Server", url: "https://gridview.doingerp.com:443", password: "selenoid" });
   const [error, seterror] = useState('')
-  let envvairable = JSON.parse(localStorage.getItem('env'))
-  console.log(envvairable)
+  let envvairable = JSON.parse(localStorage.getItem('instance'))
+  // console.log(envvairable)
   useEffect(() => {
     env = JSON.parse(localStorage.getItem('env'))
 
@@ -285,7 +285,7 @@ const TestCasePage = ({ pathname, navigate }) => {
         };
 
         WebSocketManager.subscribe(handleWebSocketData);
-
+        return () => WebSocketManager.unsubscribe(handleWebSocketData);
 
       } else {
         console.error('Error:', response.statusText);
@@ -544,14 +544,16 @@ const TestCasePage = ({ pathname, navigate }) => {
         </Box>
       </Modal>
       <Snackbar
+        anchorOrigin={{ vertical:"top", horizontal:"center" }}
+        
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={10000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", height: "100%" }}
         >
           {snackbar.message}
         </Alert>

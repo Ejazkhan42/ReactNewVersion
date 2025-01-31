@@ -99,7 +99,7 @@ function Clients() {
 
   const handleSubmit = async () => {
     try {
-      if (isEdit) {
+      if (isEdit && ctx.role_id <=6) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
         await axios.put(`${API_URL}/customerupdate/${data[currentClient]._id}`, formData, { withCredentials: true });
         const updatedData = [...data];

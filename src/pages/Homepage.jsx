@@ -243,7 +243,7 @@ function Homepage({ pathname, navigate }) {
 
     const handleClick = () => {
       setIsClicked(true);
-      navigate('/customers');
+      navigate('/execute_test_cases');
     };
 
     return (

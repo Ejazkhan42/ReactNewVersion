@@ -166,7 +166,7 @@ function AdminRoute({pathname}) {
   return item;
 });
   const location = useLocation();
-const title = location.pathname.split("/")[1].toUpperCase();
+const title = location.pathname.split("/")[1].replaceAll("_"," ").toUpperCase();
 
 
   

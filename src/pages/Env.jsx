@@ -16,13 +16,15 @@ const EnvPage = ({pathname, navigate}) => {
 
 
   const handleRowClick = (variable) => {
-    navigate('/Modules', { state: { variable } });
+    const variables = env.find((env) => env.instance_url === variable);
+    localStorage.setItem('instance', JSON.stringify([variables]));
+    navigate('/modules', { state: { variable } });
   };
 
   return (
     <Box style={{ display: 'flex', justifyContent: 'center', padding: '16px 16px' }}>
       <Paper style={{ width: '100%', maxWidth: '800px', padding: '16px' }}>
-        <Typography variant="h4" style={{ fontSize: '1.2rem', marginBottom: '16px', fontWeight:"bolder" }}>Environment Variables</Typography>
+        <Typography variant="h4" style={{ fontSize: '1.2rem', marginBottom: '16px', fontWeight:"bolder" }}>Environment</Typography>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>

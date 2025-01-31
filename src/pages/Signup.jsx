@@ -333,7 +333,7 @@ export default function Signup() {
   const [verify2FA, setVerify2FA] = useState(false); // Initially set to false as user hasn't verified 2FA yet
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [newUserDetails, setNewUserDetails] = useState({
-    FirstName: "", LastName: "", username: "", Email: "", PhoneNumber: "", password: "", role: 3
+    FirstName: "", LastName: "", username: "", Email: "", PhoneNumber: "", password: "", role: 7
   });
 
   const handleEnable2FA = async (userId) => {

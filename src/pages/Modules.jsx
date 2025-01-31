@@ -47,7 +47,7 @@ function Orders({pathname, navigate}) {
 
   const handleCardClick = (moduleId, moduleName,JOB) => {
     WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
-    navigate('/Jobs', { moduleId, moduleName,JOB});
+    navigate('/Run_Test_Cases', { moduleId, moduleName,JOB});
   };
 
   return (

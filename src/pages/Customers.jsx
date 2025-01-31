@@ -30,7 +30,7 @@ const CustomersPage = ({ pathname, navigate }) => {
     const handleClick = (key) => {
         const customer = customers[key]
         localStorage.setItem("env", JSON.stringify(customer))
-        navigate('/env', { state: { variables: customers[key] } });
+        navigate('/environment', { state: { variables: customers[key] } });
     };
 
     return (
@@ -43,7 +43,7 @@ const CustomersPage = ({ pathname, navigate }) => {
                                 <Typography variant="h6" style={{ fontSize: '1.2rem' }}>Icon</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="h6" style={{ fontSize: '1.2rem' }}>Executions</Typography>
+                                <Typography variant="h6" style={{ fontSize: '1.2rem' }}>Execute Test Cases</Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
