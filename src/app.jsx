@@ -49,7 +49,7 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<Homepage pathname={router.pathname} navigate={router.navigate} />} />
         <Route path="/home" element={<Homepage pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Instances' element={<Instance pathname={router.pathname} navigate={router.navigate} />} />
-        <Route path='/customers' element={<Customers pathname={router.pathname} navigate={router.navigate} />} />
+        <Route path='/executions' element={<Customers pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/business/Scenario' element={<Scenario_manager />} />
         <Route path='/business/objects' element={<Objects pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/env' element={<Env pathname={router.pathname} navigate={router.navigate} />} />

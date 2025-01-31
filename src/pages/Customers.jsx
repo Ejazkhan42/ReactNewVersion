@@ -43,7 +43,7 @@ const CustomersPage = ({ pathname, navigate }) => {
                                 <Typography variant="h6" style={{ fontSize: '1.2rem' }}>Icon</Typography>
                             </TableCell>
                             <TableCell>
-                                <Typography variant="h6" style={{ fontSize: '1.2rem' }}>Customer</Typography>
+                                <Typography variant="h6" style={{ fontSize: '1.2rem' }}>Executions</Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
