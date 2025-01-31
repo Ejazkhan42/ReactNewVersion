@@ -270,7 +270,7 @@ const TestCasePage = ({ pathname, navigate }) => {
       });
 
       if (response.ok) {
-        setSnackbar({ open: true, message: 'Test cases are running', severity: 'success' });
+        setSnackbar({ open: true, message: "Test cases are being compiled. Please wait, it won't be a minute !", severity: 'success' });
         const result = await response.json();
         const handleWebSocketData = (data) => {
           if (data.path === "chat" && data?.token === token && data?.hasOwnProperty('browserId')) {
