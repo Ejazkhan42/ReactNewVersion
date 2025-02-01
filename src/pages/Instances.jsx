@@ -9,20 +9,12 @@ import {
   DialogContent,
   DialogTitle,
   DialogContentText,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Snackbar,
+  Alert,
   TextField,
-  Typography,
-  Paper,
+
 } from "@mui/material";
 import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
-import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
-import { AuthLoginInfo } from "../AuthComponents/AuthLogin";
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 
 import { DataGrid, GridActionsCellItem, } from '@mui/x-data-grid';
@@ -30,6 +22,11 @@ import { base } from '../config';
 const API_URL = base(window.env.AP)
 
 function Clients() {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [ctx, setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
   const [data, setData] = useState([]);
   const [customerUpdate, setCustomerUpdate] = useState(false)
@@ -109,24 +106,60 @@ function Clients() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  const rows = data.map((client, index) => ({ id: index, ...client }));
+  console.log(rows.length >= 2)
   const handleSubmit = async () => {
     try {
-      if (isEdit) {
-        const token = sessionStorage.getItem('token');
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        await axios.put(`${API_URL}/updatecustomer`, formData, { withCredentials: true });
-        const updatedData = [...data];
-        updatedData[currentClient] = formData;
-        setData(updatedData);
-        setCustomerUpdate(true);
-      } else {
-        const token = sessionStorage.getItem('token');
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await axios.post(`${API_URL}/addcustomer`, formData, { withCredentials: true });
-        setData([...data, response.data]);
-        setCustomerUpdate(true)
+      if (ctx.role_id <= 6) {
 
+        if (isEdit) {
+          const token = sessionStorage.getItem('token');
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          await axios.put(`${API_URL}/updatecustomer`, formData, { withCredentials: true }).then((response) => {
+            if (response.status === 200) {
+              setSnackbar({
+                open: true,
+                message: "Instance updated successfully",
+                severity: "success",
+              });
+              const updatedData = [...data];
+              updatedData[currentClient] = formData;
+              setData(updatedData);
+              setCustomerUpdate(true);
+
+            }
+          });
+
+          
+        } else {
+          if ((ctx.role_id == 2 || ctx.role_id == 5 || ctx.role_id == 6) && rows.length <= 3 || (ctx.role_id == 3 || ctx.role_id == 4) && rows.length <= 2) {
+            const token = sessionStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            const response = await axios.post(`${API_URL}/addcustomer`, formData, { withCredentials: true });
+            if (response.status === 200) {
+            setData([...data, response.data]);
+            setCustomerUpdate(true)
+            setSnackbar({
+              open: true,
+              message: "Instance added successfully",
+              severity: "success",
+            });
+          } else {
+            setSnackbar({
+              open: true,
+              message: "Error adding instance",
+              severity: "error",
+            });
+          }
+          }
+          else {
+            setSnackbar({
+              open: true,
+              message: "You have reached the maximum number of instances",
+              severity: "error",
+            });
+          }
+        }
       }
       handleClose();
     } catch (error) {
@@ -136,9 +169,11 @@ function Clients() {
 
   const handleDelete = (clientIndex) => {
     try {
-      const idToDelete = data[clientIndex].customer_id;
-      setClientIndex(clientIndex);
-      setDeleteId(idToDelete)
+      if (ctx.role_id <= 6) {
+        const idToDelete = data[clientIndex].customer_id;
+        setClientIndex(clientIndex);
+        setDeleteId(idToDelete)
+      }
     } catch (error) {
       console.error("Error deleting client:", error);
     }
@@ -147,16 +182,35 @@ function Clients() {
     try {
       const token = sessionStorage.getItem('token');
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      await axios.delete(`${API_URL}/deletecustomer/?deletecustomer=${deleteId}`, { withCredentials: true });
-      const updatedData = data.filter((_, index) => index !== clientIndex);
-      setData(updatedData);
-      setCustomerUpdate(true)
-      setDeleteId(null);
+      await axios.delete(`${API_URL}/deletecustomer/?deletecustomer=${deleteId}`, { withCredentials: true }).then((response) => {
+        if (response.status === 200) {
+          const updatedData = data.filter((_, index) => index !== clientIndex);
+          setData(updatedData);
+          setCustomerUpdate(true)
+          setDeleteId(null);
+          setSnackbar({
+            open: true,
+            message: "Instance deleted successfully",
+            severity: "success",
+          });
+
+        } else {
+          setSnackbar({
+            open: true,
+            message: "Error deleting instance",
+            severity: "error",
+          });
+        }
+      });
+
+     
     } catch (error) {
+      
       console.error("Error deleting client:", error);
     }
   }
-  const rows = data.map((client, index) => ({ id: index, ...client }));
+
+
   const columns = [
     {
       field: 'id', headerName: 'ID', width: 80, flex: 0.3,
@@ -203,9 +257,12 @@ function Clients() {
     <Container>
       <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 1, sm: 1, md: 4 }}>
         <Grid size={{ xs: 1, sm: 4, md: 4 }}>
-          <Button variant="contained" sx={{ backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} startIcon={<AddIcon />} onClick={() => handleClickOpen()}>
-            Add Instance
-          </Button>
+          {ctx.role_id <= 6 && (
+            <Button variant="contained" sx={{ backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} startIcon={<AddIcon />} onClick={() => handleClickOpen()}>
+              Add Instance
+            </Button>
+          )}
+
         </Grid>
         <Grid size={{ xs: 2, sm: 3, md: 4 }}>
           <DataGrid rows={rows} columns={columns} pageSize={5} />
@@ -300,6 +357,21 @@ function Clients() {
 
         </Dialog>
       </Grid>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+
+        open={snackbar.open}
+        autoHideDuration={10000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
