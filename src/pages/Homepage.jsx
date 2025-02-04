@@ -127,7 +127,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? start_time BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 15 DAY) AND CURRENT_DATE", whereValues: [ctx.username] });
+      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 15 DAY) AND CURRENT_DATE", whereValues: [ctx.username] });
     }
   }, []);
 
