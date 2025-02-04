@@ -117,7 +117,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 15 DAY) AND CURRENT_DATE", whereValues: [] });
+      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [] });
     }
     else {
       const handleWebSocketData = (data) => {
@@ -127,7 +127,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 15 DAY) AND CURRENT_DATE", whereValues: [ctx.username] });
+      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username] });
     }
   }, []);
 
@@ -450,21 +450,21 @@ function Homepage({ pathname, navigate }) {
         field: "test_name",
         headerName: 'Job Name',
         flex: 1,
-        resizable: false,
+       
         minWidth: 150,
       },
       {
         field: "instance",
         headerName: 'Instance Name',
-        flex: 1,
-        resizable: false,
+        flex: 0.3,
+      
         minWidth: 150,
       },
       {
         field: "Video",
         headerName: 'Video View',
         flex: 0.2,
-        resizable: false,
+        
         minWidth: 80,
         renderCell: (params) => (
           <GridActionsCellItem
@@ -478,7 +478,7 @@ function Homepage({ pathname, navigate }) {
         field: "jenkinsPath",
         headerName: 'Excel Report',
         flex: 0.2,
-        resizable: false,
+       
         minWidth: 80,
         renderCell: (params) => (
           <Link
@@ -496,7 +496,7 @@ function Homepage({ pathname, navigate }) {
         field: "end_time",
         headerName: 'Date',
         flex: 0.2,
-        resizable: false,
+     
         minWidth: 80,
         type: 'date',
         valueGetter: (value) => value && new Date(value)
@@ -505,7 +505,7 @@ function Homepage({ pathname, navigate }) {
         field: "test_status",
         headerName: 'Status',
         flex: 0.2,
-        resizable: false,
+       
         minWidth: 80,
         cellClassName: (params) => {
           if (params.value == null) {
