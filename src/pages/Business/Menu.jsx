@@ -352,6 +352,7 @@ const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
                 </Box>
             </Modal>
             <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
@@ -493,6 +494,7 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
                 </Box>
             </Modal>
             <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}

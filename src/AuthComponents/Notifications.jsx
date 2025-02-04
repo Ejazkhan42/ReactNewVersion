@@ -65,7 +65,7 @@ function Notifications() {
   React.useEffect(() => {
     const handleWebSocketData = (data) => {
       // Ensure data has the correct structure
-      if (data && data.path === 'chat' && data.Username === user?.username) {
+      if (data && data.path === 'chat' && data.Username === user?.username ) {
         // Format the message content
         const message = `
           Test: ${data.Test}

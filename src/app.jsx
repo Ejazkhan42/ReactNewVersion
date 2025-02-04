@@ -9,7 +9,6 @@ import Login from './pages/Login';
 import Instance from './pages/Instances'
 import Customers from './pages/Customers'
 import Env from "./pages/Env"
-import Business from "./pages/Business"
 import Modules from "./pages/Modules"
 import TestCasePage from "./pages/TestCase"
 import Progress from "./pages/Progress"

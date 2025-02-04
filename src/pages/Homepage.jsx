@@ -417,18 +417,7 @@ function Homepage({ pathname, navigate }) {
     );
   };
 
-  const formatDate = (dateString) => {
-    console.log(dateString)
-    const date = new Date(dateString);
-
-    // Get the day, month, and year
-    const day = String(date.getDate()).padStart(2, '0'); // Adds leading zero if needed
-    const month = date.toLocaleString('default', { month: 'short' }).toLowerCase(); // 'oct' for October
-    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of the year
-
-    return `${day}-${month}-${year}`;
-  };
-
+  
 
   const TableComponent = () => {
     const [openview, setOpenview] = useState(false);
@@ -520,7 +509,7 @@ function Homepage({ pathname, navigate }) {
         },
       },
     ];
-    const paginationModel = { page: 0, pageSize: 10 };
+    const paginationModel = { page: 0, pageSize: 20 };
     return (
       <Box sx={{
         paddingTop: "10px",
@@ -556,10 +545,14 @@ function Homepage({ pathname, navigate }) {
             <h3>Recent Run Test Case</h3>
 
             <DataGrid
+  
               columns={columns}
               rows={dashboardData}
               initialState={{
-                pagination: { paginationModel }, sorting: {
+                pagination: { 
+                  paginationModel 
+                }, 
+                sorting: {
                   sortModel: [{ field: 'end_time', sort: 'desc' }],
                 },
               }}

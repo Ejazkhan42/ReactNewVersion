@@ -13,7 +13,7 @@
   }
   
   .login-header {
-    background-image: url('./../../../public/logo.png');
+    background-image: url('./loginBackGround.png');
     background-position: center;
     background-repeat: no-repeat;
     color: #fff;

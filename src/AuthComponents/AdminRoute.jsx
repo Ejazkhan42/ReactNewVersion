@@ -38,7 +38,7 @@ import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-
+import logo from "./350.png";
 const logout = () => {
   axios
     .get(`${API_URL}/logout`, { withCredentials: true })
@@ -190,7 +190,7 @@ function AdminRoute({ pathname }) {
   
   
 
-  console.log("breadcrumbs", breadcrumbs)
+
   return (
     <AppProvider
       id="backToHome"
@@ -202,7 +202,7 @@ function AdminRoute({ pathname }) {
       branding={{
         logo: (
           <img
-            src="https://doingerp.com/wp-content/uploads/2023/11/New-Project-1-1.png"
+            src={logo}
             alt="KAIROS FUNCATIOANAL VISUAL SUITE"
           />
         ),

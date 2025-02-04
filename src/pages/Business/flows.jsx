@@ -564,6 +564,7 @@ const AddModal = ({ Open, setOpen, components, selectedComp, rows, setLoad, type
         </Box>
       </Modal>
       <Snackbar
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
@@ -758,6 +759,7 @@ const UpdatesModal = ({ rows, open, setOpen, setLoad, testCases, components, obj
         </Box>
       </Modal>
       <Snackbar
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}

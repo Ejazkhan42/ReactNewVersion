@@ -575,7 +575,7 @@ export default function Signup() {
 
             {/* 2FA Verification */}
             {verify2FA && (
-              <Box sx={{ textAlign: "center" }}> 
+              <Box sx={{ textAlign: "center" }}>
                 <Typography variant="body1" sx={{ mt: 2 }}>
                   Scan this QR code with your authentication app:
                 </Typography>
@@ -601,6 +601,7 @@ export default function Signup() {
       </Container>
 
       <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}

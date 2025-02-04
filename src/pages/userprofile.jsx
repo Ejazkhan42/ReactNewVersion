@@ -78,7 +78,7 @@ const UserProfile = () => {
     });
     useEffect(() => {
         WebSocketManager.sendMessage({
-            token:tokens,
+            token: tokens,
             path: 'data',
             type: 'find',
             table: 'users',
@@ -99,7 +99,7 @@ const UserProfile = () => {
     const handleProfileUpdate = (e) => {
         e.preventDefault();
         WebSocketManager.sendMessage({
-            token:tokens,
+            token: tokens,
             path: 'data',
             type: 'update',
             table: 'users',
@@ -220,7 +220,7 @@ const UserProfile = () => {
     const handleEnable2FA = async () => {
         if (profileData.isTwoFAEnabled === 0) {  // If 2FA is not enabled
             try {
-                
+
                 axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
                 const { data } = await axios.post(`${API_URL}/enable-2fa`, null, {
                     params: { id: profileData.id },
@@ -588,6 +588,7 @@ const UserProfile = () => {
             </Grid>
 
             <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}

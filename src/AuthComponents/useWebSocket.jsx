@@ -24,6 +24,8 @@ class WebSocketManager {
           this.notifySubscribers(data);
         }
       } catch (error) {
+        console.error("Error parsing WebSocket message:", 
+          event.data, error);
 
       }
     };

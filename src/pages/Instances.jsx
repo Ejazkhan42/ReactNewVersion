@@ -171,9 +171,12 @@ function Clients() {
             setCustomerUpdate(true);
           }
         }
-
-        else if (permissions.canAdd && dataLengthExcludingDemo < permissions.maxClients) {
-          // Add Client Logic
+        // Add Client Logic
+        else if (permissions.canAdd && dataLengthExcludingDemo < permissions.maxClients ) {
+          if(formData.clientName === "Demo" && ctx.role_id !== 1) {
+            setSnackbar({ open: true, message: "You are not allowed to add the 'Demo' Instance", severity: "error" });
+            return;
+          }
           const token = sessionStorage.getItem('token');
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           const response = await axios.post(`${API_URL}/addcustomer`, formData, { withCredentials: true });
@@ -360,7 +363,7 @@ function Clients() {
 
       {/* Snackbar for Notifications */}
       <Snackbar
-        anchorOrigin={{ vertical: "center", horizontal: "center" }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbar.open}
         autoHideDuration={10000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
