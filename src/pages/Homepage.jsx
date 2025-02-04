@@ -127,7 +127,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({ path: "data", type: "list", table: "logs", whereCondition: "username=?", whereValues: [ctx.username] });
+      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=?", whereValues: [ctx.username] });
     }
   }, []);
 
