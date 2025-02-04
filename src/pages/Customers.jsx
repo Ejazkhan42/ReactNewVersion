@@ -29,8 +29,14 @@ const CustomersPage = ({ pathname, navigate }) => {
 
     const handleClick = (key) => {
         const customer = customers[key]
-        localStorage.setItem("env", JSON.stringify(customer))
-        navigate('/environment', { state: { variables: customers[key] } });
+        const uniqueCustomers = customer.filter((value, index, self) => 
+            index === self.findIndex((t) => (
+                t.customer_id === value.customer_id
+            ))
+        );
+        console.log(uniqueCustomers)
+        localStorage.setItem("env", JSON.stringify(uniqueCustomers))
+        navigate('/environment', { state: { variables: uniqueCustomers } });
     };
 
     return (
