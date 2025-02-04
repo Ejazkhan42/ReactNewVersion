@@ -19,6 +19,7 @@ import Grid from '@mui/material/Grid2';
 
 import { DataGrid, GridActionsCellItem, } from '@mui/x-data-grid';
 import { base } from '../config';
+import { getRowGroupingCriteriaFromGroupingField } from "@mui/x-data-grid/internals";
 const API_URL = base(window.env.AP)
 
 // function Clients() {
@@ -450,7 +451,7 @@ function Clients() {
       canEdit: true,
       canDelete: true,
       canView: true,
-      maxClients: 2, // Can add 1 client + 1 demo
+      maxClients: 1, // Can add 1 client + 1 demo
     },
     7: { // Standard
       canAdd: false,
@@ -473,8 +474,12 @@ function Clients() {
             clientsData.push({ ...client, clientName });
           });
         });
+        const uniqueClientsData = clientsData.filter((value, index, self) => 
+          index === self.findIndex((client) => client.customer_id === value.customer_id)
+        );
+  
         setCustomerUpdate(false);
-        setData(clientsData);
+        setData(uniqueClientsData); 
       } catch (error) {
         console.error("Error fetching clients:", error);
         setData([]);
@@ -525,13 +530,14 @@ function Clients() {
 
   const handleSubmit = async () => {
     const permissions = rolePermissions[ctx.role_id];
-
+    const filteredData = data.filter(client => client.clientName !== 'Demo');
+    const dataLengthExcludingDemo = filteredData.length;
     try {
       if (permissions.canAdd) {
         if (isEdit) {
           // Edit Client Logic (Admin, Professional, and Enterprise can edit their own data)
           if (formData.clientName === "Demo" && ctx.role_id !== 1) {
-            setSnackbar({ open: true, message: "You are not allowed to edit the 'Demo' client", severity: "error" });
+            setSnackbar({ open: true, message: "You are not allowed to edit the 'Demo' Instance", severity: "error" });
             return;
           }
           const token = sessionStorage.getItem('token');
@@ -545,7 +551,8 @@ function Clients() {
             setCustomerUpdate(true);
           }
         }
-        else if (permissions.canAdd && data.length < permissions.maxClients) {
+    
+        else if (permissions.canAdd && dataLengthExcludingDemo < permissions.maxClients) {
           // Add Client Logic
           const token = sessionStorage.getItem('token');
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -557,7 +564,7 @@ function Clients() {
           }
         }
         else {
-          setSnackbar({ open: true, message: `You can only add up to ${permissions.maxClients} clients`, severity: "error" });
+          setSnackbar({ open: true, message: `You can only add up to ${permissions.maxClients} Instance`, severity: "error" });
         }
       }
       handleClose();
@@ -573,8 +580,16 @@ function Clients() {
     if (permissions.canDelete) {
       try {
         const idToDelete = data[clientIndex].customer_id;
-        setClientIndex(clientIndex);
-        setDeleteId(idToDelete);
+        if (data[clientIndex].clientName === "Demo" && ctx.role_id !== 1) {
+          setSnackbar({ open: true, message: "You are not authorized to delete this instance", severity: "error" });
+          return;
+        }
+        else
+        {
+          setClientIndex(clientIndex);
+          setDeleteId(idToDelete);
+        }
+        
       } catch (error) {
         console.error("Error deleting client:", error);
       }
@@ -603,6 +618,8 @@ function Clients() {
     }
   };
 
+
+ 
   const columns = [
     {
       field: 'id', headerName: 'ID', width: 80, flex: 0.3,
