@@ -116,7 +116,7 @@ const TestCasePage = ({ pathname, navigate }) => {
   const [servers, setservers] = useState({ id: 1, name: "Linux", url: "https://gridnew.doingerp.com:443", password: "selenoid" });
   const [error, seterror] = useState('')
   const [instance, setInstance] = useState(JSON.parse(localStorage.getItem('env')))
-  const [envvairable, setEnvvairable] = useState([])
+  const [envvairable, setEnvvairable] = useState(instance[0])
  
   useEffect(() => {
     const handleWebSocketData = (data) => {
