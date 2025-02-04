@@ -123,7 +123,7 @@ function Clients() {
     }
     else {
       setOpen(true);
-      setSnackbar({ open: true, message: "Upgrade Your Plane", severity: "error" })
+      setSnackbar({ open: true, message: "Upgrade Your", severity: "error" })
     }
 
   };
