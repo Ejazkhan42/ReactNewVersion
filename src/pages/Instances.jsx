@@ -122,8 +122,8 @@ function Clients() {
       setOpen(true);
     }
     else {
-      setOpen(true);
-      setSnackbar({ open: true, message: "Upgrade Your", severity: "error" })
+      // setOpen(true);
+      setSnackbar({ open: true, message: "Upgrade your plan in order to add your instance.", severity: "error" })
     }
 
   };
@@ -326,7 +326,7 @@ function Clients() {
 
               <DialogContent>
                 <Alert variant="filled" severity="warning">
-                  Upgrade Your Plan to Add Your Instance
+                Upgrade your plan in order to add your instance.
                 </Alert>
               </DialogContent>
 
@@ -360,7 +360,7 @@ function Clients() {
 
       {/* Snackbar for Notifications */}
       <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        anchorOrigin={{ vertical: "center", horizontal: "center" }}
         open={snackbar.open}
         autoHideDuration={10000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
