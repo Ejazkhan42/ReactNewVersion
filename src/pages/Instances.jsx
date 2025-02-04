@@ -122,8 +122,8 @@ function Clients() {
       setOpen(true);
     }
     else {
-      // setOpen(true);
-      setSnackbar({ open: true, message: "Upgrade your plan in order to add your instance.", severity: "error" })
+      setOpen(true);
+
     }
 
   };
@@ -336,7 +336,7 @@ function Clients() {
                 <DialogContent>
 
                   <Alert variant="filled" severity="warning">
-                    You Can Add {rolePermissions[ctx.role_id].maxClients} Instance
+                  You are allowed to add up to {rolePermissions[ctx.role_id].maxClients} instances based on your current Plan.
                   </Alert>
                   {isEdit && (<TextField margin="dense" label="ID" name="customer_id" value={formData.customer_id} onChange={handleChange} fullWidth />)}
                   <TextField margin="dense" label="Customer Name" name="clientName" required value={formData.clientName} onChange={handleChange} fullWidth />
