@@ -453,7 +453,13 @@ function Homepage({ pathname, navigate }) {
         resizable: false,
         minWidth: 150,
       },
-
+      {
+        field: "instance",
+        headerName: 'Instance Name',
+        flex: 1,
+        resizable: false,
+        minWidth: 150,
+      },
       {
         field: "Video",
         headerName: 'Video View',

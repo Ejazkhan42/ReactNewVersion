@@ -34,9 +34,9 @@ const CustomersPage = ({ pathname, navigate }) => {
                 t.customer_id === value.customer_id
             ))
         );
-        console.log(uniqueCustomers)
+
         localStorage.setItem("env", JSON.stringify(uniqueCustomers))
-        navigate('/environment', { state: { variables: uniqueCustomers } });
+        navigate('/modules', { state: { variables: uniqueCustomers } });
     };
 
     return (

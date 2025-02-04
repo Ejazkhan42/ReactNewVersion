@@ -93,7 +93,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     severity: "success",
   });
   const [ctx, setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
-  const { moduleId, JOB, moduleName } = location.state || {};
+  const { moduleName } = location.state || {};
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -108,46 +108,16 @@ const TestCasePage = ({ pathname, navigate }) => {
   const [SeleniumServer, setSeleniumServer] = useState([]);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [excelData, setExcelData] = useState([]);
-  const [selectEnv, setSelectEnv] = useState([]);
-  const [selectedEnv, setSelectedEnv] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [buttonDisableFile, setButtonDisableFile] = useState(false);
   const [buttonDisableImage, setButtonDisableImage] = useState(false);
   const [filePopUp, setFilePopUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [servers, setservers] = useState({ id: 1, name: "SQ Brother Server", url: "https://gridview.doingerp.com:443", password: "selenoid" });
+  const [servers, setservers] = useState({ id: 1, name: "Linux", url: "https://gridnew.doingerp.com:443", password: "selenoid" });
   const [error, seterror] = useState('')
-  let envvairable = JSON.parse(localStorage.getItem('instance'))
-  // console.log(envvairable)
-  useEffect(() => {
-    env = JSON.parse(localStorage.getItem('env'))
-
-    if (env == undefined || env == '') {
-      const fetchClients = async () => {
-        try {
-          const response = await axios.get(`${API_URL}/getbycustomer?user_id=${ctx.id}`, { withCredentials: true });
-          const clientsData = [];
-          Object.keys(response.data).forEach(clientName => {
-            response.data[clientName].forEach(client => {
-              clientsData.push({ ...client, clientName });
-            });
-          });
-          setData(clientsData);
-          localStorage.setItem("env", JSON.stringify(clientsData))
-        } catch (error) {
-          console.error("Error fetching clients:", error);
-          setData([]);
-        }
-      };
-      fetchClients();
-    }
-    else {
-      setSelectEnv(env);
-    }
-
-
-  }, [moduleId]);
-
+  const [instance, setInstance] = useState(JSON.parse(localStorage.getItem('env')))
+  const [envvairable, setEnvvairable] = useState([])
+ 
   useEffect(() => {
     const handleWebSocketData = (data) => {
       if (Array.isArray(data) && data[0]?.Modules_id && data[0]?.Test_Case) {
@@ -230,18 +200,9 @@ const TestCasePage = ({ pathname, navigate }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (selectEnv.map((env) => env.Jenkins_Path)) {
-      try {
-        const JOB = selectEnv.map((env) => env.Jenkins_Path)
-        JOBNAME = JOB[0]
-      } catch {
-        JOBNAME = selectEnv.map((env) => env.Jenkins_Path)
-      }
-
-    }
     setIsLoading(true);
     const formData = new FormData();
-    formData.append('JobName', JOBNAME);
+    formData.append('JobName', envvairable.Jenkins_Path);
     formData.append('TestCase', testCaseList.join(','));
     formData.append('GridMode', gridMode);
     formData.append('Browsers', selectedBrowser);
@@ -250,10 +211,10 @@ const TestCasePage = ({ pathname, navigate }) => {
     formData.append('API', API_URL)
     formData.append('websocket', WS_URL)
     formData.append('Token', token);
-    formData.append('Instance_URL', envvairable[0].instance_url);
-    formData.append('Instance_Username', envvairable[0].instance_username);
-    formData.append('Instance_Name', envvairable[0].envName);
-    formData.append('Instance_Password', envvairable[0].instance_password);
+    formData.append('Instance_URL', envvairable.instance_url);
+    formData.append('Instance_Username', envvairable.instance_username);
+    formData.append('Instance_Name', envvairable.envName);
+    formData.append('Instance_Password', envvairable.instance_password);
 
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -261,7 +222,6 @@ const TestCasePage = ({ pathname, navigate }) => {
     if (selectedImageFile) {
       formData.append('image', selectedImageFile);
     }
-
     try {
       setButtonDisableImage(true);
       const response = await fetch(`${API_URL}/build`, {
@@ -336,7 +296,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               variant="contained"
               color="primary"
               href=
-              {`https://oracle.doingerp.com/api/samplefile?path=/job/${envvairable[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${moduleName.replace(' ', '_')}`}
+              {`https://oracle.doingerp.com/api/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${moduleName.replace(' ', '_')}&customer=${instance[0].customer}`}
 
               sx={{ margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
@@ -466,6 +426,16 @@ const TestCasePage = ({ pathname, navigate }) => {
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
+                <InputLabel>Instance</InputLabel>
+                <Select value={envvairable} onChange={(e) => setEnvvairable(e.target.value)}>
+                  {instance.map((env) =>
+                    <MenuItem key={env.id} value={env}>{env.envName}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 4, sm: 4, md: 4 }}>
+              <FormControl variant="outlined" fullWidth>
                 <InputLabel>Selenium Server</InputLabel>
                 <Select value={servers?.id || ""} renderValue={() => servers?.name || ""} onChange={(e) => setservers(SeleniumServer.find((s) => s.id === e.target.value))}>
                   {SeleniumServer.map((server) =>
@@ -504,18 +474,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               </Button>
               {selectedFile && <Typography variant="caption">{selectedFile.name}</Typography>}
             </Grid>
-            {/* <Grid size={{ xs: 4, sm: 4, md: 4 }}>
-              <Button
-                variant="contained"
-                component="label"
-                fullWidth
-                sx={{ backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
-              >
-                Upload Image
-                <VisuallyHiddenImageInput type="file" accept="image/*" onChange={handleImageFileChange} />
-              </Button>
-              {selectedImageFile && <Typography variant="caption">{selectedImageFile.name}</Typography>}
-            </Grid> */}
+           
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <Button
                 variant="contained"
