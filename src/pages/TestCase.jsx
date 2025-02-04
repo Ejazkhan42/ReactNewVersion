@@ -93,7 +93,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     severity: "success",
   });
   const [ctx, setctx] = useState(JSON.parse(sessionStorage.getItem("user")));
-  const { moduleName } = location.state || {};
+  const [ module,setmodule ] =useState(JSON.parse(localStorage.getItem("module")));
   const [testCases, setTestCases] = useState([]);
   const [selectedTestCases, setSelectedTestCases] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,6 +124,7 @@ const TestCasePage = ({ pathname, navigate }) => {
         setTestCases(data);
       }
     };
+    WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "testcase",whereCondition:"Modules_id=?",whereValues:[module.id] });
     WebSocketManager.subscribe(handleWebSocketData);
 
   }, []);
@@ -296,7 +297,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               variant="contained"
               color="primary"
               href=
-              {`https://oracle.doingerp.com/api/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${moduleName.replace(' ', '_')}&customer=${instance[0].customer}`}
+              {`https://oracle.doingerp.com/api/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${module.name.replace(' ', '_')}&customer=${instance[0].customer}`}
 
               sx={{ margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >

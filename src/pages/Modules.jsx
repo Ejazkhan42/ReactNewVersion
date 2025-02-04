@@ -45,9 +45,10 @@ function Orders({pathname, navigate}) {
   //   fetchModules();
   // }, [ctx.id]);
 
-  const handleCardClick = (moduleId, moduleName,JOB) => {
-    WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "testcase",whereCondition:"Modules_id=?",whereValues:[moduleId] });
-    navigate('/Run_Test_Cases', { moduleId, moduleName,JOB});
+  const handleCardClick = (id, name) => {
+
+    localStorage.setItem("module",JSON.stringify( {id,name}));
+    navigate('/Run_Test_Cases');
   };
 
   return (

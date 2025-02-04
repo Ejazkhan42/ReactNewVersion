@@ -1,11 +1,11 @@
-import React, {useState, } from "react";
-import {AppProvider,DashboardLayout,PageContainer,ThemeSwitcher  } from '@toolpad/core';
+import React, { useState,useEffect } from "react";
+import { AppProvider, DashboardLayout, PageContainer, ThemeSwitcher } from '@toolpad/core';
 
 import axios from "axios";
 import { createTheme } from '@mui/material/styles';
 import "./Styles/loadingPage.css";
 import { base } from '../config';
-const API_URL=base(window.env.AP)
+const API_URL = base(window.env.AP)
 import Notifications from './Notifications';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -32,12 +32,13 @@ import DangerousIcon from '@mui/icons-material/Dangerous';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
 import { useDemoRouter } from './Route';
 import { Box } from "@mui/material";
-import { useLocation,Outlet } from "react-router-dom";
-
+import { useLocation, Outlet } from "react-router-dom";
+import { useActivePage } from "@toolpad/core";
 import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
+
 const logout = () => {
   axios
     .get(`${API_URL}/logout`, { withCredentials: true })
@@ -66,29 +67,29 @@ const demoTheme = createTheme({
 });
 
 const iconMapping = {
-  "DashboardIcon": <DashboardIcon/>,
-  "ShoppingCartIcon": <ShoppingCartIcon/>,
-  "DescriptionIcon": <DescriptionIcon/>,
-  "AdminPanelSettingsIcon":<AdminPanelSettingsIcon/>,
-  "SupervisorAccountIcon":<SupervisorAccountIcon/>,
-  "SchemaIcon":<SchemaIcon/>,
-  "ViewModuleIcon":<ViewModuleIcon/>,
-  "ApartmentIcon":<ApartmentIcon/>,
-  "FenceIcon":<FenceIcon/>,
-  "AirIcon":<AirIcon/>,
-  "EmojiObjectsIcon":<EmojiObjectsIcon/>,
-  "AdsClickIcon":<AdsClickIcon/>,
-  "DataObjectIcon":<DataObjectIcon/>,
-  "SupportAgentIcon":<SupportAgentIcon/>,
-  "ListIcon":<ListIcon/>,
-  "ManageAccountsSharpIcon":<ManageAccountsSharpIcon/>,
-  "CasesSharpIcon":<CasesSharpIcon/>,
-  "ModelTrainingSharpIcon":<ModelTrainingSharpIcon/>,
-  "AppSettingsAltIcon":<AppSettingsAltIcon/>,
-  "Person3Icon":<Person3Icon/>,
-  "SettingsIcon":<SettingsIcon/>,
-  "DangerousIcon":<DangerousIcon/>,
-  "LiveTvIcon":<LiveTvIcon/>
+  "DashboardIcon": <DashboardIcon />,
+  "ShoppingCartIcon": <ShoppingCartIcon />,
+  "DescriptionIcon": <DescriptionIcon />,
+  "AdminPanelSettingsIcon": <AdminPanelSettingsIcon />,
+  "SupervisorAccountIcon": <SupervisorAccountIcon />,
+  "SchemaIcon": <SchemaIcon />,
+  "ViewModuleIcon": <ViewModuleIcon />,
+  "ApartmentIcon": <ApartmentIcon />,
+  "FenceIcon": <FenceIcon />,
+  "AirIcon": <AirIcon />,
+  "EmojiObjectsIcon": <EmojiObjectsIcon />,
+  "AdsClickIcon": <AdsClickIcon />,
+  "DataObjectIcon": <DataObjectIcon />,
+  "SupportAgentIcon": <SupportAgentIcon />,
+  "ListIcon": <ListIcon />,
+  "ManageAccountsSharpIcon": <ManageAccountsSharpIcon />,
+  "CasesSharpIcon": <CasesSharpIcon />,
+  "ModelTrainingSharpIcon": <ModelTrainingSharpIcon />,
+  "AppSettingsAltIcon": <AppSettingsAltIcon />,
+  "Person3Icon": <Person3Icon />,
+  "SettingsIcon": <SettingsIcon />,
+  "DangerousIcon": <DangerousIcon />,
+  "LiveTvIcon": <LiveTvIcon />
 };
 function ScrollTop(props) {
   const { children, window } = props;
@@ -98,7 +99,7 @@ function ScrollTop(props) {
     threshold: 10,
   });
 
-const handleClick = () => {
+  const handleClick = () => {
     const scrollWindow = window || globalThis || document;
     if (scrollWindow.scrollTo) {
       scrollWindow.scrollTo({
@@ -120,17 +121,17 @@ const handleClick = () => {
     </Fade>
   );
 }
-function AdminRoute({pathname}) {
-  const [user,setuser] = useState(JSON.parse(sessionStorage.getItem("user")));
+function AdminRoute({ pathname }) {
+  const [user, setuser] = useState(JSON.parse(sessionStorage.getItem("user")));
   const [Menu, setMenu] = useState(JSON.parse(sessionStorage.getItem("menu")));
   const [session, setSession] = useState({
-      user: {
-        id: String(user.id),
-        name: user.FirstName,
-        email: user.Email,
-        image: user.image,
-      }
-    });
+    user: {
+      id: String(user.id),
+      name: user.FirstName,
+      email: user.Email,
+      image: user.image,
+    }
+  });
 
 
   const authentication = {
@@ -144,59 +145,79 @@ function AdminRoute({pathname}) {
   };
   const router = useDemoRouter('/');
 
-  const NAVIGATION = Menu? Menu:[]
+  const NAVIGATION = Menu ? Menu : []
   const updatedNavigation = NAVIGATION?.map(item => {
-  // If the item has a string 'icon', replace it with the corresponding JSX element
-  if (typeof item.icon === 'string' && iconMapping[item.icon]) {
-    item.icon = iconMapping[item.icon];
-  }
-  // Parse children if it is a JSON string 
-  if (item.children && typeof item.children === 'string') { item.children = JSON.parse(item.children); }
+    // If the item has a string 'icon', replace it with the corresponding JSX element
+    if (typeof item.icon === 'string' && iconMapping[item.icon]) {
+      item.icon = iconMapping[item.icon];
+    }
+    // Parse children if it is a JSON string 
+    if (item.children && typeof item.children === 'string') { item.children = JSON.parse(item.children); }
 
-  // If children exist, update their icons too
-  if (Array.isArray(item.children)) {
-      
-    item.children = item.children.map(child => {
-      if (typeof child.icon === 'string' && iconMapping[child.icon]) {
-        child.icon = iconMapping[child.icon];
-      }
-      return child;
-    });
-  }
-  return item;
-});
+    // If children exist, update their icons too
+    if (Array.isArray(item.children)) {
+
+      item.children = item.children.map(child => {
+        if (typeof child.icon === 'string' && iconMapping[child.icon]) {
+          child.icon = iconMapping[child.icon];
+        }
+        return child;
+      });
+    }
+    return item;
+  });
   const location = useLocation();
-const title = location.pathname.split("/")[1].replaceAll("_"," ").toUpperCase();
+  const title = location.pathname.split("/")[1].replaceAll("_", " ").toUpperCase();
+  const path = location.pathname === '/' ? '/home' : location.pathname;
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
 
-
+  useEffect(() => {
+    // Check if the current breadcrumb (title, path) is already in the breadcrumbs array
+    setBreadcrumbs((prevBreadcrumbs) => {
+      // Avoid adding the same breadcrumb twice
+      const isDuplicate = prevBreadcrumbs.some(
+        (breadcrumb) => breadcrumb.path === path
+      );
+      
+      // Only add the new breadcrumb if it's not already present
+      if (!isDuplicate) {
+        return [...prevBreadcrumbs, { title, path }];
+      }
+      
+      return prevBreadcrumbs; // No change if it's a duplicate
+    });
+  }, [location,title, path]);
   
+  
+
+  console.log("breadcrumbs", breadcrumbs)
   return (
     <AppProvider
-            id="backToHome"
-            navigation={updatedNavigation}
-            
-            session={session}
-            authentication={authentication}
-            router={router}
-            branding={{
-              logo: (
-                <img
-                  src="https://doingerp.com/wp-content/uploads/2023/11/New-Project-1-1.png"
-                  alt="KAIROS FUNCATIOANAL VISUAL SUITE"
-                />
-              ),
-              title: '',
-            }}
-            theme={demoTheme}
-          >
-      <DashboardLayout slots={{ toolbarActions: Notifications}}>
-      <PageContainer title={title}/>
-        <Outlet/>
+      id="backToHome"
+      navigation={updatedNavigation}
+
+      session={session}
+      authentication={authentication}
+      router={router}
+      branding={{
+        logo: (
+          <img
+            src="https://doingerp.com/wp-content/uploads/2023/11/New-Project-1-1.png"
+            alt="KAIROS FUNCATIOANAL VISUAL SUITE"
+          />
+        ),
+        title: '',
+      }}
+      theme={demoTheme}
+    >
+      <DashboardLayout slots={{ toolbarActions: Notifications }}>
+        <PageContainer title={title} breadcrumbs={breadcrumbs} />
+        <Outlet />
       </DashboardLayout>
       <ScrollTop>
-         <Fab size="small" aria-label="scroll back to top">
-           <KeyboardArrowUpIcon />
-         </Fab>
+        <Fab size="small" aria-label="scroll back to top">
+          <KeyboardArrowUpIcon />
+        </Fab>
       </ScrollTop>
     </AppProvider>
   );
