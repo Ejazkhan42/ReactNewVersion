@@ -90,7 +90,7 @@ function Modules() {
     const [image, setimage] = useState(null)
     const [deleteId, setDeleteId] = useState(null)
     useEffect(() => {
-          WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "reports" ,whereCondition: "created_at BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [] });
+          WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "reports" ,whereCondition: "created_at BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW()", whereValues: [] });
 
     }, [openUpdate, lodding])
     useEffect(() => {
