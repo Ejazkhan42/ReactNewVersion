@@ -26,6 +26,10 @@ h2{
 .css-10sdabs-MuiListSubheader-root{
   font-family: 'Orbitron', sans-serif !important;
 }
+.css-1gqmilo-MuiDataGrid-columnHeaderTitle{
+  font-family: 'Orbitron', sans-serif !important;
+  text-align: center !important;
+}
 .css-f9ykhc-MuiListSubheader-root{
   font-family: 'Orbitron', sans-serif !important;
 }
