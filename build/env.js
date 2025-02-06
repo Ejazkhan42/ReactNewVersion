@@ -1,7 +1,7 @@
-const Hostname = window.location.hostname;
-const protocol = window.location.protocol;
-const port = window.location.port;
+const hostname = window.location.hostname;
+
+// Set environment variables based on hostname
 window.env = {
-            AP: `https://${Hostname}/api`,
-            WS: `wss://${Hostname}443`,
+  AP: `https://${hostname}/api`,  // API URL
+  WS: `wss://${hostname}`,       // WebSocket URL
 };
