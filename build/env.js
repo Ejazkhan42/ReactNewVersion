@@ -1,4 +1,7 @@
+const Hostname = window.location.hostname;
+const protocol = window.location.protocol;
+const port = window.location.port;
 window.env = {
-            AP: "https://kairosfs.doingerp.com/api",
-            WS: "wss://kairosfs.doingerp.com:443"
+            AP: `https://${Hostname}/api`,
+            WS: `wss://${Hostname}443`,
 };
