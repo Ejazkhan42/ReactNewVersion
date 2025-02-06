@@ -297,7 +297,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               variant="contained"
               color="primary"
               href=
-              {`https://oracle.doingerp.com/api/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${module.name.replace(' ', '_')}&customer=${instance[0].customer}`}
+              {`${API_URL}/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${module.name.replace(' ', '_')}&customer=${instance[0].customer}`}
 
               sx={{ margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
@@ -414,7 +414,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               <Typography variant="h6" component="h2" sx={{textAlign:"center"}} gutterBottom>
                 Run Configuration
               </Typography>
-              <Typography sx={{textAlign:"center"}} variant='subtitle1' color='warning'>Please Check Your User Name,Password of Intance Before Run, <LINK color='warning' href="/Instances">Click and Change</LINK></Typography>
+              <Typography sx={{textAlign:"center", fontWeight:"400 !important"}} variant='subtitle2' color='warning'>Please Check Your User Name,Password of Intance Before Run, <LINK color='warning' href="/Instances">Click and Change</LINK></Typography>
               
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>

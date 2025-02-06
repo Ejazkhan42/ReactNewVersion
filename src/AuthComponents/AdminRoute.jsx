@@ -212,7 +212,7 @@ function AdminRoute({ pathname }) {
       theme={demoTheme}
     >
       <DashboardLayout slots={{ toolbarActions: Notifications }}>
-        <PageContainer title={title} breadcrumbs={breadcrumbs} />
+        <PageContainer  style={{fontFamily:'Orbitron, sans-serif !important'}} title={title} breadcrumbs={breadcrumbs} />
         <Outlet />
       </DashboardLayout>
       <ScrollTop>
