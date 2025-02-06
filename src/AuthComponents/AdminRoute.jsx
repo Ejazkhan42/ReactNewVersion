@@ -169,6 +169,7 @@ function AdminRoute({ pathname }) {
   const location = useLocation();
   const title = location.pathname.split("/")[1].replaceAll("_", " ").toUpperCase();
   const path = location.pathname === '/' ? '/home' : location.pathname;
+
   const [breadcrumbs, setBreadcrumbs] = useState([]);
 
   useEffect(() => {

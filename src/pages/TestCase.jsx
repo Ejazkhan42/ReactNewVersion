@@ -301,7 +301,7 @@ const TestCasePage = ({ pathname, navigate }) => {
 
               sx={{ fontFamily:'Orbitron,sans-serif' ,fontSize:'.7em', margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
-              1. Download Test Data
+              1. Provide Test Data
             </Button>
             <Button
               title='Please select the test cases to run'
