@@ -294,6 +294,9 @@ function UsersSetting() {
             p: 4,
           }}
         >
+          <Typography variant="h6" component="h2" sx={{textAlign:"center"}} gutterBottom>
+                          ADD USER
+                        </Typography>
           <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 4, sm: 4, md: 4 }}>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <TextField

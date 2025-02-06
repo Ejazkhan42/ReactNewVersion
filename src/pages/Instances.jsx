@@ -323,7 +323,7 @@ function Clients() {
 
         {/* Add/Edit Client Dialog */}
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{isEdit ? "Edit Instance" : "Add Instance"}</DialogTitle>
+          <DialogTitle style={{textAlign:"center" ,textTransform:"uppercase"}} >{isEdit ? "Edit Instance" : "Add Instance"}</DialogTitle>
           <Box>
             {!rolePermissions[ctx.role_id].canAdd && (
 
