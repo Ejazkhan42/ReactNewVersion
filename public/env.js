@@ -1,4 +1,4 @@
 window.env = {
-            AP: "https://oracle.doingerp.com/api",
-            WS: "wss://oracle.doingerp.com:443"
+            AP: "https://kairosfs.doingerp.com/api",
+            WS: "wss://kairosfs.doingerp.com:443"
 };

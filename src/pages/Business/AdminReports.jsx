@@ -336,3 +336,4 @@ const UpdatesModal = ({ rows, Open, setOpen, token }) => {
         </div>
     );
 };
+

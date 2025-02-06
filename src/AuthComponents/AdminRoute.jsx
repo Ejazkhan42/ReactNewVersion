@@ -38,7 +38,7 @@ import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import logo from "./350.png";
+import logo from "./kairosfsback.svg";
 const logout = () => {
   axios
     .get(`${API_URL}/logout`, { withCredentials: true })
@@ -204,6 +204,7 @@ function AdminRoute({ pathname }) {
           <img
             src={logo}
             alt="KAIROS FUNCATIOANAL VISUAL SUITE"
+            style={{ width: "10em" }}
           />
         ),
         title: '',
