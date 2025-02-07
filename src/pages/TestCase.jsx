@@ -433,7 +433,7 @@ const TestCasePage = ({ pathname, navigate }) => {
                 value={Iterations}
                 onChange={(e) => setIterations(e.target.value)}
                 fullWidth
-                disabled
+            
               />
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
