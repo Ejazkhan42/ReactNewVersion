@@ -117,6 +117,7 @@ const TestCasePage = ({ pathname, navigate }) => {
   const [error, seterror] = useState('')
   const [instance, setInstance] = useState(JSON.parse(localStorage.getItem('env')))
   const [envvairable, setEnvvairable] = useState(instance[0])
+  const [Iterations, setIterations] = useState('1')
  
   useEffect(() => {
     const handleWebSocketData = (data) => {
@@ -216,6 +217,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     formData.append('Instance_Username', envvairable.instance_username);
     formData.append('Instance_Name', envvairable.envName);
     formData.append('Instance_Password', envvairable.instance_password);
+    formData.append('SubIteration', Iterations);
 
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -421,6 +423,15 @@ const TestCasePage = ({ pathname, navigate }) => {
               <TextField
                 label="Test Case"
                 value={testCaseList.join(',')}
+                fullWidth
+                disabled
+              />
+            </Grid>
+            <Grid size={{ xs: 4, sm: 4, md: 4 }}>
+              <TextField
+                label="Iterations (Default 1)"
+                value={Iterations}
+                onChange={(e) => setIterations(e.target.value)}
                 fullWidth
                 disabled
               />

@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/static/css/main.23616a30.css",
-    "main.js": "/static/js/main.9cee0795.js",
+    "main.js": "/static/js/main.23fce46f.js",
     "static/media/notification.wav": "/static/media/notification.a3dd13b67e8debac2288.wav",
     "static/media/kairosfsback.svg": "/static/media/kairosfsback.8c8da1342f289171c84ffa1ad877dd4c.svg",
     "index.html": "/index.html",
     "main.23616a30.css.map": "/static/css/main.23616a30.css.map",
-    "main.9cee0795.js.map": "/static/js/main.9cee0795.js.map"
+    "main.23fce46f.js.map": "/static/js/main.23fce46f.js.map"
   },
   "entrypoints": [
     "static/css/main.23616a30.css",
-    "static/js/main.9cee0795.js"
+    "static/js/main.23fce46f.js"
   ]
 }
