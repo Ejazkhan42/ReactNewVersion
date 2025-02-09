@@ -301,7 +301,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               href=
               {`${API_URL}/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${module.name.replace(' ', '_')}&customer=${instance[0].customer}`}
 
-              sx={{ fontFamily:'Orbitron,sans-serif' ,fontSize:'.7em', margin: "3px", maxWidth: '240px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+              sx={{ fontFamily:'Orbitron,sans-serif' ,fontSize:'.7em', margin: "3px", maxWidth: '200px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
               1. Provide Test Data
             </Button>
@@ -312,9 +312,9 @@ const TestCasePage = ({ pathname, navigate }) => {
               color="primary"
               onClick={handleRunClick}
               disabled={selectedTestCases.length === 0}
-              sx={{ margin: "3px", maxWidth: '100px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+              sx={{ margin: "3px", maxWidth: '200px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
             >
-              2. Run
+              2. Upload Test Data
             </Button>
             <TextField
               title='Search for test cases'

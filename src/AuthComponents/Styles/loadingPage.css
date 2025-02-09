@@ -1,27 +1,46 @@
-/* 
 body {
-  font-family: 'Orbitron', sans-serif !important;
+  font-family: var(--orbitron-font) !important;
   }
-h4{
-  font-family: 'Orbitron', sans-serif !important;
-  font-weight: bold !important;
-}
-h6{
-  font-family: 'Orbitron', sans-serif !important;
-  font-weight: bold !important;
-}
-h2{
-  font-family: 'Orbitron', sans-serif !important;
-  font-weight: bold !important;
-  text-transform: uppercase;
-  text-align: center;
- 
-}
+
+  h4{
+    font-family: var(--orbitron-font) !important;
+    font-weight: var(--orbitron-semibold) !important;
+  }
+  h6{
+    font-family: var(--rajdhani-font) !important;
+    /* font-weight: var(--orbitron-semibold) !important; */
+  }
+.css-1v24f9t-MuiOutlinedInput-notchedOutline{
+    border-color: var(--rajdhani-font) !important;
+  }
+  .css-1c8frck-MuiDataGrid-root .MuiDataGrid-cell--textLeft{
+    font-family: var(--rajdhani-font) !important;
+    font-weight: var(--rajdhani-regular) !important;
+  }
+  h2{
+    font-family: var(--orbitron-font) !important;
+    font-weight: var(--rajdhani-semibold) !important;
+    text-transform: uppercase;
+    text-align: center;
+   
+  }
+
+
+
+
+
 .css-17uzhmm-MuiTypography-root{
-  font-family: 'Orbitron', sans-serif !important;
+  font-family: var(--rajdhani-font) !important;
+}
+label{
+  font-family: var(--rajdhani-font) !important;
+}
+.css-cc5vd3-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+  font-family: var(--rajdhani-font) !important;
 }
 .css-fyswvn{
-  font-family: 'Orbitron', sans-serif !important;
+  font-family: var(--rajdhani-font) !important;
+  font-weight: var(--rajdhani-semibold) !important;
 }
 .css-10sdabs-MuiListSubheader-root{
   font-family: 'Orbitron', sans-serif !important;
@@ -52,7 +71,7 @@ h5{
 li{
   font-family: 'Orbitron', sans-serif !important;
  
-} */
+}
 /* .css-rizt0-MuiTypography-root{
   font-family: 'Rajdhani', sans-serif !important;
 
@@ -62,60 +81,22 @@ button{
   font-weight: bold !important;
   
 } */
- .Orbitron-light {
-  font-family: "Orbitron", sans-serif;
-  font-weight: 300;
-  font-style: normal;
-}
-.Orbitron-regular {
-  font-family: "Orbitron", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-.Orbitron-medium {
-  font-family: "Orbitron", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-}
-.Orbitron-semibold {
-  font-family: "Orbitron", sans-serif;
-  font-weight: 600;
-  font-style: normal;
-}
-.Orbitron-bold {
-  font-family: "Orbitron", sans-serif;
-  font-weight: 700;
-  font-style: normal;
-}
 
-.rajdhani-light {
-  font-family: "Rajdhani", serif;
-  font-weight: 300;
-  font-style: normal;
-}
+:root {
+  --orbitron-font: 'Orbitron', sans-serif;
+  --rajdhani-font: 'Rajdhani', serif;
 
-.rajdhani-regular {
-  font-family: "Rajdhani", serif;
-  font-weight: 400;
-  font-style: normal;
-}
+  --orbitron-light: 300;
+  --orbitron-regular: 400;
+  --orbitron-medium: 500;
+  --orbitron-semibold: 600;
+  --orbitron-bold: 700;
 
-.rajdhani-medium {
-  font-family: "Rajdhani", serif;
-  font-weight: 500;
-  font-style: normal;
-}
-
-.rajdhani-semibold {
-  font-family: "Rajdhani", serif;
-  font-weight: 600;
-  font-style: normal;
-}
-
-.rajdhani-bold {
-  font-family: "Rajdhani", serif;
-  font-weight: 700;
-  font-style: normal;
+  --rajdhani-light: 300;
+  --rajdhani-regular: 400;
+  --rajdhani-medium: 500;
+  --rajdhani-semibold: 600;
+  --rajdhani-bold: 700;
 }
 
 
