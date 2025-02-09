@@ -416,7 +416,7 @@ const TestCasePage = ({ pathname, navigate }) => {
               <Typography variant="h6" component="h2" sx={{textAlign:"center"}} gutterBottom>
                 Run Configuration
               </Typography>
-              <Typography sx={{textAlign:"center", fontWeight:"200 !important"}} variant='subtitle2' color='warning'>Please Check Your User Name,Password of Intance Before Run, <LINK color='warning' href="/Instances">Click and Change</LINK></Typography>
+              <Typography sx={{textAlign:"center", fontWeight:"200 !important"}} variant='subtitle2' color='success'>Please Check Your User Name,Password of Intance Before Run, <LINK color='error' href="/Instances">Click and Change</LINK></Typography>
               
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
