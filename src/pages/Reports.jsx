@@ -188,8 +188,11 @@ function Homepage({ pathname, navigate }) {
       setOpenview(true)
     }
     const getExeclReport = (value, row) => {
-      return `${API_URL}/download?path=${row.jenkinsPath || ''}&build=${row.build || ''}`;
+      return `${API_URL}/download?path=${row.jenkinsPath || ''}&build=${row.build || ''}&type=excel`;
     };
+    const getHtmlReport = (value, row) => {
+      return `${API_URL}/download?path=${row.jenkinsPath || ''}&build=${row.build || ''}&type=html`;
+    }
     const columns = [
       {
         field: "id",
@@ -234,21 +237,36 @@ function Homepage({ pathname, navigate }) {
           />),
       },
       {
-        field: "jenkinsPath",
+        field: "excelReport", // Unique field for Excel Report
         headerName: 'Excel Report',
         flex: 0.2,
-        // disableExport: true,
         minWidth: 80,
         valueGetter: getExeclReport,
         renderCell: (params) => (
           <Link
             variant="contained"
-            href={`${API_URL}/download?path=${params.row.jenkinsPath}&build=${params.row.build}`}
+            href={params.value} // Use the value returned by valueGetter
             target="_blank"
             rel="noopener noreferrer"
-
           >
             Excel Report
+          </Link>
+        ),
+      },
+      {
+        field: "htmlReport", // Unique field for HTML Report
+        headerName: 'Html Report',
+        flex: 0.2,
+        minWidth: 80,
+        valueGetter: getHtmlReport,
+        renderCell: (params) => (
+          <Link
+            variant="contained"
+            href={params.value} // Use the value returned by valueGetter
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Html Report
           </Link>
         ),
       },

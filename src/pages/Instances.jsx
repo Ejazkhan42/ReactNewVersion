@@ -12,12 +12,15 @@ import {
   Snackbar,
   Alert,
   TextField,
+  Typography,
+  IconButton,
 
 } from "@mui/material";
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon    } from "@mui/icons-material";
 import Grid from '@mui/material/Grid2';
 import MuiAlert from '@mui/material/Alert';
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { DataGrid, GridActionsCellItem, } from '@mui/x-data-grid';
 import { base } from '../config';
 import { getRowGroupingCriteriaFromGroupingField } from "@mui/x-data-grid/internals";
@@ -34,6 +37,7 @@ function Clients() {
   const [deleteId, setDeleteId] = useState(null);
   const [clientIndex, setClientIndex] = useState(null);
   const [currentClient, setCurrentClient] = useState(null);
+  const [showPassword, setShowPassword] = React.useState(false);
   const [formData, setFormData] = useState({
     customer_id: "",
     clientName: "",
@@ -251,7 +255,35 @@ function Clients() {
     { field: 'envName', headerName: 'Env Name', width: 100, flex: 0.3, resizable: false },
     { field: 'instance_url', headerName: 'Instance', width: 100, flex: 1, resizable: false },
     { field: 'instance_username', headerName: 'Username', width: 100, flex: 0.5, resizable: false },
-    { field: 'instance_password', headerName: 'Password', width: 100, flex: 0.5, resizable: false },
+    {
+      field: 'instance_password',
+      headerName: 'Password',
+      width: 100,
+      flex: 0.5,
+      resizable: false,
+      renderCell: (params) => {
+        const [showPassword, setShowPassword] = React.useState(false);
+  
+        const handleClickShowPassword = () => {
+          setShowPassword(!showPassword);
+        };
+  
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body1">
+              {showPassword ? params.value : '•'.repeat(params.value.length)}
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={handleClickShowPassword}
+              sx={{ ml: 1 }}
+            >
+              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          </Box>
+        );
+      },
+    },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -335,26 +367,109 @@ function Clients() {
 
             )}
             {rolePermissions[ctx.role_id].canAdd && (
-              <>
-                <DialogContent>
-
-                  <Alert variant="filled" severity="warning">
-                  You are allowed to add up to {rolePermissions[ctx.role_id].maxClients} instances based on your current Plan.
-                  </Alert>
-                  {isEdit && (<TextField margin="dense" label="ID" name="customer_id" value={formData.customer_id} onChange={handleChange} fullWidth />)}
-                  <TextField margin="dense" label="Customer Name" name="clientName" required value={formData.clientName} onChange={handleChange} fullWidth />
-                  <TextField margin="dense" label="Env Name" name="envName" required value={formData.envName} onChange={handleChange} fullWidth />
-                  <TextField margin="dense" label="Instance URL" name="instance_url" required value={formData.instance_url} onChange={handleChange} fullWidth />
-                  <TextField margin="dense" label="Instance Username" name="instance_username" required value={formData.instance_username} onChange={handleChange} fullWidth />
-                  <TextField margin="dense" label="Instance Password" name="instance_password" required value={formData.instance_password} onChange={handleChange} fullWidth />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose} sx={{ ml: 2, fontSize: '1.2rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }}>Cancel</Button>
-                  <Button onClick={handleSubmit} sx={{ ml: 2, fontSize: '1.2rem', backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }} variant="contained">
-                    {isEdit ? "Update" : "Add"}
-                  </Button>
-                </DialogActions>
-              </>
+            <>
+            <DialogContent>
+              <Alert variant="filled" severity="warning">
+                You are allowed to add up to {rolePermissions[ctx.role_id].maxClients} instances based on your current Plan.
+              </Alert>
+              {isEdit && (
+                <TextField
+                  margin="dense"
+                  label="ID"
+                  name="customer_id"
+                  value={formData.customer_id}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              )}
+              <TextField
+                margin="dense"
+                label="Customer Name"
+                name="clientName"
+                required
+                value={formData.clientName}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Env Name"
+                name="envName"
+                required
+                value={formData.envName}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Instance URL"
+                name="instance_url"
+                required
+                value={formData.instance_url}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                margin="dense"
+                label="Instance Username"
+                name="instance_username"
+                required
+                value={formData.instance_username}
+                onChange={handleChange}
+                fullWidth
+              />
+              <Box sx={{ position: 'relative' }}>
+                <TextField
+                  margin="dense"
+                  label="Instance Password"
+                  name="instance_password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={formData.instance_password}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={handleClose}
+                sx={{
+                  ml: 2,
+                  fontSize: '1.2rem',
+                  backgroundColor: '#393E46',
+                  color: 'white',
+                  '&:hover': { backgroundColor: '#00ADB5' },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                sx={{
+                  ml: 2,
+                  fontSize: '1.2rem',
+                  backgroundColor: '#393E46',
+                  color: 'white',
+                  '&:hover': { backgroundColor: '#00ADB5' },
+                }}
+                variant="contained"
+              >
+                {isEdit ? 'Update' : 'Add'}
+              </Button>
+            </DialogActions>
+          </>
             )}
 
           </Box>
