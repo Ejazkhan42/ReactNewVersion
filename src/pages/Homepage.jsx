@@ -61,20 +61,47 @@ const API_URL = base(window.env.AP)
 
 function CustomToolbar() {
   const apiRef = useGridApiContext();
-  const getRowsFromCurrentPage = ({ apiRef }) =>
-    gridPaginatedVisibleSortedGridRowIdsSelector(apiRef);
-  const handleExport = (options) => apiRef.current.exportDataAsCsv(options);
+
+  const getRowsFromCurrentPage = ({ apiRef }) => {
+    // Get all rows from the current page
+    const rowIds = gridPaginatedVisibleSortedGridRowIdsSelector(apiRef);
+
+    // Filter out rows where test_status is "Running"
+    const filteredRows = rowIds.filter((id) => {
+      const row = apiRef.current.getRow(id);
+      return row.test_status !== "Running";
+    });
+
+    return filteredRows;
+  };
+
+  const handleExport = (options) => {
+    apiRef.current.exportDataAsCsv({
+      ...options,
+      fileName: `TEST_CASES_REPORT_${new Date().toLocaleDateString()}`,
+      includeHeaders: true,
+      includeColumnGroupsHeaders: true,
+      includeFilters: true,
+    });
+  };
+  const handleExportAll = () => {
+    apiRef.current.exportDataAsCsv({
+      fileName: `TEST_CASES_REPORT_${new Date().toLocaleDateString()}`,
+      includeHeaders: true,
+      includeColumnGroupsHeaders: true,
+      includeFilters: true,
+    });
+  };
   return (
     <GridToolbarContainer>
-     <Button
-   
+      <Button
         onClick={() => handleExport({ getRowsToExport: getRowsFromCurrentPage })}
       >
-        Current page rows
+        Export Current Page Report
       </Button>
-      <GridToolbarExport csvOptions={{
-        fileName: `TEST_CASES_REPORT_${new Date().toLocaleDateString()}`,
-      }}/>
+      <Button onClick={handleExportAll}>
+        Export All Report
+      </Button>
     </GridToolbarContainer>
   );
 }
