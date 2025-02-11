@@ -8,7 +8,7 @@ body {
   }
   h6{
     font-family: var(--rajdhani-font) !important;
-    /* font-weight: var(--orbitron-semibold) !important; */
+    font-weight: var(--orbitron-semibold) !important;
   }
 .css-1v24f9t-MuiOutlinedInput-notchedOutline{
     border-color: var(--rajdhani-font) !important;
@@ -72,15 +72,15 @@ li{
   font-family: 'Orbitron', sans-serif !important;
  
 }
-/* .css-rizt0-MuiTypography-root{
+.css-rizt0-MuiTypography-root{
   font-family: 'Rajdhani', sans-serif !important;
 
 }
 button{
-  font-family: 'Orbitron', sans-serif !important;
-  font-weight: bold !important;
+ font-family: var(--rajdhani-font) !important;
+ font-weight: var(--rajdhani-semibold) !important;
   
-} */
+}
 
 :root {
   --orbitron-font: 'Orbitron', sans-serif;

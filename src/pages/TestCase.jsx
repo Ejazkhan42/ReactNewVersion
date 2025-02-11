@@ -218,7 +218,7 @@ const TestCasePage = ({ pathname, navigate }) => {
     formData.append('Instance_Name', envvairable.envName);
     formData.append('Instance_Password', envvairable.instance_password);
     formData.append('SubIteration', Iterations);
-
+    formData.append('RunCustomer', envvairable.customer);
     if (selectedFile) {
       formData.append('file', selectedFile);
     }

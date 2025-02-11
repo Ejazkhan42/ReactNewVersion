@@ -275,6 +275,7 @@ const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
         if (type == "Menu") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'insert',
                 table: 'Menu',
@@ -298,6 +299,7 @@ const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
         else if (type == "Access") {
             event.preventDefault();
             WebSocketManager.sendMessage({
+                token: token,
                 path: 'data',
                 type: 'insert',
                 table: 'menu_level',

@@ -30,6 +30,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Person3Icon from '@mui/icons-material/Person3';
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import { useDemoRouter } from './Route';
 import { Box } from "@mui/material";
 import { useLocation, Outlet } from "react-router-dom";
@@ -89,7 +90,8 @@ const iconMapping = {
   "Person3Icon": <Person3Icon />,
   "SettingsIcon": <SettingsIcon />,
   "DangerousIcon": <DangerousIcon />,
-  "LiveTvIcon": <LiveTvIcon />
+  "LiveTvIcon": <LiveTvIcon />,
+  "SummarizeIcon": <SummarizeIcon />
 };
 function ScrollTop(props) {
   const { children, window } = props;

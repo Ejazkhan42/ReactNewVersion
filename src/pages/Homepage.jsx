@@ -51,12 +51,33 @@ import WebSocketManager from '../AuthComponents/useWebSocket';
 import {
   DataGrid,
   GridActionsCellItem,
-  GridToolbarContainer, GridToolbarExport
+  GridToolbarContainer,
+  useGridApiContext,
+  gridPaginatedVisibleSortedGridRowIdsSelector,
+  GridToolbarExport,
 } from '@mui/x-data-grid';
 import clsx from 'clsx';
 const API_URL = base(window.env.AP)
 
-
+function CustomToolbar() {
+  const apiRef = useGridApiContext();
+  const getRowsFromCurrentPage = ({ apiRef }) =>
+    gridPaginatedVisibleSortedGridRowIdsSelector(apiRef);
+  const handleExport = (options) => apiRef.current.exportDataAsCsv(options);
+  return (
+    <GridToolbarContainer>
+     <Button
+   
+        onClick={() => handleExport({ getRowsToExport: getRowsFromCurrentPage })}
+      >
+        Current page rows
+      </Button>
+      <GridToolbarExport csvOptions={{
+        fileName: `TEST_CASES_REPORT_${new Date().toLocaleDateString()}`,
+      }}/>
+    </GridToolbarContainer>
+  );
+}
 function VideoView({ video, setOpen, open }) {
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState('sm');
@@ -427,6 +448,9 @@ function Homepage({ pathname, navigate }) {
       setvideo(video)
       setOpenview(true)
     }
+    const getExeclReport = (value, row) => {
+      return `${API_URL}/download?path=${row.jenkinsPath || ''}&build=${row.build || ''}`;
+    };
     const columns = [
       {
         field: "id",
@@ -438,6 +462,13 @@ function Homepage({ pathname, navigate }) {
       {
         field: "test_name",
         headerName: 'Job Name',
+        flex: 1,
+       
+        minWidth: 150,
+      },
+      {
+        field: "customer",
+        headerName: 'Customer',
         flex: 1,
        
         minWidth: 150,
@@ -467,8 +498,9 @@ function Homepage({ pathname, navigate }) {
         field: "jenkinsPath",
         headerName: 'Excel Report',
         flex: 0.2,
-       
+        // disableExport: true,
         minWidth: 80,
+        valueGetter: getExeclReport,
         renderCell: (params) => (
           <Link
             variant="contained"
@@ -549,12 +581,16 @@ function Homepage({ pathname, navigate }) {
               columns={columns}
               rows={dashboardData}
               initialState={{
+                
                 pagination: { 
                   paginationModel 
                 }, 
                 sorting: {
                   sortModel: [{ field: 'end_time', sort: 'desc' }],
                 },
+              }}
+              slots={{
+                toolbar: () => <CustomToolbar/>, // Pass handleAddClick to CustomToolbar
               }}
               pageSizeOptions={[20, 40, 80, 100]} />
 
