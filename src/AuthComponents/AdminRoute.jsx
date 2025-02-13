@@ -234,7 +234,6 @@ export default AdminRoute;
 const CometChatWidget = () => {
   const [usermy] = useState(JSON.parse(sessionStorage.getItem('user')) || {});
 
- 
   useEffect(() => {
     const initCometChat = async () => {
       try {
@@ -266,27 +265,18 @@ const CometChatWidget = () => {
         });
         console.log('User logged in:', user);
 
-        // Launch the chat widget
+        // Launch the chat widget with the admin chat by default
         window.CometChatWidget.launch({
           widgetID: '5ba76e25-c3bb-495a-9fe1-561658e99110', // Replace with your Widget ID
           docked: 'true',
           alignment: 'right', // 'left' or 'right'
           roundedCorners: 'true',
-          height: '600px',
-          width: '400px',
-          defaultID: `${usermy?.username}-uid-1`, // Default UID (user) or GUID (group) to show
+          height: "450px",
+          width: "400px",
+          defaultID: 'admin-uid-1', // Default UID set to admin for direct chat
           defaultType: 'user', // 'user' or 'group'
         });
 
-        // Restrict chat functionality based on user role
-        if (usermy?.role_id === 1) {
-          // If the user is an admin, they can chat with anyone
-          console.log('Admin can chat with anyone.');
-        } else {
-          // If the user is a customer (Manali), they can only chat with the admin
-          window.CometChatWidget.chatWithUser('admin-uid-1');
-        
-        }
       } catch (error) {
         console.log('Error:', error);
       }
@@ -298,8 +288,15 @@ const CometChatWidget = () => {
     }
   }, [usermy]);
 
-  return <div id="cometchat-widget"></div>;
+  return (
+    <div>
+      <div id="cometchat-widget"></div>
+    </div>
+  );
 };
+
+
+
 
 
 
