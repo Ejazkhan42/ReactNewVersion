@@ -165,7 +165,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [] });
+      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [], limit:200 });
     }
     else {
       const handleWebSocketData = (data) => {
@@ -175,7 +175,7 @@ function Homepage({ pathname, navigate }) {
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username] });
+      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username],limit:200 });
     }
   }, []);
 

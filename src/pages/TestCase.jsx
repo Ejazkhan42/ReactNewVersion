@@ -291,20 +291,6 @@ const TestCasePage = ({ pathname, navigate }) => {
             alignItems: "stretch",
             height: "53px",
           }}>
-
-            <Button
-              // style={{ fontSize: '0.7em' }}
-              title="Please download the test data file before running the test cases"
-              fullWidth
-              variant="contained"
-              color="primary"
-              href=
-              {`${API_URL}/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${module.name.replace(' ', '_')}&customer=${instance[0].customer}`}
-
-              sx={{ fontFamily:'Orbitron,sans-serif' ,fontSize:'.7em', margin: "3px", maxWidth: '200px', backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
-            >
-              1. Provide Test Data
-            </Button>
             <Button
               title='Please select the test cases to run'
               fullWidth
@@ -420,6 +406,21 @@ const TestCasePage = ({ pathname, navigate }) => {
               
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
+            <Button
+              // style={{ fontSize: '0.7em' }}
+              title="Please download the test data file before running the test cases"
+              fullWidth
+              variant="contained"
+              color="primary"
+              href=
+              {`${API_URL}/samplefile?path=/job/${instance[0].Jenkins_Path.split('/').slice(0, -1).join('/job/')}/job/Test_Data_${module.name.replace(' ', '_')}&customer=${instance[0].customer}`}
+
+              sx={{ fontFamily:'Orbitron,sans-serif' ,fontSize:'.7em', margin: "3px", backgroundColor: '#393E46', '&:hover': { backgroundColor: '#00ADB5' } }}
+            >
+              1. Provide Test Data
+            </Button>
+            </Grid>
+            <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <TextField
                 label="Test Case"
                 value={testCaseList.join(',')}
@@ -448,7 +449,7 @@ const TestCasePage = ({ pathname, navigate }) => {
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
-                <InputLabel>Selenium Server</InputLabel>
+                <InputLabel>Server</InputLabel>
                 <Select value={servers?.id || ""} renderValue={() => servers?.name || ""} onChange={(e) => setservers(SeleniumServer.find((s) => s.id === e.target.value))}>
                   {SeleniumServer.map((server) =>
                     <MenuItem key={server.id} value={server.id}>{server.name}</MenuItem>
@@ -467,10 +468,10 @@ const TestCasePage = ({ pathname, navigate }) => {
             </Grid>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <FormControl variant="outlined" fullWidth>
-                <InputLabel sx={{ paddingBottom: '5%' }}>Grid Mode</InputLabel>
+                <InputLabel sx={{ paddingBottom: '5%' }}>Video Recording</InputLabel>
                 <Select value={gridMode} onChange={(e) => setGridMode(e.target.value)}>
-                  <MenuItem value="on">On</MenuItem>
-                  <MenuItem value="off">Off</MenuItem>
+                  <MenuItem value="on">Yes</MenuItem>
+                  <MenuItem value="off">No</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

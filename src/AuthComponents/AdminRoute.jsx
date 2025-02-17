@@ -290,7 +290,7 @@ const CometChatWidget = () => {
 
   return (
     <div>
-      <div id="cometchat-widget"></div>
+      <div style={{backgroundColor:"transparent"}} id="cometchat-widget"></div>
     </div>
   );
 };
