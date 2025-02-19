@@ -161,23 +161,23 @@ function Homepage({ pathname, navigate }) {
       const handleWebSocketData = (data) => {
         if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status")) {
           setDashboardData(data);
-          processChartData(data);
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [], limit:200 });
+      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [] });
     }
     else {
       const handleWebSocketData = (data) => {
         if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status") && data[0]?.username === ctx.username) {
           setDashboardData(data);
-          processChartData(data);
+       
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username],limit:200 });
+      WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username] });
     }
-  }, []);
+  }, [ctx.role_id]);
+
 
 
 

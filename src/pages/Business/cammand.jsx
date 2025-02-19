@@ -259,7 +259,7 @@ const UpdatesModal = ({ rows, Open, setOpen, token }) => {
     setcammand(rows || null);
     setcammand_name(rows?.cammand || '')
     setDescription(rows?.description || '')
-  }, [rows]);
+  }, [rows,Open]);
 
   const handleSubmit = (event) => {
     event.preventDefault();

@@ -272,7 +272,7 @@ const UpdatesModal = ({ rows, Open, setOpen, token }) => {
         setmodule_name(rows?.testcase || '')
         SetExpectionsDetails(rows?.exception || '')
         SetStatus(rows?.status || '')
-    }, [rows]);
+    }, [rows,Open]);
 
     const handleSubmit = (event) => {
         event.preventDefault();

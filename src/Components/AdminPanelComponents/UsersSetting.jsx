@@ -29,7 +29,7 @@ import {
   AddCircleOutlineRounded as AddCircleOutlineRoundedIcon,
 } from "@mui/icons-material";
 import Grid from '@mui/material/Grid2';
-import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 
 import { base } from "../../config"
 const API_URL = base(window.env.AP)
@@ -58,7 +58,7 @@ function UsersSetting() {
   const [role, setRole] = useState([]);
   const [selectRole, setSelectRole] = useState('');
   useEffect(() => {
-
+    axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
     axios
       .get(`${API_URL}/role`, { withCredentials: true })
       .then((res) => {
@@ -138,15 +138,16 @@ function UsersSetting() {
   const AdminUsers = () => {
     const filteredUsers = usersData.filter((user) => user.role_id === 1);
     const columns = [
-      { field: "id", headerName: "ID", width: 70,flex: 0.3 },
-      { field: "username", headerName: "Username", width: 150,flex: 0.3 },
-      { field: "role_name", headerName: "Role", width: 150,flex: 0.3,
+      { field: "id", headerName: "ID", width: 70, flex: 0.3 },
+      { field: "username", headerName: "Username", width: 150, flex: 0.3 },
+      {
+        field: "role_name", headerName: "Role", width: 150, flex: 0.3,
         valueGetter: (value, row) => role.find((r) => r.id === row.role_id)?.role_name || 'Unknown',
-       },
-      { field: "FirstName", headerName: "First Name", width: 150,flex: 0.3 },
-      { field: "LastName", headerName: "Last Name", width: 150,flex: 0.3 },
-      { field: "Email", headerName: "Email", width: 200,flex: 0.3 },
-      { field: "PhoneNumber", headerName: "Phone", width: 150,flex: 0.3 },
+      },
+      { field: "FirstName", headerName: "First Name", width: 150, flex: 0.3 },
+      { field: "LastName", headerName: "Last Name", width: 150, flex: 0.3 },
+      { field: "Email", headerName: "Email", width: 200, flex: 0.3 },
+      { field: "PhoneNumber", headerName: "Phone", width: 150, flex: 0.3 },
       {
         field: "created_at",
         headerName: "Created At",
@@ -158,7 +159,7 @@ function UsersSetting() {
         headerName: "Actions",
         width: 150,
         renderCell: (params) => (
-          
+
           <IconButton
             color="error"
             onClick={() => handleDelete(params.row.id)}
@@ -183,13 +184,13 @@ function UsersSetting() {
   const NormalUsers = () => {
     const filteredUsers = usersData.filter((user) => user.role_id !== 1);
     const columns = [
-      { field: "id", headerName: "ID", width: 70 ,flex: 0.3},
-      { field: "username", headerName: "Username", width: 150,flex: 0.3 },
-      { field: "role_name", headerName: "Role", width: 150,flex: 0.3 , valueGetter: (value, row) => role.find((r) => r.id === row.role_id)?.role_name || 'Unknown',},
-      { field: "FirstName", headerName: "First Name", width: 150,flex: 0.3 },
-      { field: "LastName", headerName: "Last Name", width: 150,flex: 0.3 },
-      { field: "Email", headerName: "Email", width: 200,flex: 0.3 },
-      { field: "PhoneNumber", headerName: "Phone", width: 150 ,flex: 0.3},
+      { field: "id", headerName: "ID", width: 70, flex: 0.3 },
+      { field: "username", headerName: "Username", width: 150, flex: 0.3 },
+      { field: "role_name", headerName: "Role", width: 150, flex: 0.3, valueGetter: (value, row) => role.find((r) => r.id === row.role_id)?.role_name || 'Unknown', },
+      { field: "FirstName", headerName: "First Name", width: 150, flex: 0.3 },
+      { field: "LastName", headerName: "Last Name", width: 150, flex: 0.3 },
+      { field: "Email", headerName: "Email", width: 200, flex: 0.3 },
+      { field: "PhoneNumber", headerName: "Phone", width: 150, flex: 0.3 },
       {
         field: "created_at",
         headerName: "Created At",
@@ -214,12 +215,12 @@ function UsersSetting() {
     ];
     return (
       <Box>
-          <Grid>
-            <Typography variant="h5" className="usersInfoHeader" align="center">
-              Normal users
-            </Typography>
-            <DataGrid rows={filteredUsers} columns={columns} pageSize={5} />
-          </Grid>
+        <Grid>
+          <Typography variant="h5" className="usersInfoHeader" align="center">
+            Normal users
+          </Typography>
+          <DataGrid rows={filteredUsers} columns={columns} pageSize={5} />
+        </Grid>
       </Box>
     );
   };
@@ -244,12 +245,12 @@ function UsersSetting() {
 
   return (
     <div>
-      
-      <Paper 
-       sx={{  width: '100%', padding:5 }}>
+
+      <Paper
+        sx={{ width: '100%', padding: 5 }}>
         <AddNewUserSection />
-      <AdminUsers />
-      <NormalUsers />
+        <AdminUsers />
+        <NormalUsers />
       </Paper>
       <Dialog
         open={deleteUserId !== null}
@@ -294,9 +295,9 @@ function UsersSetting() {
             p: 4,
           }}
         >
-          <Typography variant="h6" component="h2" sx={{textAlign:"center"}} gutterBottom>
-                          ADD USER
-                        </Typography>
+          <Typography variant="h6" component="h2" sx={{ textAlign: "center" }} gutterBottom>
+            ADD USER
+          </Typography>
           <Grid container spacing={{ xs: 1, md: 1 }} sx={{ alignItems: "basecine" }} columns={{ xs: 4, sm: 4, md: 4 }}>
             <Grid size={{ xs: 4, sm: 4, md: 4 }}>
               <TextField

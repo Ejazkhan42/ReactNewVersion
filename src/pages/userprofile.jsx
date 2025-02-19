@@ -129,21 +129,49 @@ const UserProfile = () => {
 
     const handlePasswordReset = (e) => {
         e.preventDefault();
+        let errorMessage = '';
+        const password = passwordData.newPassword;
+        if (password) {
+            let passwordError = '';
+            if (password.length < 8) passwordError += 'at least 8 characters long, ';
+            if (!/[A-Z]/.test(password)) passwordError += 'one uppercase letter, ';
+            if (!/[a-z]/.test(password)) passwordError += 'one lowercase letter, ';
+            if (!/[0-9]/.test(password)) passwordError += 'one number, ';
+            if (!/[!@#$%^&*]/.test(password)) passwordError += 'one special character, ';
+            if (passwordError) errorMessage += `Password must contain ${passwordError.slice(0, -2)}. `;
+        }
+
         if (passwordData.newPassword !== passwordData.confirmPassword) {
+            errorMessage += 'Passwords do not match. ';
+        }
+
+        if (errorMessage) {
             setSnackbar({
                 open: true,
-                message: "Passwords do not match!",
+                message: errorMessage,
                 severity: "error",
             });
             return;
         }
-        axios.post(`${API_URL}/resetpasword`, passwordData, { withCredentials: true });
-        setSnackbar({
-            open: true,
-            message: "Password reset successfully!",
-            severity: "success",
-        });
-        setPasswordData({ id: profileData.id, currentPassword: "", newPassword: "", confirmPassword: "" });
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${tokens}`;
+        axios.post(`${API_URL}/resetpassword`, passwordData, { withCredentials: true })
+            .then(() => {
+                setSnackbar({
+                    open: true,
+                    message: "Password reset successfully!",
+                    severity: "success",
+                });
+                setPasswordData({ id: profileData.id, currentPassword: "", newPassword: "", confirmPassword: "" });
+            })
+            .catch(err => {
+                console.error('Password reset error:', err);
+                setSnackbar({
+                    open: true,
+                    message: "An error occurred. Please try again later.",
+                    severity: "error",
+                });
+            });
     };
 
     const handleImageUpload = (e) => {
