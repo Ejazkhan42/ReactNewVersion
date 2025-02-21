@@ -160,7 +160,7 @@ function Homepage({ pathname, navigate }) {
       WebSocketManager.subscribe(handleWebSocketData);
       WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username] });
     }
-  }, [ctx.role_id]);
+  }, []);
 
 
 

@@ -24,7 +24,10 @@ import {
   Container,
   CardMedia,
   Link,
+  Stack,
 } from "@mui/material";
+import { PieChart as Pies } from '@mui/x-charts/PieChart';
+import { Gauge } from '@mui/x-charts/Gauge';
 import LibraryBooksRoundedIcon from "@mui/icons-material/LibraryBooksRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
@@ -118,10 +121,10 @@ function VideoView({ video, setOpen, open }) {
     <Dialog fullWidth={fullWidth}
       maxWidth={maxWidth}
       open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title" style={{textAlign:"center"}}>{"TEST CASE VIDEO"}</DialogTitle>
+      <DialogTitle id="alert-dialog-title" style={{ textAlign: "center" }}>{"TEST CASE VIDEO"}</DialogTitle>
       <DialogContent >
         <DialogContentText sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} id="alert-dialog-description">
-          <video component="iframe" src={video} alt="Video"  width={"600"} style={{width:"550px",height:"300px",background:"black"}}  controls></video>
+          <video component="iframe" src={video} alt="Video" width={"600"} style={{ width: "550px", height: "300px", background: "black" }} controls></video>
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -161,22 +164,23 @@ function Homepage({ pathname, navigate }) {
       const handleWebSocketData = (data) => {
         if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status")) {
           setDashboardData(data);
+          processChartData(data);
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
-      WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "logs" ,whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [] });
+      WebSocketManager.sendMessage({ token: token, path: "data", type: "find", table: "logs", whereCondition: "start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [] });
     }
     else {
       const handleWebSocketData = (data) => {
         if (Array.isArray(data) && data[0]?.hasOwnProperty('test_name') && data[0]?.hasOwnProperty("test_status") && data[0]?.username === ctx.username) {
           setDashboardData(data);
-       
+          processChartData(data);
         }
       };
       WebSocketManager.subscribe(handleWebSocketData);
       WebSocketManager.sendMessage({ path: "data", type: "find", table: "logs", whereCondition: "username=? AND start_time BETWEEN DATE_SUB(NOW(), INTERVAL 15 DAY) AND NOW()", whereValues: [ctx.username] });
     }
-  }, [ctx.role_id]);
+  }, []);
 
 
 
@@ -186,6 +190,7 @@ function Homepage({ pathname, navigate }) {
     data.forEach((item) => {
       pieCounts[item.test_status] += 1;
     });
+
     setPieData([
       { name: "Pass", value: pieCounts.pass },
       { name: "Fail", value: pieCounts.fail },
@@ -315,57 +320,61 @@ function Homepage({ pathname, navigate }) {
         <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 2, sm: 8, md: 12 }}>
           <Grid size={{ xs: 2, sm: 4, md: 3 }}>
             <Item onClick={scrollToTable}>
-              <div>
+              <Stack direction="column" spacing={1} alignItems="center">
                 <h3>Total Cases in list</h3>
-                <div>
-                  <LibraryBooksRoundedIcon />
-                </div>
-                <h1>{dashboardData.length}</h1>
-              </div>
+                <LibraryBooksRoundedIcon />
+                <Gauge
+                  value={dashboardData.length || 0}
+                  valueMax={dashboardData.length || 0}
+                  width={100}
+                  height={100}
+
+                />
+              </Stack>
             </Item>
           </Grid>
           <Grid size={{ xs: 2, sm: 4, md: 3 }}>
             <Item className="card" onClick={scrollToTable}>
-              <div>
+              <Stack direction="column" spacing={1} alignItems="center">
                 <h3>Total Cases Run</h3>
-                <div>
-                  <PlayArrowRoundedIcon />
-                </div>
-                <h1>{pieData.reduce((acc, d) => acc + d.value, 0)}</h1>
-              </div>
+                <EventNoteRoundedIcon />
+                <Gauge
+                  value={pieData.reduce((acc, d) => acc + d.value, 0)}
+                  valueMax={dashboardData.length || 0}
+                  width={100}
+                  height={100}
+                />
+              </Stack>
             </Item>
           </Grid>
-          {/* <Grid size={{ xs: 2, sm: 4, md: 4.3 }}>
-            <Item onClick={scrollToTable}>
-              <div>
-                <h3>Total Cases in Progress</h3>
-                <div>
-                  <EventNoteRoundedIcon />
-                </div>
-                <h1>{pieData.find((d) => d.name === "Running")?.value || 0}</h1>
-              </div>
-            </Item>
-          </Grid> */}
           <Grid size={{ xs: 2, sm: 4, md: 3 }}>
             <Item onClick={scrollToTable}>
-              <div>
+              <Stack direction="column" spacing={1} alignItems="center">
                 <h3>Total Failed</h3>
-                <div>
-                  <TrendingUpRoundedIcon />
-                </div>
-                <h1>{pieData.find((d) => d.name === "Fail")?.value || 0}</h1>
-              </div>
+                <TrendingUpRoundedIcon />
+                <Gauge
+
+                  value={pieData.find((d) => d.name === "Fail")?.value || 0}
+                  valueMax={dashboardData.length || 0}
+                  width={100}
+                  height={100}
+                />
+              </Stack>
             </Item>
           </Grid>
           <Grid size={{ xs: 2, sm: 4, md: 3 }}>
             <Item onClick={scrollToTable}>
-              <div>
+              <Stack direction="column" spacing={1} alignItems="center">
                 <h3>Total Passed</h3>
-                <div>
-                  <PaymentsRoundedIcon />
-                </div>
-                <h1>{pieData.find((d) => d.name === "Pass")?.value || 0}</h1>
-              </div>
+                <PaymentsRoundedIcon />
+                <Gauge
+
+                  value={pieData.find((d) => d.name === "Pass")?.value || 0}
+                  valueMax={dashboardData.length || 0}
+                  width={100}
+                  height={100}
+                />
+              </Stack>
             </Item>
           </Grid>
         </Grid>
@@ -465,7 +474,7 @@ function Homepage({ pathname, navigate }) {
     );
   };
 
-  
+
 
   const TableComponent = () => {
     const [openview, setOpenview] = useState(false);
@@ -493,28 +502,28 @@ function Homepage({ pathname, navigate }) {
         field: "test_name",
         headerName: 'Job Name',
         flex: 1,
-       
+
         minWidth: 150,
       },
       {
         field: "customer",
         headerName: 'Customer Name',
         flex: 1,
-       
+
         minWidth: 150,
       },
       {
         field: "instance",
         headerName: 'Instance Name',
         flex: 0.3,
-      
+
         minWidth: 150,
       },
       {
         field: "Video",
         headerName: 'Video View',
         flex: 0.2,
-        
+
         minWidth: 80,
         renderCell: (params) => (
           <GridActionsCellItem
@@ -562,7 +571,7 @@ function Homepage({ pathname, navigate }) {
         field: "start_time",
         headerName: 'Start Time',
         flex: 0.2,
-     
+
         minWidth: 80,
         type: 'string',
         valueGetter: (value) => value && new Date(value).toLocaleString(),
@@ -571,7 +580,7 @@ function Homepage({ pathname, navigate }) {
         field: "end_time",
         headerName: 'End Time',
         flex: 0.2,
-     
+
         minWidth: 80,
         type: 'string',
         valueGetter: (value) => value && new Date(value).toLocaleString(),
@@ -580,7 +589,7 @@ function Homepage({ pathname, navigate }) {
         field: "test_status",
         headerName: 'Status',
         flex: 0.2,
-       
+
         minWidth: 80,
         cellClassName: (params) => {
           if (params.value == null) {
@@ -631,20 +640,20 @@ function Homepage({ pathname, navigate }) {
             <h3>Recent Run Test Case</h3>
 
             <DataGrid
-  
+
               columns={columns}
               rows={dashboardData}
               initialState={{
-                
-                pagination: { 
-                  paginationModel 
-                }, 
+
+                pagination: {
+                  paginationModel
+                },
                 sorting: {
                   sortModel: [{ field: 'end_time', sort: 'desc' }],
                 },
               }}
               slots={{
-                toolbar: () => <CustomToolbar/>, // Pass handleAddClick to CustomToolbar
+                toolbar: () => <CustomToolbar />, // Pass handleAddClick to CustomToolbar
               }}
               pageSizeOptions={[20, 40, 80, 100]} />
 
@@ -664,6 +673,7 @@ function Homepage({ pathname, navigate }) {
     }}>
       <ButtonComponent />
       <TopPanel />
+      <CustomerPieChart data={dashboardData} />
       <ChartComponent />
       <TableComponent />
 
@@ -674,3 +684,60 @@ function Homepage({ pathname, navigate }) {
 }
 
 export default Homepage;
+
+
+
+
+
+function CustomerPieChart({ data }) {
+  // Count occurrences of each customer
+  const customerCounts = {};
+
+  data.forEach((item) => {
+    if (!customerCounts[item.customer] && item.customer?.trim() !== "") {
+      customerCounts[item.customer] = 1;
+    } else {
+      customerCounts[item.customer] += 1;
+    }
+  });
+
+  // Convert customer count data into PieChart format
+  const chartData = Object.keys(customerCounts).map((customer, index) => ({
+    id: index,
+    value: customerCounts[customer],
+    label: `${customer} Run(${customerCounts[customer]})`,
+  }));
+  const gaugeData = Object.keys(customerCounts).map((customer, index) => (
+    <>
+      <Gauge
+        key={index}
+        width={100}
+        height={100}
+        value={customerCounts[customer]} // Show customer count as gauge value
+        valueMin={0}
+        valueMax={Math.max(...Object.values(customerCounts))} // Max gauge value based on highest count
+      />
+      <h6 id="battery_level_label">
+        customer: {customer} 
+      </h6>
+
+    </>
+  ));
+  return (
+    <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems="center">
+      <Pies
+        series={[
+          {
+            data: chartData,
+          },
+        ]}
+        width={400}
+        height={200}
+      />
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 1, md: 3 }}>
+        {gaugeData}
+      </Stack>
+
+    </Stack>
+  );
+}
