@@ -215,7 +215,7 @@ function AdminRoute({ pathname }) {
       theme={demoTheme}
     >
       <DashboardLayout slots={{ toolbarActions: Notifications }}>
-        <CometChatWidget />
+     
         <PageContainer style={{ fontFamily: 'Orbitron, sans-serif !important' }} title={title} breadcrumbs={breadcrumbs} />
         <Outlet />
       </DashboardLayout>
