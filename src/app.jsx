@@ -71,6 +71,7 @@ const AppRoutes = () => {
         <Route path='/adminreport' element={<AdminReports pathname={router.pathname} navigate={router.navigate} />} />
         <Route path='/Report' element={<Reports pathname={router.pathname} navigate={router.navigate} />} />
       </Route>
+      {/* customer Route */}
 
 
       <Route

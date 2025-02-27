@@ -271,7 +271,7 @@ function Clients() {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography variant="body1">
-              {showPassword ? params.value : '•'.repeat(params.value.length)}
+              {showPassword ? params?.value : '•'.repeat(params?.value?.length)}
             </Typography>
             <IconButton
               size="small"

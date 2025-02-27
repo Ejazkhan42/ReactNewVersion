@@ -12,8 +12,9 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    FormControl,
+    FormControlLabel,
     Autocomplete,
+    Checkbox,
     Paper,
     Snackbar,
     Alert,
@@ -55,6 +56,10 @@ function CustomToolbar({ handleAddClick }) {
 }
 
 function Menu_function() {
+    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')));
+     if(user.role_id !== 1){
+       window.location.href = '/dashboard';
+      }
     const token = sessionStorage.getItem('token');
     const [openAdd, setOpenAdd] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
@@ -119,6 +124,19 @@ function Menu_function() {
         settype("Access")
         setOpenAdd(true);
     };
+    const handleToggleModule = (row, checked) => {
+        WebSocketManager.sendMessage({
+            token: token,
+            path: 'data',
+            type: 'update',
+            table: 'menu_level',
+            whereCondition: 'id=?',
+            whereValues: [row.id],
+            columns: ['is_enable'],
+            values: [checked],
+        });
+        setLodding(true);
+    };
 
     const columns = [
         {
@@ -173,6 +191,27 @@ function Menu_function() {
             // resizable: false,
             minWidth: 150,
             valueGetter: (value, row) => rolesname.find((u) => u.id === row.role_id)?.role_name || 'Unknown',
+        },
+        {
+            field: "is_enabled",
+            headerName: 'Enable Menu',
+            flex: 1,
+            // resizable: false,
+            minWidth: 150,
+            renderCell: (params) => {
+                const handleCheckboxChange = (event) => {
+                    const checked = event.target.checked;
+                    handleToggleModule(params.row, checked);
+                };
+
+                return (
+                    <Checkbox
+                        checked={params.row.is_enable || false}
+                        onChange={handleCheckboxChange}
+                        color="primary"
+                    />
+                );
+            },
         },
 
         {
@@ -271,6 +310,7 @@ const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
     const [modulename, setmodulename] = useState(null);
     const [segment, setsegment] = useState('');
     const [title, settitle] = useState('');
+    const [enable, setEnable] = useState(false);
     const handleSubmit = (event) => {
         if (type == "Menu") {
             event.preventDefault();
@@ -303,8 +343,8 @@ const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
                 path: 'data',
                 type: 'insert',
                 table: 'menu_level',
-                columns: ['Menu_id', 'role_id',],
-                values: [menu_name.id, selectedRoles.id],
+                columns: ['Menu_id', 'role_id', 'is_enable'],
+                values: [menu_name.id, selectedRoles.id, enable],
             });
 
             const handleWebSocketData = (data) => {
@@ -348,13 +388,18 @@ const AddModal = ({ Open, setOpen, roles, type, Menu, token }) => {
                                 renderInput={(params) => <TextField {...params} label="User Name" variant="outlined" />}
 
                             />
+                            <FormControlLabel label="Enable Menu" control={<Checkbox
+                                checked={enable}
+                                onChange={e => setEnable(e.target.checked)}
+                                color="primary"
+                            />} />
                         </>)
                     }
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
             <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
@@ -383,6 +428,7 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
     const [title, settitle] = useState('');
     const [icon, seticon] = useState('')
     const [Children, setChildren] = useState('')
+     const [enable, setEnable] = useState(false);
     useEffect(() => {
         if (type == "Menu") {
             setmenu_name(rows?.kind || '')
@@ -393,6 +439,7 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
         if (type == "Access") {
             setmenu_name(Menu?.find(m => m.id === rows?.menu_id) || null)
             setSelectedRoles(roles.find(u => u?.id === rows?.role_id) || null)
+            setEnable(rows?.is_enable || false)
         }
 
     }, [rows]);
@@ -433,8 +480,8 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
                 table: 'menu_level',
                 whereCondition: "id=?",
                 whereValues: [rows.id],
-                columns: ['Menu_id', 'user_id',],
-                values: [menu_name.id, selectedRoles.id],
+                columns: ['Menu_id', 'user_id',"is_enable"],
+                values: [menu_name.id, selectedRoles.id, enable],
             });
 
             const handleWebSocketData = (data) => {
@@ -488,6 +535,11 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
                                 renderInput={(params) => <TextField {...params} label="Role Name" variant="outlined" />}
 
                             />
+                            <FormControlLabel label="Enable Menu"  control={ <Checkbox
+                                                            checked={enable}
+                                                            onChange={e => setEnable(e.target.checked)}
+                                                            color="primary"
+                                                        />}/>
                         </>
 
                     }
@@ -496,7 +548,7 @@ const UpdatesModal = ({ rows, Open, setOpen, roles, type, Menu, token }) => {
                 </Box>
             </Modal>
             <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}

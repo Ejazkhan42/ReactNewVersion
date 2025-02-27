@@ -31,7 +31,7 @@ function Orders({pathname, navigate}) {
     }
   };
   WebSocketManager.subscribe(handleWebSocketData);
-  WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "modules_view",whereCondition:"User_id=?",whereValues:[ctx.id] });
+  WebSocketManager.sendMessage({token:token, path: "data", type: "find", table: "modules_view",whereCondition:"User_id=? and enable=?",whereValues:[ctx.id,true] });
 }, [ctx.id]);
   // useEffect(() => {
   //   const fetchModules = async () => {

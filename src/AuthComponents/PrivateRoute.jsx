@@ -5,9 +5,7 @@ import './Styles/loadingPage.css';
 import { useSession } from '@toolpad/core';
 function PrivateRoute({ children }) {
   const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')));
-  
- 
- return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/login" />;
 
 }
 export default PrivateRoute

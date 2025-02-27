@@ -112,6 +112,8 @@ function UsersSetting() {
       )
       .then((res) => {
         if (res.data === "success") {
+          setNewUserPopup(false);
+          setUsersUpdated(true);
           setNewUserDetails({
             FirstName: "",
             LastName: "",
@@ -121,20 +123,31 @@ function UsersSetting() {
             password: "",
             role: "",
           });
-          setUsersUpdated(true);
-          setNewUserPopup(false);
+          
         }
       });
   };
 
   const selectRoleInputChange = (event) => {
-    setSelectRole(event.target.value);
+    const selectedValue = event.target.value;
     setNewUserDetails({
       ...newUserDetails,
-      role: selectRole,
+      role: selectedValue,
     });
   };
 
+  const AddUserDiag = () => {
+    setNewUserDetails({
+      FirstName: "",
+      LastName: "",
+      username: "",
+      Email: "",
+      PhoneNumber: "",
+      password: "",
+      role: "",
+    });
+    setNewUserPopup(true);
+  }
   const AdminUsers = () => {
     const filteredUsers = usersData.filter((user) => user.role_id === 1);
     const columns = [
@@ -234,7 +247,7 @@ function UsersSetting() {
             color="primary"
             sx={{ ml: 2, fontSize: "1rem", backgroundColor: '#393E46', color: 'white', '&:hover': { backgroundColor: '#00ADB5' } }}
             startIcon={<AddCircleOutlineRoundedIcon />}
-            onClick={() => setNewUserPopup(true)}
+            onClick={() => AddUserDiag()}
           >
             Add New User
           </Button>
@@ -414,10 +427,8 @@ function UsersSetting() {
                 sx={{ marginTop: 0, marginBottom: 0 }}
                 value={newUserDetails.role}
                 onChange={(e) =>
-                  setNewUserDetails({
-                    ...newUserDetails,
-                    role: e.target.value,
-                  })}
+                  selectRoleInputChange(e)
+                }
                 style={{ width: "100%" }}
               >
                 {role.map((name) => (

@@ -12,11 +12,12 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    FormControl,
+    Checkbox,
     Autocomplete,
     Paper,
     Snackbar,
     Alert,
+    FormControlLabel
 
 
 } from '@mui/material';
@@ -29,6 +30,7 @@ import {
     GridActionsCellItem,
     GridToolbarContainer, GridToolbarExport
 } from '@mui/x-data-grid';
+import { is } from 'drizzle-orm';
 const style = {
     position: 'absolute',
     top: '50%',
@@ -57,6 +59,10 @@ function CustomToolbar({ handleAddClick }) {
 
 
 function Modules() {
+    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')));
+     if(user.role_id !== 1){
+       window.location.href = '/dashboard';
+      }
     const token = sessionStorage.getItem('token');
     const [openAdd, setOpenAdd] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
@@ -121,7 +127,19 @@ function Modules() {
         settype("Access")
         setOpenAdd(true);
     };
-
+    const handleToggleModule = (row, checked) => {
+        WebSocketManager.sendMessage({
+            token: token,
+            path: 'data',
+            type: 'update',
+            table: 'usermodulesaccess',
+            whereCondition: 'id=?',
+            whereValues: [row.id],
+            columns: ['is_enable'],
+            values: [checked],
+        });
+        setLodding(true);
+    };
     const columns = [
         {
             field: "id",
@@ -186,22 +204,45 @@ function Modules() {
             minWidth: 100,
         },
         {
-            field: "name",
-            headerName: 'Name',
-            flex: 1,
-            // resizable: false,
-            minWidth: 150,
-            valueGetter: (value, row) => modulesData.find((m) => m.id === row.Modules_id)?.name || 'Unknown',
-        },
-        {
             field: "username",
             headerName: 'User Name',
             flex: 1,
             // resizable: false,
             minWidth: 150,
-            valueGetter: (value, row) => username.find((u) => u.id === row.user_id)?.username || 'Unknown',
+            valueGetter: (value, row) => username.find((u) => u.id === row.user_id)?.username.toString().toUpperCase()|| 'Unknown',
         },
+        {
+            field: "name",
+            headerName: 'Modules Name',
+            flex: 1,
+            // resizable: false,
+            minWidth: 150,
+            valueGetter: (value, row) => modulesData.find((m) => m.id === row.Modules_id)?.name || 'Unknown',
+        },
+       
+        {
+            field: "is_enable",
+            headerName: 'Enable Modules',
+            flex: 1,
+            // I want to Display All of each user in this row and Enable or Disable checkbox in this row
 
+            // resizable: false,
+            minWidth: 150,
+            renderCell: (params) => {
+                const handleCheckboxChange = (event) => {
+                    const checked = event.target.checked;
+                    handleToggleModule(params.row, checked);
+                };
+
+                return (
+                    <Checkbox
+                        checked={params.row.is_enable || false}
+                        onChange={handleCheckboxChange}
+                        color="primary"
+                    />
+                );
+            },
+        },
         {
             field: 'actions',
             sortable: false,
@@ -299,6 +340,7 @@ const AddModal = ({ Open, setOpen, users, type, Modules, token }) => {
     const [modulename, setmodulename] = useState(null);
     const [imagepath, setimagepath] = useState('');
     const [jenkinsPath, setjenkinsPath] = useState('');
+    const [enable, setEnable] = useState(false);
     const handleSubmit = (event) => {
         if (type == "Modules") {
             event.preventDefault();
@@ -327,8 +369,8 @@ const AddModal = ({ Open, setOpen, users, type, Modules, token }) => {
                 path: 'data',
                 type: 'insert',
                 table: 'usermodulesaccess',
-                columns: ['Modules_id', 'user_id',],
-                values: [module_name.id, selectedUsers.id],
+                columns: ['Modules_id', 'user_id','is_enable'],
+                values: [module_name.id, selectedUsers.id,enable],
             });
 
             const handleWebSocketData = (data) => {
@@ -383,13 +425,18 @@ const AddModal = ({ Open, setOpen, users, type, Modules, token }) => {
                                 renderInput={(params) => <TextField {...params} label="User Name" variant="outlined" />}
 
                             />
+                           <FormControlLabel label="Enable Module"  control={ <Checkbox
+                                checked={enable}
+                                onChange={e => setEnable(e.target.checked)}
+                                color="primary"
+                            />}/>
                         </>)
                     }
                     <Button variant="contained" color="secondary" type="submit">Submit</Button>
                 </Box>
             </Modal>
             <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
@@ -417,6 +464,7 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules, token }) => {
     const [imagepath, setimagepath] = useState('');
     const [jenkinsPath, setjenkinsPath] = useState('');
     const [modules, setmodules] = useState([])
+    const [enable, setEnable] = useState(false);
     useEffect(() => {
         if (type == "Modules") {
             setmodules(rows || null);
@@ -428,6 +476,7 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules, token }) => {
         if (type == "Access") {
             setmodule_name(Modules?.find(m => m.id === rows?.Modules_id) || null)
             setSelectedUsers(users.find(u => u?.id === rows?.user_id) || null)
+            setEnable(rows?.is_enable || false)
         }
 
     }, [rows]);
@@ -468,8 +517,8 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules, token }) => {
                 table: 'usermodulesaccess',
                 whereCondition: "id=?",
                 whereValues: [rows.id],
-                columns: ['Modules_id', 'user_id',],
-                values: [module_name.id, selectedUsers.id],
+                columns: ['Modules_id', 'user_id',"is_enable"],
+                values: [module_name.id, selectedUsers.id,enable],
             });
 
             const handleWebSocketData = (data) => {
@@ -523,6 +572,13 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules, token }) => {
                                 renderInput={(params) => <TextField {...params} label="User Name" variant="outlined" />}
 
                             />
+                            <FormControlLabel label="Enable Module"  control={ <Checkbox
+                                checked={enable}
+                                onChange={e => setEnable(e.target.checked)}
+                                color="primary"
+                            />}/>
+                           
+                      
                         </>
 
                     }
@@ -531,7 +587,7 @@ const UpdatesModal = ({ rows, Open, setOpen, users, type, Modules, token }) => {
                 </Box>
             </Modal>
             <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
